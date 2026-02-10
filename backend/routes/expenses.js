@@ -6,12 +6,38 @@ const prisma = new PrismaClient();
 
 // GET all expenses
 router.get("/", async (req, res) => {
-  const expenses = await prisma.expense.findMany({
-    include: { category: true },
-    orderBy: { date: "desc" },
+    const {
+      categoryId,
+      startDate,
+      endDate,
+      sort = "date",
+      order = "desc",
+    } = req.query;
+  
+    const where = {};
+  
+    if (categoryId) {
+      where.categoryId = Number(categoryId);
+    }
+  
+    if (startDate && endDate) {
+      where.date = {
+        gte: new Date(startDate),
+        lte: new Date(endDate),
+      };
+    }
+  
+    const expenses = await prisma.expense.findMany({
+      where,
+      include: { category: true },
+      orderBy: {
+        [sort]: order,
+      },
+    });
+  
+    res.json(expenses);
   });
-  res.json(expenses);
-});
+  
 
 // CREATE expense
 router.post("/", async (req, res) => {
