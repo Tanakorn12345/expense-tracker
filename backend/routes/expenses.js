@@ -4,59 +4,51 @@ import { PrismaClient } from "@prisma/client";
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// GET all expenses
-router.get("/", async (req, res) => {
-    const {
-      categoryId,
-      startDate,
-      endDate,
-      sort = "date",
-      order = "desc",
-    } = req.query;
-  
-    const where = {};
-  
-    if (categoryId) {
-      where.categoryId = Number(categoryId);
-    }
-  
-    if (startDate && endDate) {
-      where.date = {
-        gte: new Date(startDate),
-        lte: new Date(endDate),
-      };
-    }
-  
-    const expenses = await prisma.expense.findMany({
-      where,
-      include: { category: true },
-      orderBy: {
-        [sort]: order,
+router.post("/", async (req, res) => {
+  const { amount, description, date, categoryName } = req.body;
+
+  // 🔎 หา category จากชื่อ
+  let category = await prisma.category.findFirst({
+    where: {
+      name: categoryName,
+    },
+  });
+
+  // ➕ ถ้าไม่มี → สร้างใหม่
+  if (!category) {
+    category = await prisma.category.create({
+      data: {
+        name: categoryName,
       },
     });
-  
-    res.json(expenses);
-  });
-  
-
-// CREATE expense
-router.post("/", async (req, res) => {
-  const { amount, date, categoryId, description } = req.body;
-
-  if (!amount || !date || !categoryId) {
-    return res.status(400).json({ message: "Missing required fields" });
   }
 
+  // 💾 สร้าง expense และผูก category
   const expense = await prisma.expense.create({
     data: {
-      amount: Number(amount),
-      date: new Date(date),
-      categoryId: Number(categoryId),
+      amount,
       description,
+      date: new Date(date),
+      categoryId: category.id,
+    },
+    include: {
+      category: true, // ⭐ สำคัญมาก
     },
   });
 
   res.json(expense);
+});
+
+
+router.get("/", async (req, res) => {
+  const expenses = await prisma.expense.findMany({
+    orderBy: { date: "desc" },
+    include: {
+      category: true, // ⭐ ต้องมี
+    },
+  });
+
+  res.json(expenses);
 });
 
 export default router;

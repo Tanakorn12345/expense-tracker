@@ -1,15 +1,16 @@
-import { Container, Typography } from "@mui/material";
+import { Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout";
 import Expense from "./pages/Expense";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
-    <Container maxWidth="sm">
-      <Typography variant="h4" sx={{ mt: 4, mb: 4 }}>
-        Expense Tracker
-      </Typography>
-
-      <Expense />
-    </Container>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/expenses" element={<Expense />} />
+      </Routes>
+    </Layout>
   );
 }
 

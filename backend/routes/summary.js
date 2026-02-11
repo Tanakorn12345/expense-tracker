@@ -1,65 +1,93 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../prisma/client.js";
 
 const router = express.Router();
-const prisma = new PrismaClient();
+
+
 
 router.get("/", async (req, res) => {
-  const { startDate, endDate } = req.query;
+  try {
+    const mode = req.query.mode || "day";
+    const { startDate, endDate } = req.query;
 
-  const where = {};
+    const where = {};
 
-  if (startDate && endDate) {
-    where.date = {
-      gte: new Date(startDate),
-      lte: new Date(endDate),
-    };
+    // ✅ filter ช่วงวันที่
+    if (startDate && endDate) {
+      where.date = {
+        gte: new Date(startDate),
+        lte: new Date(endDate)
+      };
+    }
+
+    /* -------------------- */
+    /* 1. Group by date */
+    /* -------------------- */
+    let byDate;
+
+    if (mode === "day") {
+      const raw = await prisma.expense.findMany({
+        where,
+        select: { date: true, amount: true }
+      });
+
+      const map = {};
+
+      raw.forEach(e => {
+        const key = e.date.toISOString().slice(0, 10);
+        map[key] = (map[key] || 0) + e.amount;
+      });
+
+      byDate = Object.entries(map).map(([label, total]) => ({
+        label,
+        total
+      }));
+    }
+
+    if (mode === "month") {
+      const raw = await prisma.expense.findMany({
+        where,
+        select: { date: true, amount: true }
+      });
+
+      const map = {};
+
+      raw.forEach(e => {
+        const key = e.date.toISOString().slice(0, 7);
+        map[key] = (map[key] || 0) + e.amount;
+      });
+
+      byDate = Object.entries(map).map(([label, total]) => ({
+        label,
+        total
+      }));
+    }
+
+    /* -------------------- */
+    /* 2. Group by category */
+    /* -------------------- */
+    const byCategoryRaw = await prisma.expense.groupBy({
+      by: ["categoryId"],
+      where,
+      _sum: { amount: true }
+    });
+
+    const categories = await prisma.category.findMany();
+
+    const byCategory = byCategoryRaw.map(c => {
+      const cat = categories.find(cat => cat.id === c.categoryId);
+      return {
+        category: cat ? cat.name : "ไม่ระบุ",
+        total: c._sum.amount
+      };
+    });
+
+    res.json({ byDate, byCategory });
+  } catch (err) {
+    console.error("SUMMARY ERROR:", err);
+    res.status(500).json({ message: "Summary error" });
   }
-
-  // 1️⃣ Total amount
-  const total = await prisma.expense.aggregate({
-    _sum: { amount: true },
-    where,
-  });
-
-  // 2️⃣ Group by category (Pie Chart)
-  const byCategory = await prisma.expense.groupBy({
-    by: ["categoryId"],
-    _sum: { amount: true },
-    where,
-  });
-
-  const categories = await prisma.category.findMany();
-
-  const categorySummary = byCategory.map((item) => {
-    const category = categories.find(
-      (c) => c.id === item.categoryId
-    );
-
-    return {
-      category: category?.name || "Unknown",
-      amount: item._sum.amount,
-    };
-  });
-
-  // 3️⃣ Group by date (Line Chart)
-  const byDate = await prisma.expense.groupBy({
-    by: ["date"],
-    _sum: { amount: true },
-    where,
-    orderBy: {
-      date: "asc",
-    },
-  });
-
-  res.json({
-    totalAmount: total._sum.amount || 0,
-    byCategory: categorySummary,
-    byDate: byDate.map((d) => ({
-      date: d.date,
-      amount: d._sum.amount,
-    })),
-  });
 });
+
 
 export default router;
