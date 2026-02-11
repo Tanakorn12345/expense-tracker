@@ -27,11 +27,11 @@ export default function Dashboard() {
 
   const fetchSummary = async () => {
     try {
-      const res = await api.get(`/api/summary`, {
+      const res = await api.get(`/summary`, {
         params: { mode, startDate, endDate }
       });
       console.log("SUMMARY DATA:", res.data);
-      
+
       setChartData(res.data.byDate || []);
       setCategoryData(res.data.byCategory || []);
     } catch (err) {

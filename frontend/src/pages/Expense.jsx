@@ -21,7 +21,7 @@ export default function Expense() {
 
   const fetchExpenses = async () => {
     try {
-      const res = await api.get("/api/expenses");
+      const res = await api.get("/expenses");
       setExpenses(res.data);
     } catch (err) { console.error(err); }
   };
@@ -34,7 +34,7 @@ export default function Expense() {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post("/api/expenses", { 
+      await api.post("/expenses", { 
         amount: Number(amount), 
         description, 
         date, 
