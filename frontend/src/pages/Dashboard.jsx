@@ -27,7 +27,7 @@ export default function Dashboard() {
 
   const fetchSummary = async () => {
     try {
-      const res = await api.get(`/summary`, {
+      const res = await api.get(`/api/summary`, {
         params: { mode, startDate, endDate }
       });
       console.log("SUMMARY DATA:", res.data);
