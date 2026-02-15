@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-
 import DailyExpenseBarChart from "../components/DailyExpenseBarChart";
 import CategoryPieChart from "../components/CategoryPieChart";
+import ExpenseList from "../components/ExpenseList"; // ✅ 1. เพิ่ม Import นี้
 import api from "../api";
 import { 
   Box, Typography, Stack, ToggleButton, 
@@ -11,10 +11,9 @@ import {
   BarChartRounded, 
   RestartAltRounded, 
   PieChartRounded,
-  AccountBalanceWalletRounded
+  AccountBalanceWalletRounded,
+  ListAltRounded // ✅ เพิ่มไอคอนสำหรับลิสต์
 } from "@mui/icons-material";
-
-
 
 console.log("API URL:", import.meta.env.VITE_API_URL);
 
@@ -22,8 +21,10 @@ export default function Dashboard() {
   const [mode, setMode] = useState("day");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  
   const [chartData, setChartData] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
+  const [recentExpenses, setRecentExpenses] = useState([]); // ✅ 2. เพิ่ม State สำหรับเก็บรายการ
 
   const fetchSummary = async () => {
     try {
@@ -34,6 +35,7 @@ export default function Dashboard() {
 
       setChartData(res.data.byDate || []);
       setCategoryData(res.data.byCategory || []);
+      setRecentExpenses(res.data.expenses || []); // ✅ 3. เซ็ตค่ารายการที่ได้จาก API
     } catch (err) {
       console.error("Dashboard error:", err);
     }
@@ -61,10 +63,9 @@ export default function Dashboard() {
         </Card>
       </Stack>
 
-      {/* Main Content Area - เรียงเป็นแนวตั้ง (Flex Column) */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, width: '100%' }}>
         
-        {/* --- ส่วนที่ 1: Filters (วางแนวนอนยาวๆ ด้านบนกราฟ) --- */}
+        {/* --- ส่วนที่ 1: Filters --- */}
         <Card sx={{ p: 2, borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
           <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems="center">
             <Typography sx={{ color: "#1B254B", fontSize: 14, fontWeight: 700 }}>FILTERS</Typography>
@@ -110,7 +111,7 @@ export default function Dashboard() {
           </Stack>
         </Card>
 
-        {/* --- ส่วนที่ 2: Expense Trend (ขยายเต็มด้านบน) --- */}
+        {/* --- ส่วนที่ 2: Expense Trend --- */}
         <Card sx={{ p: 3, borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
           <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3 }}>
             <BarChartRounded sx={{ color: '#4318FF' }} />
@@ -121,7 +122,7 @@ export default function Dashboard() {
           </Box>
         </Card>
 
-        {/* --- ส่วนที่ 3: Category (ขยายเต็มด้านล่าง) --- */}
+        {/* --- ส่วนที่ 3: Category --- */}
         <Card sx={{ p: 3, borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
           <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3 }}>
             <PieChartRounded sx={{ color: '#FF3D71' }} />
@@ -130,6 +131,18 @@ export default function Dashboard() {
           <Box sx={{ height: 450, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <CategoryPieChart data={categoryData} />
           </Box>
+        </Card>
+
+        {/* --- ส่วนที่ 4: (เพิ่มใหม่) Detailed List --- */}
+        <Card sx={{ p: 3, borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
+            <ListAltRounded sx={{ color: '#05CD99' }} />
+            <Typography sx={{ fontWeight: 800, color: "#1B254B", fontSize: 18 }}>
+              Transaction Details
+            </Typography>
+          </Stack>
+          {/* ส่งข้อมูล recentExpenses ไปแสดงผล */}
+          <ExpenseList expenses={recentExpenses} />
         </Card>
 
       </Box>
