@@ -7,40 +7,32 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Box, Typography, alpha, useTheme } from "@mui/material";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 export default function DailyExpenseBarChart({ data, mode }) {
-  const theme = useTheme();
-
-  // กรณีไม่มีข้อมูล แสดงสถานะด้วย MUI Typography
+  // กรณีไม่มีข้อมูล แสดงสถานะด้วย tailwind class
   if (!data || data.length === 0) {
     return (
-      <Box 
-        display="flex" 
-        alignItems="center" 
-        justifyContent="center" 
-        height="100%"
-      >
-        <Typography variant="body1" sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
+      <div className="flex items-center justify-center h-full w-full">
+        <p className="text-gray-500 dark:text-gray-400 italic text-base">
           ยังไม่มีข้อมูลค่าใช้จ่าย
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
   const chartData = {
-    labels: data.map(d => mode === 'day' 
+    labels: data.map(d => mode === 'day'
       ? new Date(d.label).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })
       : new Date(d.label).toLocaleDateString('th-TH', { month: 'long' })
     ),
     datasets: [{
       label: 'ยอดใช้จ่าย',
       data: data.map(d => d.total),
-      // ใช้สี Primary จาก MUI Theme เพื่อความกลมกลืน
-      backgroundColor: alpha(theme.palette.primary.main, 0.8),
-      hoverBackgroundColor: theme.palette.primary.main,
+      // ใช้สี Tailwind Indigo-600 (0.8 opacity)
+      backgroundColor: "rgba(79, 70, 229, 0.8)",
+      hoverBackgroundColor: "#4f46e5", // Tailwind indigo-600
       borderRadius: 8,
       barThickness: mode === 'day' ? 20 : 40,
       maxBarThickness: 50,
@@ -56,9 +48,9 @@ export default function DailyExpenseBarChart({ data, mode }) {
         enabled: true,
         mode: 'index',
         intersect: false,
-        backgroundColor: '#1e293b',
-        titleFont: { size: 14, family: theme.typography.fontFamily },
-        bodyFont: { size: 14, family: theme.typography.fontFamily },
+        backgroundColor: '#1e293b', // Tailwind slate-800
+        titleFont: { size: 14, family: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" },
+        bodyFont: { size: 14, family: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" },
         padding: 12,
         cornerRadius: 10,
         displayColors: false,
@@ -70,31 +62,31 @@ export default function DailyExpenseBarChart({ data, mode }) {
     scales: {
       x: {
         grid: { display: false },
-        ticks: { 
-          color: theme.palette.text.secondary,
+        ticks: {
+          color: "#6b7280", // Tailwind gray-500
           font: { size: 12, weight: '500' }
         }
       },
       y: {
         beginAtZero: true,
         border: { display: false, dash: [5, 5] },
-        grid: { 
-          color: alpha(theme.palette.divider, 0.5),
-          drawTicks: false 
+        grid: {
+          color: "rgba(226, 232, 240, 0.5)", // Tailwind slate-200 with opacity
+          drawTicks: false
         },
-        ticks: { 
-          color: theme.palette.text.secondary,
+        ticks: {
+          color: "#6b7280", // Tailwind gray-500
           font: { size: 12 },
           padding: 10,
-          callback: (val) => val >= 1000 ? (val/1000) + 'k' : val
+          callback: (val) => val >= 1000 ? (val / 1000) + 'k' : val
         }
       }
     }
   };
 
   return (
-    <Box sx={{ width: '100%', height: '100%', position: 'relative' }}>
+    <div className="w-full h-full relative">
       <Bar data={chartData} options={options} />
-    </Box>
+    </div>
   );
 }

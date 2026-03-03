@@ -14,12 +14,23 @@ model Category {
   expenses  Expense[]
 }
 
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String?
+  createdAt DateTime  @default(now())
+  expenses  Expense[]
+}
+
 model Expense {
   id          Int      @id @default(autoincrement())
   amount      Float
   date        DateTime
   description String?
   categoryId  Int
+  userId      Int
   createdAt   DateTime @default(now())
   category    Category @relation(fields: [categoryId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
 }

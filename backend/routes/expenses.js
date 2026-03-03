@@ -1,10 +1,11 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import auth from "../middleware/auth.js";
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const { amount, description, date, categoryName } = req.body;
 
   // 🔎 หา category จากชื่อ
@@ -30,6 +31,7 @@ router.post("/", async (req, res) => {
       description,
       date: new Date(date),
       categoryId: category.id,
+      userId: req.user.id,
     },
     include: {
       category: true, // ⭐ สำคัญมาก
@@ -40,8 +42,9 @@ router.post("/", async (req, res) => {
 });
 
 
-router.get("/", async (req, res) => {
+router.get("/", auth, async (req, res) => {
   const expenses = await prisma.expense.findMany({
+    where: { userId: req.user.id },
     orderBy: { date: "desc" },
     include: {
       category: true, // ⭐ ต้องมี

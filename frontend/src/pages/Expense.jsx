@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
 import api from "../api";
 import {
-  TextField, Button, Stack, Typography, Box, InputAdornment, Card
-} from "@mui/material";
-import {
-  PaymentsRounded, SaveRounded, AddCircleOutlineRounded,
-  DescriptionRounded, CalendarMonthRounded, CategoryRounded
-} from "@mui/icons-material";
+  Wallet, Save, PlusCircle,
+  FileText, Calendar, Tag
+} from "lucide-react";
 import ExpenseList from "../components/ExpenseList";
 
 console.log("API URL:", import.meta.env.VITE_API_URL);
@@ -34,175 +31,149 @@ export default function Expense() {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post("/api/expenses", { 
-        amount: Number(amount), 
-        description, 
-        date, 
-        categoryName 
+      await api.post("/api/expenses", {
+        amount: Number(amount),
+        description,
+        date,
+        categoryName
       });
-      setAmount(""); 
-      setDescription(""); 
-      setDate(""); 
+      setAmount("");
+      setDescription("");
+      setDate("");
       setCategoryName("");
       await fetchExpenses();
-    } catch (err) { 
-      console.error(err); 
-    } finally { 
-      setLoading(false); 
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Box sx={{ 
-      bgcolor: "#F0F2F5", 
-      height: "100vh", 
-      display: "flex", 
-      flexDirection: "column",
-      overflow: "hidden" 
-    }}>
-      
+    <div className="bg-gray-50/50 dark:bg-zinc-950 min-h-[calc(100vh-80px)] flex flex-col rounded-3xl overflow-hidden mt-4 shadow-sm border border-gray-100 dark:border-zinc-800">
+
       {/* 1. Header (Top) */}
-      <Box sx={{ p: 3, bgcolor: "white", borderBottom: "1px solid #e2e8f0" }}>
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Box sx={{ p: 1, bgcolor: "primary.main", borderRadius: 2, color: "white", display: 'flex' }}>
-            <PaymentsRounded fontSize="small" />
-          </Box>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: "#1e293b" }}>
+      <div className="p-5 sm:p-6 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-indigo-600 rounded-xl text-white shadow-sm shadow-indigo-600/20">
+            <Wallet className="w-5 h-5" />
+          </div>
+          <h1 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">
             Expense Management
-          </Typography>
-        </Stack>
-      </Box>
+          </h1>
+        </div>
+      </div>
 
-      {/* 2. Main Content Area (Flex Row) */}
-      <Box sx={{ 
-        display: "flex", 
-        flex: 1, 
-        p: 2, 
-        gap: 2, 
-        flexDirection: { xs: "column", lg: "row" }, 
-        overflow: "hidden" 
-      }}>
-        
-        {/* --- Left Side: Entry Form (Fixed Width) --- */}
-        <Card sx={{ 
-          p: 3, 
-          borderRadius: 4, 
-          boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
-          flex: { lg: "0 0 350px" }, 
-          display: "flex",
-          flexDirection: "column"
-        }}>
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3 }}>
-            <AddCircleOutlineRounded color="primary" fontSize="small" />
-            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+      {/* 2. Main Content Area */}
+      <div className="flex flex-col lg:flex-row flex-1 p-4 sm:p-6 gap-6 overflow-hidden">
+
+        {/* --- Left Side: Entry Form --- */}
+        <div className="bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-zinc-800 lg:w-[400px] shrink-0 flex flex-col h-max lg:h-full lg:overflow-y-auto custom-scrollbar">
+          <div className="flex items-center gap-2 mb-6 border-b border-gray-100 dark:border-zinc-800/50 pb-4">
+            <PlusCircle className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
               Add New Transaction
-            </Typography>
-          </Stack>
+            </h2>
+          </div>
 
-          <form onSubmit={handleSubmit} style={{ flex: 1 }}>
-            <Stack spacing={2.5}>
-              <TextField
-                label="Amount" 
-                size="small" 
-                fullWidth 
-                required 
-                type="number"
-                value={amount} 
-                onChange={(e) => setAmount(e.target.value)}
-                InputProps={{ 
-                  startAdornment: <InputAdornment position="start">$</InputAdornment> 
-                }}
-              />
-              <TextField
-                label="Date" 
-                size="small" 
-                fullWidth 
-                required 
-                type="date"
-                InputLabelProps={{ shrink: true }}
-                value={date} 
-                onChange={(e) => setDate(e.target.value)}
-                InputProps={{ 
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <CalendarMonthRounded fontSize="small" sx={{color: '#94a3b8'}}/>
-                    </InputAdornment>
-                  )
-                }}
-              />
-              <TextField
-                label="Description" 
-                size="small" 
-                fullWidth 
-                required
-                placeholder="What did you buy?"
-                value={description} 
-                onChange={(e) => setDescription(e.target.value)}
-                InputProps={{ 
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <DescriptionRounded fontSize="small" sx={{color: '#94a3b8'}}/>
-                    </InputAdornment>
-                  )
-                }}
-              />
-              <TextField
-                label="Category" 
-                size="small" 
-                fullWidth 
-                required
-                placeholder="Food, Travel, etc."
-                value={categoryName} 
-                onChange={(e) => setCategoryName(e.target.value)}
-                InputProps={{ 
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <CategoryRounded fontSize="small" sx={{color: '#94a3b8'}}/>
-                    </InputAdornment>
-                  )
-                }}
-              />
-              <Button 
-                type="submit" 
-                variant="contained" 
-                fullWidth 
-                disabled={loading}
-                startIcon={<SaveRounded />}
-                sx={{ borderRadius: 2, fontWeight: 700, py: 1.2, mt: 2 }}
-              >
-                {loading ? "Saving..." : "Save Transaction"}
-              </Button>
-            </Stack>
+          <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-5">
+            {/* Amount Input */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Amount</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <span className="text-gray-500 font-bold">$</span>
+                </div>
+                <input
+                  type="number"
+                  required
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 font-medium"
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+
+            {/* Date Input */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Date</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Calendar className="w-5 h-5 text-gray-400" />
+                </div>
+                <input
+                  type="date"
+                  required
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all font-medium"
+                />
+              </div>
+            </div>
+
+            {/* Description Input */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Description</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <FileText className="w-5 h-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  required
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="What did you buy?"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 font-medium"
+                />
+              </div>
+            </div>
+
+            {/* Category Input */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Category</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Tag className="w-5 h-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  required
+                  value={categoryName}
+                  onChange={(e) => setCategoryName(e.target.value)}
+                  placeholder="Food, Travel, etc."
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 font-medium"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-4 w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold rounded-2xl transition-all shadow-md hover:shadow-lg hover:shadow-indigo-500/20 disabled:opacity-70 disabled:cursor-not-allowed group"
+            >
+              <Save className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              {loading ? "Saving..." : "Save Transaction"}
+            </button>
           </form>
-        </Card>
+        </div>
 
-        {/* --- Right Side: Expense History (Flex Grow) --- */}
-        <Card sx={{ 
-          borderRadius: 4, 
-          flex: 1, 
-          boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden" 
-        }}>
-          <Box sx={{ p: 2, borderBottom: '1px solid #f1f5f9', bgcolor: '#fff' }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+        {/* --- Right Side: Expense History --- */}
+        <div className="bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl rounded-3xl shadow-sm border border-gray-100 dark:border-zinc-800 flex-1 flex flex-col overflow-hidden min-h-[500px]">
+          <div className="p-6 border-b border-gray-100 dark:border-zinc-800/50 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm z-10 shrink-0">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
               Transaction History
-            </Typography>
-          </Box>
-          
-          {/* Scrollable List Area */}
-          <Box sx={{ 
-            flex: 1, 
-            overflowY: "auto", 
-            p: 1,
-            bgcolor: "#F8FAFC" 
-          }}>
-            <ExpenseList expenses={expenses} />
-          </Box>
-        </Card>
+            </h2>
+          </div>
 
-      </Box>
-    </Box>
+          {/* Scrollable List Area */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
+            <ExpenseList expenses={expenses} />
+          </div>
+        </div>
+
+      </div>
+    </div>
   );
 }

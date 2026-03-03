@@ -1,14 +1,15 @@
 import express from "express";
 import prisma from "../prisma/client.js";
+import auth from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/", auth, async (req, res) => {
   try {
     const mode = req.query.mode || "day";
     const { startDate, endDate } = req.query;
 
-    const where = {};
+    const where = { userId: req.user.id };
 
     // ✅ filter ช่วงวันที่
     if (startDate && endDate) {
@@ -94,7 +95,7 @@ router.get("/", async (req, res) => {
 
     // ส่ง expenses กลับไปพร้อมกับ summary
     res.json({ byDate, byCategory, expenses });
-    
+
   } catch (err) {
     console.error("SUMMARY ERROR:", err);
     res.status(500).json({ message: "Summary error" });

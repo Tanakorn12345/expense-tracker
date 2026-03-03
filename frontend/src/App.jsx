@@ -2,15 +2,33 @@ import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Expense from "./pages/Expense";
 import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   return (
-    <Layout>
+    <AuthProvider>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/expenses" element={<Expense />} />
+        <Route path="/login" element={<Layout><Login /></Layout>} />
+        <Route path="/register" element={<Layout><Register /></Layout>} />
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Layout>
+              <Dashboard />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/expenses" element={
+          <ProtectedRoute>
+            <Layout>
+              <Expense />
+            </Layout>
+          </ProtectedRoute>
+        } />
       </Routes>
-    </Layout>
+    </AuthProvider>
   );
 }
 

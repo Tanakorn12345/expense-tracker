@@ -1,108 +1,97 @@
 import {
-    Chart as ChartJS,
-    ArcElement,
-    Tooltip,
-    Legend,
-  } from "chart.js";
-  import { Doughnut } from "react-chartjs-2";
-  import { Box, Typography, useTheme } from "@mui/material";
-  
-  // ลงทะเบียน ChartJS
-  ChartJS.register(ArcElement, Tooltip, Legend);
-  
-  export default function CategoryPieChart({ data = [] }) {
-    const theme = useTheme();
-  
-    // ตรวจสอบข้อมูล
-    if (!Array.isArray(data) || data.length === 0) {
-      return (
-        <Box display="flex" alignItems="center" justifyContent="center" height="100%">
-          <Typography variant="body2" sx={{ color: "text.secondary", fontStyle: "italic" }}>
-            📭 ยังไม่มีข้อมูลหมวดหมู่
-          </Typography>
-        </Box>
-      );
-    }
-  
-    // คำนวณยอดรวมทั้งหมดเพื่อแสดงตรงกลาง Doughnut (Optional)
-    const totalAmount = data.reduce((sum, item) => sum + item.total, 0);
-  
-    const chartData = {
-      labels: data.map((d) => d.category),
-      datasets: [
-        {
-          data: data.map((d) => d.total),
-          backgroundColor: [
-            "#4318FF", // Indigo
-            "#6AD2FF", // Light Blue
-            "#EFF4FB", // Grayish Blue
-            "#FFB547", // Orange
-            "#EE5D50", // Red
-            "#01B574", // Green
-          ],
-          borderWidth: 2,
-          borderColor: "#ffffff",
-          hoverOffset: 15,
-        },
-      ],
-    };
-  
-    const options = {
-      responsive: true,
-      maintainAspectRatio: false, // บังคับให้ขยายเต็ม Container
-      cutout: "70%", // ปรับรูตรงกลางให้กว้างขึ้น ดูทันสมัย (Doughnut style)
-      plugins: {
-        legend: {
-          position: "bottom", // ย้ายคำอธิบายมาไว้ด้านล่าง
-          labels: {
-            usePointStyle: true,
-            pointStyle: "circle",
-            padding: 20,
-            font: {
-              family: theme.typography.fontFamily,
-              size: 12,
-              weight: "600",
-            },
-            color: theme.palette.text.primary,
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Doughnut } from "react-chartjs-2";
+
+// ลงทะเบียน ChartJS
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+export default function CategoryPieChart({ data = [] }) {
+  // ตรวจสอบข้อมูล
+  if (!Array.isArray(data) || data.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full w-full">
+        <p className="text-sm italic text-gray-500 dark:text-gray-400">
+          📭 ยังไม่มีข้อมูลหมวดหมู่
+        </p>
+      </div>
+    );
+  }
+
+  // คำนวณยอดรวมทั้งหมดเพื่อแสดงตรงกลาง Doughnut
+  const totalAmount = data.reduce((sum, item) => sum + item.total, 0);
+
+  const chartData = {
+    labels: data.map((d) => d.category),
+    datasets: [
+      {
+        data: data.map((d) => d.total),
+        backgroundColor: [
+          "#4f46e5", // Indigo (Tailwind indigo-600)
+          "#0ea5e9", // Light Blue (Tailwind sky-500)
+          "#64748b", // Slate (Tailwind slate-500)
+          "#f59e0b", // Amber (Tailwind amber-500)
+          "#ef4444", // Red (Tailwind red-500)
+          "#10b981", // Green (Tailwind emerald-500)
+          "#d946ef", // Fuchsia (Tailwind fuchsia-500)
+        ],
+        borderWidth: 2,
+        borderColor: "#ffffff",
+        hoverOffset: 15,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false, // บังคับให้ขยายเต็ม Container
+    cutout: "70%", // ปรับรูตรงกลางให้กว้างขึ้น ดูทันสมัย (Doughnut style)
+    plugins: {
+      legend: {
+        position: "bottom", // ย้ายคำอธิบายมาไว้ด้านล่าง
+        labels: {
+          usePointStyle: true,
+          pointStyle: "circle",
+          padding: 20,
+          font: {
+            family: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif",
+            size: 12,
+            weight: "600",
           },
+          color: "#6b7280", // Tailwind gray-500
         },
-        tooltip: {
-          backgroundColor: "#1e293b",
-          padding: 12,
-          cornerRadius: 10,
-          callbacks: {
-            label: (context) => {
-              const value = context.parsed;
-              const percentage = ((value / totalAmount) * 100).toFixed(1);
-              return ` ฿${value.toLocaleString()} (${percentage}%)`;
-            },
+      },
+      tooltip: {
+        backgroundColor: "rgba(17, 24, 39, 0.9)", // Tailwind gray-900 with opacity
+        padding: 12,
+        cornerRadius: 10,
+        callbacks: {
+          label: (context) => {
+            const value = context.parsed;
+            const percentage = ((value / totalAmount) * 100).toFixed(1);
+            return ` ฿${value.toLocaleString()} (${percentage}%)`;
           },
         },
       },
-    };
-  
-    return (
-      <Box sx={{ width: "100%", height: "100%", position: "relative" }}>
-        <Doughnut data={chartData} options={options} />
-        
-        {/* ใส่ตัวเลขยอดรวมไว้ตรงกลางกราฟวงกลม (ดู Pro มากขึ้น) */}
-        <Box
-          sx={{
-            position: "absolute",
-            top: "43%", // ปรับตามตำแหน่งรูตรงกลาง
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            textAlign: "center",
-            pointerEvents: "none",
-          }}
-        >
-          <Typography sx={{ fontSize: 12, fontWeight: 700, color: "text.secondary", textTransform: "uppercase" }}>
-            Total
-          </Typography>
-          <Typography sx={{ fontSize: 18, fontWeight: 800, color: "text.primary" }}>
-            ฿{totalAmount >= 1000 ? `${(totalAmount / 1000).toFixed(1)}k` : totalAmount}
-          </Typography>
-        </Box>
-      </Box>
-    );
-  }
+    },
+  };
+
+  return (
+    <div className="w-full h-full relative">
+      <Doughnut data={chartData} options={options} />
+
+      {/* ใส่ตัวเลขยอดรวมไว้ตรงกลางกราฟวงกลม (ดู Pro มากขึ้น) */}
+      <div className="absolute top-[43%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none flex flex-col items-center">
+        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          Total
+        </span>
+        <span className="text-lg font-black text-gray-900 dark:text-white">
+          ฿{totalAmount >= 1000 ? `${(totalAmount / 1000).toFixed(1)}k` : totalAmount.toLocaleString()}
+        </span>
+      </div>
+    </div>
+  );
+}
