@@ -13,25 +13,24 @@ export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Check for existing token and user on load
-        const token = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
+        const checkAuth = async () => {
+            try {
+                const response = await api.get('/api/auth/me');
+                setUser(response.data.user);
+            } catch (error) {
+                setUser(null);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-        if (token && storedUser) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setUser(JSON.parse(storedUser));
-        }
-        setLoading(false);
-    }, [setUser, setLoading]);
+        checkAuth();
+    }, []);
 
     const login = async (email, password) => {
         try {
             const response = await api.post('/api/auth/login', { email, password });
-            const { token, user } = response.data;
-
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
-            setUser(user);
+            setUser(response.data.user);
             navigate('/');
             return { success: true };
         } catch (error) {
@@ -41,12 +40,8 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (email, password, name) => {
         try {
-            const response = await api.post('/api/auth/register', { email, password, name });
-            const { token, user } = response.data;
-
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
-            setUser(user);
+            const response = await await api.post('/api/auth/register', { email, password, name });
+            setUser(response.data.user);
             navigate('/');
             return { success: true };
         } catch (error) {
@@ -54,11 +49,15 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const logout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setUser(null);
-        navigate('/login');
+    const logout = async () => {
+        try {
+            await api.post('/api/auth/logout');
+        } catch (error) {
+            console.error('Logout failed:', error);
+        } finally {
+            setUser(null);
+            navigate('/login');
+        }
     };
 
     const value = {

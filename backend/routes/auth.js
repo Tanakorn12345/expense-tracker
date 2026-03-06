@@ -2,6 +2,7 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '../prisma/client.js';
+import auth from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -43,9 +44,15 @@ router.post('/register', async (req, res) => {
             { expiresIn: '7d' }
         );
 
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+
         res.status(201).json({
             message: 'User registered successfully',
-            token,
             user: { id: user.id, email: user.email, name: user.name }
         });
     } catch (error) {
@@ -85,14 +92,49 @@ router.post('/login', async (req, res) => {
             { expiresIn: '7d' }
         );
 
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+
         res.json({
             message: 'Login successful',
-            token,
             user: { id: user.id, email: user.email, name: user.name }
         });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Failed to log in' });
+    }
+});
+
+// Logout user
+router.post('/logout', (req, res) => {
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+    });
+    res.json({ message: 'Logged out successfully' });
+});
+
+// Get current user details
+router.get('/me', auth, async (req, res) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.id },
+            select: { id: true, email: true, name: true }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json({ user });
+    } catch (error) {
+        console.error('Fetch me error:', error);
+        res.status(500).json({ error: 'Failed to fetch user data' });
     }
 });
 
