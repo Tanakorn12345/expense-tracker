@@ -2,7 +2,12 @@ import jwt from 'jsonwebtoken';
 
 const auth = (req, res, next) => {
     try {
-        const token = req.cookies.token;
+        let token = req.cookies.token;
+
+        const authHeader = req.headers.authorization || req.headers.Authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            token = authHeader.split(' ')[1];
+        }
 
         if (!token) {
             return res.status(401).json({ error: 'Authentication required. Missing token.' });

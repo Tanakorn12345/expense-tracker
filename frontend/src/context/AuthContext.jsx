@@ -31,6 +31,9 @@ export const AuthProvider = ({ children }) => {
         try {
             const response = await api.post('/api/auth/login', { email, password });
             setUser(response.data.user);
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+            }
             navigate('/');
             return { success: true };
         } catch (error) {
@@ -42,6 +45,9 @@ export const AuthProvider = ({ children }) => {
         try {
             const response = await api.post('/api/auth/register', { email, password, name });
             setUser(response.data.user);
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+            }
             navigate('/');
             return { success: true };
         } catch (error) {
@@ -56,6 +62,7 @@ export const AuthProvider = ({ children }) => {
             console.error('Logout failed:', error);
         } finally {
             setUser(null);
+            localStorage.removeItem('token');
             navigate('/login');
         }
     };
