@@ -21,9 +21,14 @@ export default function ExpenseForm({ onSuccess }) {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const res = await api.get("/categories");
-      setCategories(res.data);
-      setLoadingCategories(false);
+      try {
+        const res = await api.get("/categories");
+        setCategories(res.data);
+      } catch (err) {
+        console.error("Failed to fetch categories:", err);
+      } finally {
+        setLoadingCategories(false);
+      }
     };
 
     fetchCategories();

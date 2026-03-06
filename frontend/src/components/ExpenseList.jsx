@@ -3,7 +3,11 @@ import {
   Utensils,
   Car,
   Ticket,
-  MoreHorizontal
+  MoreHorizontal,
+  GraduationCap,
+  Sparkles,
+  Wallet,
+  Smartphone
 } from "lucide-react";
 
 // Helper to get icon based on category name
@@ -13,6 +17,10 @@ const getCategoryIcon = (categoryName) => {
   if (name.includes("travel") || name.includes("เดินทาง")) return <Car className="w-5 h-5" />;
   if (name.includes("shop") || name.includes("ช้อปปิ้ง")) return <ShoppingBag className="w-5 h-5" />;
   if (name.includes("bill")) return <Ticket className="w-5 h-5" />;
+  if (name.includes("education") || name.includes("ศึกษา")) return <GraduationCap className="w-5 h-5" />;
+  if (name.includes("beauty") || name.includes("ความงาม")) return <Sparkles className="w-5 h-5" />;
+  if (name.includes("finance") || name.includes("การเงิน")) return <Wallet className="w-5 h-5" />;
+  if (name.includes("electronic") || name.includes("ไฟฟ้า")) return <Smartphone className="w-5 h-5" />;
   return <MoreHorizontal className="w-5 h-5" />;
 };
 
@@ -23,6 +31,10 @@ const getCategoryColor = (categoryName) => {
   if (name.includes("travel") || name.includes("เดินทาง")) return "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400";
   if (name.includes("shop") || name.includes("ช้อปปิ้ง")) return "bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400";
   if (name.includes("bill")) return "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400";
+  if (name.includes("education") || name.includes("ศึกษา")) return "bg-purple-100 text-purple-600 dark:bg-green-900/30 dark:text-green-400";
+  if (name.includes("beauty") || name.includes("ความงาม")) return "bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400";
+  if (name.includes("finance") || name.includes("การเงิน")) return "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400";
+  if (name.includes("electronic") || name.includes("ไฟฟ้า")) return "bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400";
   return "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400";
 };
 

@@ -14,6 +14,8 @@ export default function Expense() {
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [categoryName, setCategoryName] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const [loading, setLoading] = useState(false);
 
   const fetchExpenses = async () => {
@@ -23,8 +25,20 @@ export default function Expense() {
     } catch (err) { console.error(err); }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const res = await api.get("/api/categories");
+      setCategories(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
   useEffect(() => {
     fetchExpenses();
+    fetchCategories();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -137,14 +151,27 @@ export default function Expense() {
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Tag className="w-5 h-5 text-gray-400" />
                 </div>
-                <input
-                  type="text"
+                <select
                   required
                   value={categoryName}
                   onChange={(e) => setCategoryName(e.target.value)}
-                  placeholder="Food, Travel, etc."
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 font-medium"
-                />
+                  disabled={loadingCategories}
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all font-medium appearance-none"
+                >
+                  <option value="" disabled>
+                    {loadingCategories ? "Loading..." : "Select a category"}
+                  </option>
+                  {!loadingCategories && categories.map((c) => (
+                    <option key={c.id} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
               </div>
             </div>
 
