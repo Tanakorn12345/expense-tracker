@@ -68,8 +68,8 @@ export default function Layout({ children }) {
                   {/* User Email Chip */}
                   <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 transition-colors rounded-full border border-white/20 shadow-sm backdrop-blur-md">
                     <UserCircle className="w-5 h-5 text-blue-100" />
-                    <span className="text-sm font-medium text-white max-w-[150px] truncate" title={user.email}>
-                      {user.email}
+                    <span className="text-sm font-medium text-white max-w-[150px] truncate" title={user.name || user.email}>
+                      {user.name || user.email}
                     </span>
                   </div>
 
@@ -113,7 +113,7 @@ export default function Layout({ children }) {
                             Signed in as
                           </p>
                           <p className="text-sm font-medium text-gray-900 dark:text-white truncate mt-0.5">
-                            {user.email}
+                            {user.name || user.email}
                           </p>
                         </div>
                       </div>
