@@ -20,21 +20,24 @@ export default function Dashboard() {
   const [categoryData, setCategoryData] = useState([]);
   const [recentExpenses, setRecentExpenses] = useState([]);
 
-  const fetchSummary = async () => {
-    try {
-      const res = await api.get(`/api/summary`, {
-        params: { mode, startDate, endDate }
-      });
+  // ลบ const fetchSummary แบบเดิมทิ้งไป แล้วเอามาเขียนรวมในนี้แทน
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        const res = await api.get(`/api/summary`, {
+          params: { mode, startDate, endDate }
+        });
 
-      setChartData(res.data.byDate || []);
-      setCategoryData(res.data.byCategory || []);
-      setRecentExpenses(res.data.expenses || []);
-    } catch (err) {
-      console.error("Dashboard error:", err);
-    }
-  };
+        setChartData(res.data.byDate || []);
+        setCategoryData(res.data.byCategory || []);
+        setRecentExpenses(res.data.expenses || []);
+      } catch (err) {
+        console.error("Dashboard error:", err);
+      }
+    };
 
-  useEffect(() => { fetchSummary(); }, [mode, startDate, endDate]);
+    fetchSummary();
+  }, [mode, startDate, endDate]);
 
   const totalAmount = categoryData.reduce((acc, curr) => {
     return acc + (Number(curr.total) || Number(curr.value) || 0);
