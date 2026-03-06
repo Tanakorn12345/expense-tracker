@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (email, password, name) => {
         try {
-            const response = await await api.post('/api/auth/register', { email, password, name });
+            const response = await api.post('/api/auth/register', { email, password, name });
             setUser(response.data.user);
             navigate('/');
             return { success: true };
