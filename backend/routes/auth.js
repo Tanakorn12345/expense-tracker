@@ -136,7 +136,7 @@ router.get('/me', auth, async (req, res) => {
         res.json({ user });
     } catch (error) {
         console.error('Fetch me error:', error);
-        res.status(500).json({ error: 'Failed to fetch user data' });
+        res.status(500).json({ error: 'Failed to fetch user data: ' + error.message });
     }
 });
 
@@ -158,7 +158,7 @@ router.put('/me/salary', auth, async (req, res) => {
         res.json({ message: 'Salary updated successfully', user: updatedUser });
     } catch (error) {
         console.error('Update salary error:', error);
-        res.status(500).json({ error: 'Failed to update salary' });
+        res.status(500).json({ error: 'Failed to update salary: ' + error.message });
     }
 });
 
