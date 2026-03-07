@@ -136,7 +136,8 @@ router.get('/me', auth, async (req, res) => {
         res.json({ user });
     } catch (error) {
         console.error('Fetch me error:', error);
-        res.status(500).json({ error: 'Failed to fetch user data: ' + error.message });
+        const hostInfo = process.env.DATABASE_URL ? process.env.DATABASE_URL.split('@')[1] : 'No URL';
+        res.status(500).json({ error: 'Failed to fetch user data: ' + error.message + ' | URL Host: ' + hostInfo });
     }
 });
 
