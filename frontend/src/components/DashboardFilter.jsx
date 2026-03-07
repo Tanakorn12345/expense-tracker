@@ -12,7 +12,7 @@ export default function DashboardFilter({ mode, onChange }) {
             : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
           }`}
       >
-        รายวัน
+        Daily
       </button>
       <button
         onClick={() => handleChange("month")}
@@ -21,7 +21,7 @@ export default function DashboardFilter({ mode, onChange }) {
             : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
           }`}
       >
-        รายเดือน
+        Monthly
       </button>
     </div>
   );

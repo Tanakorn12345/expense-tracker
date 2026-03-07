@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Category {
@@ -19,6 +20,7 @@ model User {
   email     String    @unique
   password  String
   name      String?
+  salary    Float?    @default(0)
   createdAt DateTime  @default(now())
   expenses  Expense[]
 }

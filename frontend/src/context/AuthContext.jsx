@@ -67,11 +67,23 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const updateSalary = async (newSalary) => {
+        try {
+            const response = await api.put('/api/auth/me/salary', { salary: newSalary });
+            setUser(response.data.user);
+            return { success: true };
+        } catch (error) {
+            console.error('Update salary failed:', error);
+            return { success: false, error: error.response?.data?.error || 'Failed to update salary' };
+        }
+    };
+
     const value = {
         user,
         login,
         register,
         logout,
+        updateSalary,
         loading
     };
 

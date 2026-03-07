@@ -12,7 +12,7 @@ export default function ExpenseChart({ data = [] }) {
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className="mt-4 text-gray-500 dark:text-gray-400 italic">
-        📭 ยังไม่มีข้อมูลกราฟ
+        No graph data is available yet.
       </div>
     );
   }

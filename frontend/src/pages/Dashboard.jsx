@@ -3,15 +3,19 @@ import DailyExpenseBarChart from "../components/DailyExpenseBarChart";
 import CategoryPieChart from "../components/CategoryPieChart";
 import ExpenseList from "../components/ExpenseList";
 import api from "../api";
+import { useAuth } from "../context/AuthContext";
 import {
   BarChart2,
   RotateCcw,
   PieChart,
   Wallet,
-  ListOrdered
+  ListOrdered,
+  Percent
 } from "lucide-react";
 
 export default function Dashboard() {
+  const { user } = useAuth();
+
   const [mode, setMode] = useState("day");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -43,23 +47,76 @@ export default function Dashboard() {
     return acc + (Number(curr.total) || Number(curr.value) || 0);
   }, 0);
 
+  const salaryAmount = user?.salary || 0;
+  const expensePercentage = salaryAmount > 0 ? ((totalAmount / salaryAmount) * 100).toFixed(1) : 0;
+
   return (
     <div className="min-h-full space-y-6">
 
       {/* Header & Total (Top Row) */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-1">
         <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 drop-shadow-sm flex items-center gap-2">
-          📊 Expense Overview
+          📊 Dashboard Overview
         </h1>
-        <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl px-5 py-3 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center gap-3">
-          <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl text-indigo-600 dark:text-indigo-400">
-            <Wallet className="w-6 h-6" />
+
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* Salary Card */}
+          <div className="bg-sky-200 backdrop-blur-xl px-4 py-3 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center gap-3">
+            <div className="p-2 bg-sky-100 dark:bg-sky-900/30 rounded-xl text-sky-600 dark:text-sky-400">
+              <Wallet className="w-5 h-5" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-0.5">
+                Monthly Salary
+              </p>
+              <p className="text-lg sm:text-xl font-black text-sky-600 dark:text-sky-400 leading-none">
+                {salaryAmount.toLocaleString()} ฿
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-0.5">Total Expenses</p>
-            <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white leading-none">
-              ฿{totalAmount.toLocaleString()}
-            </p>
+
+          {/* Expenses Card */}
+          <div className="bg-rose-200 backdrop-blur-xl px-4 py-3 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center gap-3">
+            <div className="p-2 bg-rose-100 dark:bg-rose-900/30 rounded-xl text-rose-600 dark:text-rose-400">
+              <Wallet className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-0.5">Total Expenses</p>
+              <p className="text-lg sm:text-xl font-black text-rose-600 dark:text-rose-400 leading-none">
+                {totalAmount.toLocaleString()} ฿
+              </p>
+            </div>
+          </div>
+
+          {/* Expense % Card */}
+          <div className="bg-indigo-200 backdrop-blur-xl px-4 py-3 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center gap-3">
+            <div className={`p-2 rounded-xl ${expensePercentage > 100 ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" : "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"}`}>
+              <Percent className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-0.5">Percentage of Salary</p>
+              <p className={`text-lg sm:text-xl font-black leading-none ${expensePercentage > 100 ? "text-red-600 dark:text-red-400" : "text-indigo-600 dark:text-indigo-400"}`}>
+                {expensePercentage}%
+              </p>
+            </div>
+          </div>
+
+          {/* Remaining Balance Card */}
+          <div className="bg-green-200 backdrop-blur-xl px-4 py-3 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center gap-3">
+            <div className={`p-2 rounded-xl ${salaryAmount - totalAmount >= 0 ? "bg-green-100 text-green-600 dark:bg-sky-900/30 dark:text-sky-400" : "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400"}`}>
+              <Wallet className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-0.5">Remaining</p>
+              <div className="flex flex-col">
+                <p className={`text-lg sm:text-xl font-black leading-none ${salaryAmount - totalAmount >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                  {Math.abs(salaryAmount - totalAmount).toLocaleString()} ฿
+                </p>
+                <p className={`text-[10px] mt-1 font-semibold uppercase ${salaryAmount - totalAmount >= 0 ? "text-slate-400" : "text-red-400"}`}>
+                  {salaryAmount - totalAmount >= 0 ? "Available" : "Deficit"}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -75,8 +132,8 @@ export default function Dashboard() {
               <button
                 onClick={() => setMode("day")}
                 className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${mode === "day"
-                    ? "bg-white dark:bg-zinc-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  ? "bg-white dark:bg-zinc-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                   }`}
               >
                 DAY
@@ -84,8 +141,8 @@ export default function Dashboard() {
               <button
                 onClick={() => setMode("month")}
                 className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${mode === "month"
-                    ? "bg-white dark:bg-zinc-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  ? "bg-white dark:bg-zinc-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                   }`}
               >
                 MONTH

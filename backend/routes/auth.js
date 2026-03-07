@@ -126,7 +126,7 @@ router.get('/me', auth, async (req, res) => {
     try {
         const user = await prisma.user.findUnique({
             where: { id: req.user.id },
-            select: { id: true, email: true, name: true }
+            select: { id: true, email: true, name: true, salary: true }
         });
 
         if (!user) {
@@ -137,6 +137,28 @@ router.get('/me', auth, async (req, res) => {
     } catch (error) {
         console.error('Fetch me error:', error);
         res.status(500).json({ error: 'Failed to fetch user data' });
+    }
+});
+
+// Update user salary
+router.put('/me/salary', auth, async (req, res) => {
+    try {
+        const { salary } = req.body;
+
+        if (salary === undefined || isNaN(salary)) {
+            return res.status(400).json({ error: 'Valid salary amount is required' });
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: req.user.id },
+            data: { salary: parseFloat(salary) },
+            select: { id: true, email: true, name: true, salary: true }
+        });
+
+        res.json({ message: 'Salary updated successfully', user: updatedUser });
+    } catch (error) {
+        console.error('Update salary error:', error);
+        res.status(500).json({ error: 'Failed to update salary' });
     }
 });
 

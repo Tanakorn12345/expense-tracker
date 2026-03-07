@@ -2,13 +2,19 @@ import { useEffect, useState } from "react";
 import api from "../api";
 import {
   Wallet, Save, PlusCircle,
-  FileText, Calendar, Tag
+  FileText, Calendar, Tag, Pencil, Check, X
 } from "lucide-react";
 import ExpenseList from "../components/ExpenseList";
+import { useAuth } from "../context/AuthContext";
 
 console.log("API URL:", import.meta.env.VITE_API_URL);
 
 export default function Expense() {
+  const { user, updateSalary } = useAuth();
+
+  const [isEditingSalary, setIsEditingSalary] = useState(false);
+  const [tempSalary, setTempSalary] = useState("");
+
   const [expenses, setExpenses] = useState([]);
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -17,6 +23,19 @@ export default function Expense() {
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user?.salary !== undefined) {
+      setTempSalary(user.salary.toString());
+    }
+  }, [user]);
+
+  const handleSaveSalary = async () => {
+    const result = await updateSalary(Number(tempSalary));
+    if (result.success) {
+      setIsEditingSalary(false);
+    }
+  };
 
   const fetchExpenses = async () => {
     try {
@@ -82,108 +101,152 @@ export default function Expense() {
       <div className="flex flex-col lg:flex-row flex-1 p-4 sm:p-6 gap-6 overflow-hidden">
 
         {/* --- Left Side: Entry Form --- */}
-        <div className="bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-zinc-800 lg:w-[400px] shrink-0 flex flex-col h-max lg:h-full lg:overflow-y-auto custom-scrollbar">
-          <div className="flex items-center gap-2 mb-6 border-b border-gray-100 dark:border-zinc-800/50 pb-4">
-            <PlusCircle className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-              Add New Transaction
-            </h2>
+        <div className="flex flex-col gap-6 lg:w-[400px] shrink-0 h-max lg:h-full lg:overflow-y-auto custom-scrollbar">
+
+          {/* Salary Card */}
+          <div className="bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-zinc-800">
+            <div className="flex items-center gap-2 mb-4 border-b border-gray-100 dark:border-zinc-800/50 pb-4">
+              <Wallet className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white flex-1">
+                Monthly Salary
+              </h2>
+              {!isEditingSalary && (
+                <button onClick={() => setIsEditingSalary(true)} className="text-gray-400 hover:text-emerald-500">
+                  <Pencil className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center">
+              {isEditingSalary ? (
+                <div className="flex items-center gap-2 w-full">
+                  <span className="text-gray-500 font-bold">฿</span>
+                  <input
+                    type="number"
+                    value={tempSalary}
+                    onChange={(e) => setTempSalary(e.target.value)}
+                    className="flex-1 w-full bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-lg px-3 py-2 font-bold text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                    autoFocus
+                  />
+                  <button type="button" onClick={handleSaveSalary} className="p-2 bg-emerald-100 text-emerald-600 rounded-xl hover:bg-emerald-200 transition-colors">
+                    <Check className="w-5 h-5" />
+                  </button>
+                  <button type="button" onClick={() => { setIsEditingSalary(false); setTempSalary(user?.salary?.toString() || "0"); }} className="p-2 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition-colors">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              ) : (
+                <p className="text-3xl font-black text-sky-600 dark:text-sky-400">
+                  {(user?.salary || 0).toLocaleString()}  ฿
+                </p>
+              )}
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-5">
-            {/* Amount Input */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Amount</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <span className="text-gray-500 font-bold">$</span>
-                </div>
-                <input
-                  type="number"
-                  required
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 font-medium"
-                  placeholder="0.00"
-                />
-              </div>
+          {/* Form Card */}
+          <div className="bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-zinc-800 flex flex-col">
+            <div className="flex items-center gap-2 mb-6 border-b border-gray-100 dark:border-zinc-800/50 pb-4">
+              <PlusCircle className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                Add New Transaction
+              </h2>
             </div>
 
-            {/* Date Input */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Date</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Calendar className="w-5 h-5 text-gray-400" />
+            <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-5">
+              {/* Amount Input */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Amount</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <span className="text-gray-500 font-bold">$</span>
+                  </div>
+                  <input
+                    type="number"
+                    required
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 font-medium"
+                    placeholder="0.00"
+                  />
                 </div>
-                <input
-                  type="date"
-                  required
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all font-medium"
-                />
               </div>
-            </div>
 
-            {/* Description Input */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Description</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <FileText className="w-5 h-5 text-gray-400" />
+              {/* Date Input */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Date</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Calendar className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="date"
+                    required
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all font-medium"
+                  />
                 </div>
-                <input
-                  type="text"
-                  required
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="What did you buy?"
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 font-medium"
-                />
               </div>
-            </div>
 
-            {/* Category Input */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Category</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Tag className="w-5 h-5 text-gray-400" />
+              {/* Description Input */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Description</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <FileText className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    required
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="What did you buy?"
+                    className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 font-medium"
+                  />
                 </div>
-                <select
-                  required
-                  value={categoryName}
-                  onChange={(e) => setCategoryName(e.target.value)}
-                  disabled={loadingCategories}
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all font-medium appearance-none"
-                >
-                  <option value="" disabled>
-                    {loadingCategories ? "Loading..." : "Select a category"}
-                  </option>
-                  {!loadingCategories && categories.map((c) => (
-                    <option key={c.id} value={c.name}>
-                      {c.name}
+              </div>
+
+              {/* Category Input */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Category</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Tag className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <select
+                    required
+                    value={categoryName}
+                    onChange={(e) => setCategoryName(e.target.value)}
+                    disabled={loadingCategories}
+                    className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all font-medium appearance-none"
+                  >
+                    <option value="" disabled>
+                      {loadingCategories ? "Loading..." : "Select a category"}
                     </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
+                    {!loadingCategories && categories.map((c) => (
+                      <option key={c.id} value={c.name}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-4 w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold rounded-2xl transition-all shadow-md hover:shadow-lg hover:shadow-indigo-500/20 disabled:opacity-70 disabled:cursor-not-allowed group"
-            >
-              <Save className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              {loading ? "Saving..." : "Save Transaction"}
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-4 w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold rounded-2xl transition-all shadow-md hover:shadow-lg hover:shadow-indigo-500/20 disabled:opacity-70 disabled:cursor-not-allowed group"
+              >
+                <Save className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                {loading ? "Saving..." : "Save Transaction"}
+              </button>
+            </form>
+          </div>
         </div>
 
         {/* --- Right Side: Expense History --- */}
