@@ -208,7 +208,7 @@ const History = () => {
         </div>
 
         <div className="table-container">
-          <table className="data-table">
+          <table className="data-table" style={{ minWidth: '600px' }}>
             <thead>
               <tr>
                 <th>{t('transaction')}</th>
