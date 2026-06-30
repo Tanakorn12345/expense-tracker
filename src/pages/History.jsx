@@ -6,7 +6,7 @@ import { ShoppingCart, Banknote, Home, ArrowRightLeft, Car, Download, Trash2 } f
 import TransactionRow from '../components/Dashboard/TransactionRow';
 import { fetchWithAuth } from '../utils/api';
 import Swal from 'sweetalert2';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 
 const getIcon = (categoryName) => {
