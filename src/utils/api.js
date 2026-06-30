@@ -10,7 +10,7 @@ export const fetchWithAuth = async (endpoint, options = {}) => {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const API_BASE_URL = typeof import.meta.env.VITE_API_URL !== 'undefined' ? import.meta.env.VITE_API_URL : 'http://localhost:5002';
+  const API_BASE_URL = import.meta.env.VITE_API_URL || '';
   const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
 
   const response = await fetch(url, { ...options, headers });
