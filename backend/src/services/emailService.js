@@ -48,7 +48,8 @@ const sendTransactionNotification = async (userEmail, transaction) => {
   const typeText = isExpense ? 'รายจ่าย' : 'รายรับ';
   const subject = `[FinTrack] แจ้งเตือนการเพิ่ม${typeText}ใหม่`;
   const text = `
-สวัสดีครับคุณ ${userEmail},
+เรียนคุณ ${userEmail},
+
 
 มีการเพิ่มรายการ${typeText}ใหม่ในบัญชีของคุณ:
 - ชื่อรายการ: ${transaction.title}
@@ -57,6 +58,7 @@ const sendTransactionNotification = async (userEmail, transaction) => {
 - วันที่: ${new Date(transaction.date).toLocaleDateString('th-TH')}
 
 ขอขอบคุณที่ใช้บริการ FinTrack
+หากมีข้อสงสัยหรือปัญหาใด ๆ กรุณาติดต่อฝ่ายสนับสนุนของเรา hoing11111@gmail.com
   `;
 
   return sendEmail(userEmail, subject, text);
