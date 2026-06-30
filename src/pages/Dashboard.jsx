@@ -27,11 +27,19 @@ const Dashboard = () => {
   
   const currentMonthStr = new Date().getMonth().toString();
   const [filterMonth, setFilterMonth] = useState(currentMonthStr);
+  const [filterDate, setFilterDate] = useState('');
   const currentYearStr = new Date().getFullYear().toString();
 
   const { transactions, stats, forecast, isLoading } = useTransactions(filterMonth, currentYearStr);
 
   const filteredTransactions = transactions.filter(tItem => {
+    // Date filter
+    if (filterDate) {
+      const tDate = new Date(tItem.date);
+      const localDate = new Date(tDate.getTime() - (tDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+      if (localDate !== filterDate) return false;
+    }
+
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     const titleMatch = tItem.title?.toLowerCase().includes(query);
@@ -84,11 +92,27 @@ const Dashboard = () => {
           <p>{t('overviewDesc')}</p>
         </div>
         <div className="date-picker flex gap-4">
+          <input 
+            type="date" 
+            className="form-control" 
+            style={{ width: 'auto' }}
+            value={filterDate}
+            onChange={(e) => {
+              setFilterDate(e.target.value);
+              if (e.target.value) {
+                const d = new Date(e.target.value);
+                setFilterMonth(d.getMonth().toString());
+              }
+            }}
+          />
           <select 
             className="form-control" 
             style={{ width: 'auto' }}
             value={filterMonth}
-            onChange={(e) => setFilterMonth(e.target.value)}
+            onChange={(e) => {
+              setFilterMonth(e.target.value);
+              setFilterDate(''); // Clear specific date when month is changed
+            }}
           >
             {Array.from({ length: 12 }).map((_, i) => (
               <option key={i} value={i.toString()}>

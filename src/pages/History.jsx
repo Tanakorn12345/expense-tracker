@@ -24,13 +24,23 @@ const History = () => {
   const { transactions, isLoading } = useTransactions();
   const { t, getMonthName } = useLanguage();
   const [filterMonth, setFilterMonth] = useState('all');
+  const [filterDate, setFilterDate] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredTransactions = transactions.filter(tItem => {
+    const tDate = new Date(tItem.date);
+    
     // Month filter
     if (filterMonth !== 'all') {
-      const tMonth = new Date(tItem.date).getMonth().toString();
+      const tMonth = tDate.getMonth().toString();
       if (tMonth !== filterMonth) return false;
+    }
+
+    // Date filter
+    if (filterDate) {
+      // Compare YYYY-MM-DD
+      const localDate = new Date(tDate.getTime() - (tDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+      if (localDate !== filterDate) return false;
     }
     
     // Search query filter
@@ -96,13 +106,20 @@ const History = () => {
       },
       headStyles: {
         font: "Sarabun",
+        fontStyle: "normal",
         fontSize: 14
       }
     });
 
-    const engMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const monthStr = filterMonth !== 'all' ? engMonths[parseInt(filterMonth)].toLowerCase() : 'all-months';
-    doc.save(`${monthStr}-transaction.pdf`);
+    let filename = 'all-months';
+    if (filterDate) {
+      filename = filterDate;
+    } else if (filterMonth !== 'all') {
+      const engMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      filename = engMonths[parseInt(filterMonth)].toLowerCase();
+    }
+    
+    doc.save(`${filename}-transaction.pdf`);
   };
 
   const handleDeleteAll = async () => {
@@ -158,11 +175,27 @@ const History = () => {
               <Trash2 size={16} className="mr-2" style={{ marginRight: '8px' }} />
               Delete All
             </button>
+            <input 
+              type="date" 
+              className="form-control" 
+              style={{ width: 'auto', display: 'inline-block' }}
+              value={filterDate}
+              onChange={(e) => {
+                setFilterDate(e.target.value);
+                if (e.target.value) {
+                  const d = new Date(e.target.value);
+                  setFilterMonth(d.getMonth().toString());
+                }
+              }}
+            />
             <select 
               className="form-control" 
               style={{ width: 'auto', display: 'inline-block' }}
               value={filterMonth}
-              onChange={(e) => setFilterMonth(e.target.value)}
+              onChange={(e) => {
+                setFilterMonth(e.target.value);
+                setFilterDate(''); // Clear specific date when month is changed
+              }}
             >
               <option value="all">{t('allTime')}</option>
               {Array.from({ length: 12 }).map((_, i) => (
