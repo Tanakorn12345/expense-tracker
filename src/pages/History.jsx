@@ -7,7 +7,7 @@ import TransactionRow from '../components/Dashboard/TransactionRow';
 import { fetchWithAuth } from '../utils/api';
 import Swal from 'sweetalert2';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 const getIcon = (categoryName) => {
   switch (categoryName) {
@@ -79,7 +79,7 @@ const History = () => {
       tableRows.push(transactionData);
     });
 
-    doc.autoTable({
+    autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
       startY: 20,
