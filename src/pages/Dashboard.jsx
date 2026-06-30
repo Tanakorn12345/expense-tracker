@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { 
   TrendingUp, 
@@ -19,6 +19,8 @@ import TransactionRow from '../components/Dashboard/TransactionRow';
 import InsightCard from '../components/Dashboard/InsightCard';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../contexts/LanguageContext';
+import Swal from 'sweetalert2';
+import { fetchWithAuth } from '../utils/api';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -30,7 +32,89 @@ const Dashboard = () => {
   const [filterDate, setFilterDate] = useState('');
   const currentYearStr = new Date().getFullYear().toString();
 
-  const { transactions, stats, forecast, isLoading } = useTransactions(filterMonth, currentYearStr);
+  const { transactions, stats, forecast, isLoading, refresh } = useTransactions(filterMonth, currentYearStr);
+
+  useEffect(() => {
+    if (transactions.length === 0) return;
+    
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    const rolloverKey = `rollover_prompt_${currentYear}_${currentMonth}`;
+    
+    if (!localStorage.getItem(rolloverKey)) {
+      const hasRollover = transactions.some(t => {
+        const d = new Date(t.date);
+        return d.getMonth() === currentMonth && d.getFullYear() === currentYear && t.title === 'ยอดยกมา';
+      });
+
+      if (!hasRollover) {
+        let prevMonth = currentMonth - 1;
+        let prevYear = currentYear;
+        if (prevMonth < 0) {
+          prevMonth = 11;
+          prevYear -= 1;
+        }
+
+        const prevMonthTx = transactions.filter(t => {
+          const d = new Date(t.date);
+          return d.getMonth() === prevMonth && d.getFullYear() === prevYear;
+        });
+
+        const prevIncome = prevMonthTx.filter(t => t.category?.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+        const prevExpense = prevMonthTx.filter(t => t.category?.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+        const prevBalance = prevIncome - prevExpense;
+
+        if (prevBalance > 0) {
+          Swal.fire({
+            title: 'ทบยอดเดือนที่แล้ว?',
+            text: `คุณมียอดคงเหลือจากเดือนที่แล้ว ฿${prevBalance.toLocaleString()} ต้องการนำมาเป็นรายรับเริ่มต้นของเดือนนี้หรือไม่?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: 'var(--success)',
+            cancelButtonColor: 'var(--text-muted)',
+            confirmButtonText: 'ใช่, นำยอดมาทบ',
+            cancelButtonText: 'ไม่เป็นไร'
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              try {
+                // Ensure date is 1st of current month
+                const targetDate = new Date(currentYear, currentMonth, 1);
+                // Adjust for local timezone offset to avoid previous day
+                const localDateStr = new Date(targetDate.getTime() - (targetDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+                
+                const response = await fetchWithAuth('/api/transactions', {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    title: 'ยอดยกมา',
+                    subtitle: 'อื่นๆ',
+                    categoryName: 'Income',
+                    type: 'income',
+                    amount: prevBalance,
+                    date: localDateStr
+                  }),
+                });
+                if (response.ok) {
+                  localStorage.setItem(rolloverKey, 'true');
+                  Swal.fire('สำเร็จ!', 'เพิ่มยอดยกมาเรียบร้อยแล้ว', 'success');
+                  if (refresh) refresh();
+                  else window.location.reload();
+                }
+              } catch(e) {
+                console.error(e);
+              }
+            } else {
+              localStorage.setItem(rolloverKey, 'true');
+            }
+          });
+        } else {
+          localStorage.setItem(rolloverKey, 'true');
+        }
+      } else {
+        localStorage.setItem(rolloverKey, 'true');
+      }
+    }
+  }, [transactions, refresh]);
 
   const filteredTransactions = transactions.filter(tItem => {
     // Date filter

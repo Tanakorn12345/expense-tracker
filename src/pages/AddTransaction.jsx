@@ -16,7 +16,7 @@ import Swal from 'sweetalert2';
 
 const AddTransaction = () => {
   const navigate = useNavigate();
-  const { forecast } = useTransactions();
+  const { forecast, transactions } = useTransactions();
   const { t } = useLanguage();
   const [isExpense, setIsExpense] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -34,19 +34,48 @@ const AddTransaction = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    setIsSaving(true);
     
     const amountInput = document.querySelector('.amount-input').value;
     const dateInput = document.querySelector('input[type="date"]').value;
     const categoryInput = document.querySelector('select').value;
     const descriptionInput = document.querySelector('textarea').value;
+    
+    const parsedAmount = parseFloat(amountInput) || 0;
 
+    // Expense Limit Check
+    if (isExpense) {
+      const targetDate = new Date(dateInput);
+      const targetMonth = targetDate.getMonth();
+      const targetYear = targetDate.getFullYear();
+      
+      const monthTransactions = transactions.filter(t => {
+        const d = new Date(t.date);
+        return d.getMonth() === targetMonth && d.getFullYear() === targetYear;
+      });
+      
+      const monthIncome = monthTransactions.filter(t => t.category?.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+      const monthExpense = monthTransactions.filter(t => t.category?.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+      const availableBalance = monthIncome - monthExpense;
+
+      if (parsedAmount > availableBalance) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'ยอดเงินไม่เพียงพอ',
+          text: `ไม่สามารถบันทึกรายจ่ายนี้ได้ เนื่องจากยอดคงเหลือในเดือนนี้มีเพียง ฿${availableBalance.toLocaleString()}`,
+          confirmButtonColor: 'var(--primary-main)'
+        });
+        return; // stop execution
+      }
+    }
+
+    setIsSaving(true);
+    
     const payload = {
       title: descriptionInput || (isExpense ? t('expense') : t('income')),
       subtitle: isExpense ? categoryInput : document.querySelector('select').value,
       categoryName: isExpense ? categoryInput : 'Income',
       type: isExpense ? 'expense' : 'income',
-      amount: parseFloat(amountInput) || 0,
+      amount: parsedAmount,
       date: dateInput
     };
 
