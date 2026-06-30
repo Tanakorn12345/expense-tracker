@@ -70,26 +70,28 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
       
       <main className="main-content">
         <div className="top-bar">
-          <div className="flex items-center gap-3 mr-auto">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
             <button className="mobile-menu-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
               <Menu size={24} color="var(--text-main)" />
             </button>
-            <div className="search-box">
+            <div className="search-box" style={{ flex: 1, maxWidth: '360px', minWidth: 0 }}>
               <div style={{ position: 'relative' }}>
                 <Search 
-                  size={18} 
+                  size={16} 
                   style={{ 
                     position: 'absolute', 
                     left: '12px', 
                     top: '50%', 
                     transform: 'translateY(-50%)', 
-                    color: 'var(--text-muted)' 
+                    color: 'var(--text-muted)',
+                    pointerEvents: 'none'
                   }} 
                 />
                 <input 
                   type="text" 
                   placeholder={t('search')} 
                   className="form-control search-input" 
+                  style={{ paddingLeft: '36px', width: '100%' }}
                   value={searchQuery || ''}
                   onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
                 />

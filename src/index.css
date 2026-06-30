@@ -518,25 +518,31 @@ select.form-control {
 /* Top bar Layout Styles */
 .top-bar {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
 }
 .user-profile {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-.avatar {
+.avatar-circle {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #eee;
-  object-fit: cover;
+  background: linear-gradient(135deg, var(--primary-main), var(--accent));
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: default;
+  user-select: none;
 }
 
 @media (max-width: 1200px) {
@@ -544,18 +550,23 @@ select.form-control {
 }
 @media (max-width: 768px) {
   .dashboard-header { flex-direction: column; gap: 1rem; align-items: stretch; }
-  .date-picker { width: 100%; justify-content: space-between; flex-wrap: wrap; }
-  .top-bar-actions { gap: 1rem; flex-wrap: wrap; justify-content: flex-end; }
+  .date-picker { width: 100%; flex-wrap: wrap; gap: 0.5rem; }
+  .date-picker input, .date-picker select, .date-picker button { flex: 1; min-width: 0; }
+  .top-bar-actions { gap: 0.75rem; }
+  .top-bar { gap: 0.75rem; padding-bottom: 0.75rem; margin-bottom: 1.5rem; }
   .user-info { display: none; }
-  .search-input { width: 100% !important; min-width: 150px; }
-  .search-box { flex: 1; min-width: 150px; }
+  .search-box { flex: 1; min-width: 0; }
+  .search-input { width: 100% !important; }
   .card { padding: 1.2rem; }
+  .notification-dropdown { right: -60px; width: 290px; }
 }
 @media (max-width: 480px) {
-  .main-content { padding: 1rem; }
-  .search-input { min-width: 120px; }
+  .main-content { padding: 1rem; padding-top: 1rem; }
   .form-grid { grid-template-columns: 1fr; }
-  .date-picker input, .date-picker select { width: 100% !important; }
+  .header-title h1 { font-size: 1.5rem; }
+  .stats-grid { grid-template-columns: 1fr; }
+  .notification-dropdown { right: -80px; width: 270px; }
+  .search-box { display: none; }
 }
 
 /* --- New UI Components --- */
@@ -712,7 +723,8 @@ select.form-control {
 .top-bar-actions {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
+  flex-shrink: 0;
 }
 
 @media (max-width: 1024px) {
