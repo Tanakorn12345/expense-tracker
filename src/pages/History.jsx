@@ -8,6 +8,7 @@ import { fetchWithAuth } from '../utils/api';
 import Swal from 'sweetalert2';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { SarabunFont } from '../assets/fonts/Sarabun';
 
 const getIcon = (categoryName) => {
   switch (categoryName) {
@@ -61,19 +62,25 @@ const History = () => {
 
     const doc = new jsPDF();
     
-    // Add Thai Font if possible, but standard jsPDF might not support Thai out of the box without custom font.
-    // We will proceed with standard text which might show ? for Thai characters if font is missing,
-    // but the user just requested PDF export.
-    doc.text("Transaction History", 14, 15);
+    doc.addFileToVFS("Sarabun-Regular.ttf", SarabunFont);
+    doc.addFont("Sarabun-Regular.ttf", "Sarabun", "normal");
+    doc.setFont("Sarabun");
+
+    doc.text(t('history') || "ประวัติการทำรายการ", 14, 15);
     
-    const tableColumn = ["Title", "Category", "Date", "Amount"];
+    const tableColumn = [
+      t('transaction') || "รายการ", 
+      t('category') || "หมวดหมู่", 
+      t('date') || "วันที่", 
+      t('amount') || "จำนวนเงิน"
+    ];
     const tableRows = [];
 
     filteredTransactions.forEach(tItem => {
       const transactionData = [
         tItem.title,
         tItem.category?.name || tItem.subtitle,
-        new Date(tItem.date).toLocaleDateString('en-US'),
+        new Date(tItem.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }),
         `${tItem.category?.type === 'expense' ? '-' : '+'}฿${tItem.amount.toLocaleString()}`
       ];
       tableRows.push(transactionData);
@@ -83,6 +90,14 @@ const History = () => {
       head: [tableColumn],
       body: tableRows,
       startY: 20,
+      styles: {
+        font: "Sarabun",
+        fontSize: 12
+      },
+      headStyles: {
+        font: "Sarabun",
+        fontSize: 14
+      }
     });
 
     const engMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
