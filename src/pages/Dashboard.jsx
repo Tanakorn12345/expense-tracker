@@ -192,24 +192,26 @@ const Dashboard = () => {
             ) : filteredTransactions.length === 0 ? (
               <p className="text-muted" style={{ textAlign: 'center', padding: '2rem' }}>{t('noTransactions')}</p>
             ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
-                <tbody>
-                  {filteredTransactions.slice(0, 5).map(tItem => (
-                    <TransactionRow 
-                      key={tItem.id}
-                      icon={getIcon(tItem.category?.name || tItem.subtitle)} 
-                      title={tItem.title} 
-                      subtitle={tItem.subtitle} 
-                      category={tItem.category?.name || tItem.subtitle} 
-                      badgeClass={tItem.category?.type === 'income' ? 'badge-income' : 'badge-housing'}
-                      badgeStyle={tItem.category?.type === 'income' ? { background: 'rgba(0, 51, 102, 0.1)', color: 'var(--primary-main)' } : {}}
-                      date={new Date(tItem.date).toLocaleDateString(t('jan') === 'มกราคม' ? 'th-TH' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })} 
-                      amount={`${tItem.category?.type === 'expense' ? '-' : '+'}฿${tItem.amount.toLocaleString()}`} 
-                      isNegative={tItem.category?.type === 'expense'} 
-                    />
-                  ))}
-                </tbody>
-              </table>
+              <div className="table-container">
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '400px' }}>
+                  <tbody>
+                    {filteredTransactions.slice(0, 5).map(tItem => (
+                      <TransactionRow 
+                        key={tItem.id}
+                        icon={getIcon(tItem.category?.name || tItem.subtitle)} 
+                        title={tItem.title} 
+                        subtitle={tItem.subtitle} 
+                        category={tItem.category?.name || tItem.subtitle} 
+                        badgeClass={tItem.category?.type === 'income' ? 'badge-income' : 'badge-housing'}
+                        badgeStyle={tItem.category?.type === 'income' ? { background: 'rgba(0, 51, 102, 0.1)', color: 'var(--primary-main)' } : {}}
+                        date={new Date(tItem.date).toLocaleDateString(t('jan') === 'มกราคม' ? 'th-TH' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })} 
+                        amount={`${tItem.category?.type === 'expense' ? '-' : '+'}฿${tItem.amount.toLocaleString()}`} 
+                        isNegative={tItem.category?.type === 'expense'} 
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </div>

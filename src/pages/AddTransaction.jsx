@@ -261,7 +261,7 @@ const AddTransaction = () => {
           margin-bottom: 1rem;
           display: block;
         }
-        .amount-wrapper { display: inline-flex; align-items: center; gap: 12px; }
+        .amount-wrapper { display: inline-flex; align-items: center; gap: 12px; max-width: 100%; }
         .currency-symbol { font-size: 2.5rem; font-family: 'Outfit'; color: var(--text-muted); }
         .amount-input {
           border: none;
@@ -269,7 +269,8 @@ const AddTransaction = () => {
           font-size: 4rem;
           font-family: 'Outfit';
           font-weight: 700;
-          width: 250px;
+          width: 100%;
+          max-width: 250px;
           text-align: left;
           color: var(--primary-dark);
           border-bottom: 2px solid transparent;
