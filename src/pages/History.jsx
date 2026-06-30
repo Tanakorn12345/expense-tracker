@@ -85,7 +85,9 @@ const History = () => {
       startY: 20,
     });
 
-    doc.save(`transactions_${filterMonth !== 'all' ? filterMonth : 'all'}.pdf`);
+    const engMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthStr = filterMonth !== 'all' ? engMonths[parseInt(filterMonth)].toLowerCase() : 'all-months';
+    doc.save(`${monthStr}-transaction.pdf`);
   };
 
   const handleDeleteAll = async () => {
