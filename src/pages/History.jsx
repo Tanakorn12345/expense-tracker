@@ -158,7 +158,7 @@ const History = () => {
 
   return (
     <Layout searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
-      <div className="page-header">
+      <div className="page-header" style={{ marginBottom: '2rem' }}>
         <h1>{t('history')}</h1>
         <p>{t('addTransactionDesc')}</p>
       </div>
