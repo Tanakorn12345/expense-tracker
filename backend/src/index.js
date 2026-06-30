@@ -5,6 +5,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
+const { initCronJobs } = require('./services/cronJobs');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -28,4 +29,5 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  initCronJobs();
 });

@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../utils/api';
 import { useTransactions } from '../hooks/useTransactions';
 import { useLanguage } from '../contexts/LanguageContext';
+import Swal from 'sweetalert2';
 
 const AddTransaction = () => {
   const navigate = useNavigate();
@@ -71,12 +72,24 @@ const AddTransaction = () => {
           console.error(e);
         }
 
-        alert(`${isExpense ? 'Expense' : 'Income'} saved successfully!`);
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: `${isExpense ? 'Expense' : 'Income'} saved successfully!`,
+          confirmButtonColor: 'var(--primary-main)'
+        });
         navigate('/dashboard');
+      } else {
+        throw new Error('Failed to save');
       }
     } catch (error) {
       console.error('Error saving transaction:', error);
-      alert('Failed to save transaction');
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Failed to save transaction',
+        confirmButtonColor: 'var(--primary-main)'
+      });
     } finally {
       setIsSaving(false);
     }

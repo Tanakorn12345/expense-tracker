@@ -17,4 +17,7 @@ router.get('/forecast', transactionController.getForecast);
 // Create transaction
 router.post('/', transactionController.createTransaction);
 
+// Delete all user transactions
+router.delete('/all', transactionController.deleteAllTransactions);
+
 module.exports = router;

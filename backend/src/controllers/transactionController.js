@@ -100,6 +100,18 @@ const transactionController = {
     } catch (error) {
       next(error);
     }
+  },
+
+  deleteAllTransactions: async (req, res, next) => {
+    try {
+      const result = await prisma.transaction.deleteMany({
+        where: { userId: req.user.id }
+      });
+      res.json({ message: 'All transactions deleted', count: result.count });
+    } catch (error) {
+      res.status(500);
+      next(error);
+    }
   }
 };
 

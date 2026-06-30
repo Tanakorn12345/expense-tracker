@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import { useTransactions } from '../hooks/useTransactions';
 import { useLanguage } from '../contexts/LanguageContext';
-import { ShoppingCart, Banknote, Home, ArrowRightLeft, Car } from 'lucide-react';
+import { ShoppingCart, Banknote, Home, ArrowRightLeft, Car, Download, Trash2 } from 'lucide-react';
 import TransactionRow from '../components/Dashboard/TransactionRow';
+import { fetchWithAuth } from '../utils/api';
+import Swal from 'sweetalert2';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const getIcon = (categoryName) => {
   switch (categoryName) {
@@ -44,6 +48,80 @@ const History = () => {
     return true;
   });
 
+  const handleExportPDF = () => {
+    if (filteredTransactions.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Data',
+        text: 'Cannot export because there is no data.',
+        confirmButtonColor: 'var(--primary-main)'
+      });
+      return;
+    }
+
+    const doc = new jsPDF();
+    
+    // Add Thai Font if possible, but standard jsPDF might not support Thai out of the box without custom font.
+    // We will proceed with standard text which might show ? for Thai characters if font is missing,
+    // but the user just requested PDF export.
+    doc.text("Transaction History", 14, 15);
+    
+    const tableColumn = ["Title", "Category", "Date", "Amount"];
+    const tableRows = [];
+
+    filteredTransactions.forEach(tItem => {
+      const transactionData = [
+        tItem.title,
+        tItem.category?.name || tItem.subtitle,
+        new Date(tItem.date).toLocaleDateString('en-US'),
+        `${tItem.category?.type === 'expense' ? '-' : '+'}฿${tItem.amount.toLocaleString()}`
+      ];
+      tableRows.push(transactionData);
+    });
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+    });
+
+    doc.save(`transactions_${filterMonth !== 'all' ? filterMonth : 'all'}.pdf`);
+  };
+
+  const handleDeleteAll = async () => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this! This deletes all your transactions.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete all!'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await fetchWithAuth('/api/transactions/all', {
+          method: 'DELETE',
+        });
+        
+        if (response.ok) {
+          Swal.fire(
+            'Deleted!',
+            'Your transactions have been deleted.',
+            'success'
+          );
+          // Refresh page to clear data
+          window.location.reload();
+        } else {
+          throw new Error('Failed to delete');
+        }
+      } catch (error) {
+        Swal.fire('Error', 'Failed to delete transactions.', 'error');
+      }
+    }
+  };
+
   return (
     <Layout searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <div className="page-header">
@@ -55,6 +133,14 @@ const History = () => {
         <div className="flex justify-between items-center mb-6">
           <h2 style={{ fontSize: '1.25rem' }}>{t('recentTransactions')}</h2>
           <div className="flex gap-2">
+            <button className="btn btn-outline" onClick={handleExportPDF} style={{ padding: '8px 12px' }}>
+              <Download size={16} className="mr-2" style={{ marginRight: '8px' }} />
+              Export
+            </button>
+            <button className="btn" onClick={handleDeleteAll} style={{ padding: '8px 12px', background: 'var(--danger)', color: 'white' }}>
+              <Trash2 size={16} className="mr-2" style={{ marginRight: '8px' }} />
+              Delete All
+            </button>
             <select 
               className="form-control" 
               style={{ width: 'auto', display: 'inline-block' }}
