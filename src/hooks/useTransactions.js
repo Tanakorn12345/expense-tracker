@@ -24,9 +24,9 @@ export const useTransactions = (month = null, year = null) => {
       }
 
       const [transactionsRes, statsRes, forecastRes] = await Promise.all([
-        fetchWithAuth(`http://34.58.58.40/api/transactions${queryParams}`),
-        fetchWithAuth(`http://34.58.58.40/api/transactions/stats${queryParams}`),
-        fetchWithAuth(`http://34.58.58.40/api/transactions/forecast${queryParams}`)
+        fetchWithAuth(`/api/transactions${queryParams}`),
+        fetchWithAuth(`/api/transactions/stats${queryParams}`),
+        fetchWithAuth(`/api/transactions/forecast${queryParams}`)
       ]);
       
       if (!transactionsRes.ok || !statsRes.ok || !forecastRes.ok) {

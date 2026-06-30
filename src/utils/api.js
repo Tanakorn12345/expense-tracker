@@ -1,4 +1,4 @@
-export const fetchWithAuth = async (url, options = {}) => {
+export const fetchWithAuth = async (endpoint, options = {}) => {
   const token = localStorage.getItem('token');
   
   const headers = {
@@ -9,6 +9,9 @@ export const fetchWithAuth = async (url, options = {}) => {
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
+
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
 
   const response = await fetch(url, { ...options, headers });
   

@@ -22,7 +22,7 @@ const AddTransaction = () => {
   const [categories, setCategories] = useState({ expense: [], income: [] });
 
   useEffect(() => {
-    fetchWithAuth('http://34.58.58.40/api/categories')
+    fetchWithAuth('/api/categories')
       .then(res => res.json())
       .then(data => setCategories(data))
       .catch(err => console.error('Error fetching categories:', err));
@@ -50,7 +50,7 @@ const AddTransaction = () => {
     };
 
     try {
-      const response = await fetchWithAuth('http://34.58.58.40/api/transactions', {
+      const response = await fetchWithAuth('/api/transactions', {
         method: 'POST',
         body: JSON.stringify(payload),
       });

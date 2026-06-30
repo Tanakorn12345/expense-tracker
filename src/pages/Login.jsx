@@ -18,8 +18,8 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-
-    const url = isLogin ? 'http://34.58.58.40/api/auth/login' : 'http://34.58.58.40/api/auth/register';
+    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const url = isLogin ? `${API_BASE_URL}/api/auth/login` : `${API_BASE_URL}/api/auth/register`;
     
     try {
       const res = await fetch(url, {
