@@ -175,29 +175,44 @@ const Dashboard = () => {
           <h1>{t('overviewTitle')}</h1>
           <p>{t('overviewDesc')}</p>
           {transactions.length > 0 && (() => {
-            const latest = [...transactions].sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date))[0];
-            const latestTime = new Date(latest.createdAt || latest.date);
-            return (
-              <div style={{ 
-                marginTop: '0.5rem', 
-                display: 'inline-flex', 
-                alignItems: 'center', 
-                gap: '6px',
-                fontSize: '0.78rem',
-                color: 'var(--text-muted)',
-                background: 'var(--bg-body)',
-                padding: '4px 10px',
-                borderRadius: '20px',
-                border: '1px solid var(--border)'
-              }}>
-                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--success)', display: 'inline-block', flexShrink: 0 }}></span>
-                {language === 'th' ? 'บันทึกล่าสุด: ' : 'Last saved: '}
-                {latestTime.toLocaleString(language === 'th' ? 'th-TH' : 'en-US', {
-                  day: 'numeric', month: 'short', year: 'numeric',
-                  hour: '2-digit', minute: '2-digit'
-                })}
-              </div>
-            );
+            try {
+              const validTxs = transactions.filter(t => t.createdAt || t.date);
+              if (validTxs.length === 0) return null;
+              
+              const latest = [...validTxs].sort((a, b) => {
+                const dA = new Date(a.createdAt || a.date).getTime();
+                const dB = new Date(b.createdAt || b.date).getTime();
+                return (isNaN(dB) ? 0 : dB) - (isNaN(dA) ? 0 : dA);
+              })[0];
+              
+              const latestTime = new Date(latest.createdAt || latest.date);
+              if (isNaN(latestTime.getTime())) return null;
+
+              return (
+                <div style={{ 
+                  marginTop: '0.5rem', 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  gap: '6px',
+                  fontSize: '0.78rem',
+                  color: 'var(--text-muted)',
+                  background: 'var(--bg-body)',
+                  padding: '4px 10px',
+                  borderRadius: '20px',
+                  border: '1px solid var(--border)'
+                }}>
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--success)', display: 'inline-block', flexShrink: 0 }}></span>
+                  {language === 'th' ? 'บันทึกล่าสุด: ' : 'Last saved: '}
+                  {latestTime.toLocaleString(language === 'th' ? 'th-TH' : 'en-US', {
+                    day: 'numeric', month: 'short', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                  })}
+                </div>
+              );
+            } catch (e) {
+              console.error(e);
+              return null;
+            }
           })()}
         </div>
         <div className="date-picker flex gap-4">
