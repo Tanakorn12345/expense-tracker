@@ -58,7 +58,7 @@ const History = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const handleExportPDF = () => {
+  const triggerExport = () => {
     if (filteredTransactions.length === 0) {
       Swal.fire({
         icon: 'warning',
@@ -69,6 +69,23 @@ const History = () => {
       return;
     }
 
+    Swal.fire({
+      title: 'เลือภาษาของรายงาน\nSelect Report Language',
+      showCancelButton: true,
+      confirmButtonText: 'ไทย',
+      cancelButtonText: 'English',
+      confirmButtonColor: 'var(--primary-main)',
+      cancelButtonColor: '#64748b',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleExportPDF('th');
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        handleExportPDF('en');
+      }
+    });
+  };
+
+  const handleExportPDF = (exportLang) => {
     const doc = new jsPDF();
     
     doc.addFileToVFS("Sarabun-Regular.ttf", SarabunFont);
@@ -105,35 +122,38 @@ const History = () => {
     doc.setTextColor(50, 50, 50);
     doc.setFontSize(12);
 
-    let periodText = 'ทั้งหมด';
+    let periodText = exportLang === 'th' ? 'ทั้งหมด' : 'All Time';
     if (filterDate) {
-      periodText = `วันที่ ${filterDate}`;
+      periodText = exportLang === 'th' ? `วันที่ ${filterDate}` : `Date ${filterDate}`;
     } else if (filterMonth !== 'all') {
       const thMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-      periodText = thMonths[parseInt(filterMonth)];
+      const enMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      periodText = exportLang === 'th' ? thMonths[parseInt(filterMonth)] : enMonths[parseInt(filterMonth)];
     }
     
     const now = new Date();
-    const exportTime = now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + now.toLocaleTimeString('th-TH');
+    const exportTime = exportLang === 'th' 
+      ? now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + now.toLocaleTimeString('th-TH')
+      : now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + now.toLocaleTimeString('en-US');
 
-    const titleStr = `รายการแจ้งธุรกรรมที่ดำเนินการในเดือน: ${periodText}`;
-    const timeStr = `เวลาที่ส่งออก: ${exportTime}`;
+    const titleStr = exportLang === 'th' ? `รายการแจ้งธุรกรรมที่ดำเนินการในเดือน: ${periodText}` : `Transaction Report for: ${periodText}`;
+    const timeStr = exportLang === 'th' ? `เวลาที่ส่งออก: ${exportTime}` : `Exported at: ${exportTime}`;
     doc.text(titleStr, 14, 30);
     doc.text(timeStr, 14, 37);
     
-    const tableColumn = [
-      t('transaction') || "รายการ", 
-      t('category') || "หมวดหมู่", 
-      t('date') || "วันที่", 
-      t('amount') || "จำนวนเงิน"
-    ];
+    const tableColumn = exportLang === 'th' 
+      ? ["รายการ", "หมวดหมู่", "วันที่", "จำนวนเงิน"]
+      : ["Transaction", "Category", "Date", "Amount"];
+
     const tableRows = [];
 
     filteredTransactions.forEach(tItem => {
       const transactionData = [
         tItem.title,
         tItem.category?.name || tItem.subtitle,
-        new Date(tItem.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }),
+        exportLang === 'th' 
+          ? new Date(tItem.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })
+          : new Date(tItem.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
         `${tItem.category?.type === 'expense' ? '-' : '+'}฿${tItem.amount.toLocaleString()}`
       ];
       tableRows.push(transactionData);
@@ -146,13 +166,6 @@ const History = () => {
       if (t.category?.type === 'expense') reportExpense += t.amount;
     });
 
-    let systemIncome = 0;
-    let systemExpense = 0;
-    transactions.forEach(t => {
-      if (t.category?.type === 'income') systemIncome += t.amount;
-      if (t.category?.type === 'expense') systemExpense += t.amount;
-    });
-    const systemBalance = systemIncome - systemExpense;
 
     autoTable(doc, {
       head: [tableColumn],
@@ -174,7 +187,9 @@ const History = () => {
         doc.setFontSize(10);
         doc.setTextColor(100, 100, 100);
         
-        const footerText = "ขอบคุณที่ใช้บริการของเรา หากมีข้อสงสัยสามารถติดต่อได้ที่ hoing11111@gmail.com";
+        const footerText = exportLang === 'th' 
+          ? "ขอบคุณที่ใช้บริการของเรา หากมีข้อสงสัยสามารถติดต่อได้ที่ hoing11111@gmail.com" 
+          : "Thank you for using our service. For any inquiries, please contact hoing11111@gmail.com";
         const textWidth = doc.getTextWidth(footerText);
         doc.text(footerText, (pageWidth - textWidth) / 2, pageHeight - 15);
         
@@ -203,18 +218,18 @@ const History = () => {
     doc.setFontSize(12);
     
     doc.setTextColor(50, 50, 50);
-    doc.text(`สรุปตามช่วงเวลาที่เลือก (ในรายงานนี้):`, 20, finalY + 22);
+    doc.text(exportLang === 'th' ? `สรุปตามช่วงเวลาที่เลือก (ในรายงานนี้):` : `Summary for selected period:`, 20, finalY + 22);
     
     doc.setTextColor(39, 174, 96); // Green
-    doc.text(`รายรับรวม: +฿${reportIncome.toLocaleString()}`, 20, finalY + 32);
+    doc.text(exportLang === 'th' ? `รายรับรวม: +฿${reportIncome.toLocaleString()}` : `Total Income: +฿${reportIncome.toLocaleString()}`, 20, finalY + 32);
     
     doc.setTextColor(231, 76, 60); // Red
-    doc.text(`รายจ่ายรวม: -฿${reportExpense.toLocaleString()}`, 90, finalY + 32);
+    doc.text(exportLang === 'th' ? `รายจ่ายรวม: -฿${reportExpense.toLocaleString()}` : `Total Expense: -฿${reportExpense.toLocaleString()}`, 90, finalY + 32);
     
-    // System Balance
+    // Approval Text
     doc.setTextColor(0, 51, 102); // Primary Blue
-    doc.setFontSize(14);
-    doc.text(`เงินคงเหลือที่มีอยู่ในระบบทั้งหมด: ฿${systemBalance.toLocaleString()}`, 20, finalY + 45);
+    doc.setFontSize(12);
+    doc.text(exportLang === 'th' ? `อนุมัติโดย ธนกร ทิพย์วารีรัตนะ` : `Approved by Tanakorn Thipwareeratana`, 20, finalY + 45);
 
     let filename = 'all-months';
     if (filterDate) {
@@ -315,7 +330,7 @@ const History = () => {
             </div>
             
             <div className="history-actions-group">
-              <button className="btn btn-outline" onClick={handleExportPDF} style={{ padding: '8px 12px', justifyContent: 'center', display: 'flex', alignItems: 'center' }}>
+              <button className="btn btn-outline" onClick={triggerExport} style={{ padding: '8px 12px', justifyContent: 'center', display: 'flex', alignItems: 'center' }}>
                 <Download size={16} className="mr-2" style={{ marginRight: '8px' }} />
                 Export
               </button>
