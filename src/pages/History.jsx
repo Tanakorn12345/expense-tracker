@@ -75,7 +75,35 @@ const History = () => {
     doc.addFont("Sarabun-Regular.ttf", "Sarabun", "normal");
     doc.setFont("Sarabun");
 
-    doc.text(t('history') || "ประวัติการทำรายการ", 14, 15);
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+
+    // Header Logo
+    doc.setFillColor(0, 51, 102); // var(--primary-main)
+    doc.rect(14, 12, 35, 10, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14);
+    doc.text("Fintrack", 18, 19);
+
+    // Title
+    doc.setTextColor(50, 50, 50);
+    doc.setFontSize(12);
+
+    let periodText = 'ทั้งหมด';
+    if (filterDate) {
+      periodText = `วันที่ ${filterDate}`;
+    } else if (filterMonth !== 'all') {
+      const thMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+      periodText = thMonths[parseInt(filterMonth)];
+    }
+    
+    const now = new Date();
+    const exportTime = now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + now.toLocaleTimeString('th-TH');
+
+    const titleStr = `รายการแจ้งธุรกรรมที่ดำเนินการในเดือน: ${periodText}`;
+    const timeStr = `เวลาที่ส่งออก: ${exportTime}`;
+    doc.text(titleStr, 14, 30);
+    doc.text(timeStr, 14, 37);
     
     const tableColumn = [
       t('transaction') || "รายการ", 
@@ -98,15 +126,32 @@ const History = () => {
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: 20,
+      startY: 43,
       styles: {
         font: "Sarabun",
-        fontSize: 12
+        fontSize: 10
       },
       headStyles: {
         font: "Sarabun",
         fontStyle: "normal",
-        fontSize: 14
+        fontSize: 12,
+        fillColor: [0, 51, 102]
+      },
+      margin: { bottom: 30 },
+      didDrawPage: function(data) {
+        doc.setFont("Sarabun");
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        
+        const footerText = "ขอบคุณที่ใช้บริการของเรา หากมีข้อสงสัยสามารถติดต่อได้ที่ hoing11111@gmail.com";
+        const textWidth = doc.getTextWidth(footerText);
+        doc.text(footerText, (pageWidth - textWidth) / 2, pageHeight - 15);
+        
+        doc.setFillColor(0, 51, 102);
+        doc.rect((pageWidth - 25) / 2, pageHeight - 10, 25, 6, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(10);
+        doc.text("Fintrack", (pageWidth - 17) / 2, pageHeight - 6);
       }
     });
 
