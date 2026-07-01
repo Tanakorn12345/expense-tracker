@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Sidebar from './Sidebar';
+import Footer from './Footer';
 import { Search, Bell, Globe, Menu, X, CheckCircle, Info } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useLocation } from 'react-router-dom';
@@ -21,19 +22,28 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem('user');
-      if (storedUser) setUser(JSON.parse(storedUser));
+      let currentUser = null;
+      if (storedUser) {
+        currentUser = JSON.parse(storedUser);
+        setUser(currentUser);
+      }
       
-      // Load mock notifications
-      const storedNotifs = localStorage.getItem('notifications');
-      if (storedNotifs) {
-        setNotifications(JSON.parse(storedNotifs));
+      if (currentUser) {
+        // Load mock notifications specific to user
+        const notifKey = `notifications_${currentUser.id}`;
+        const storedNotifs = localStorage.getItem(notifKey);
+        if (storedNotifs) {
+          setNotifications(JSON.parse(storedNotifs));
+        } else {
+          // Initial mock notifications
+          const initial = [
+            { id: 1, type: 'summary', text: 'สรุปยอดเงินคงเหลือประจำเดือนพร้อมใช้งานแล้ว', time: new Date().toISOString(), read: false },
+          ];
+          setNotifications(initial);
+          localStorage.setItem(notifKey, JSON.stringify(initial));
+        }
       } else {
-        // Initial mock notifications
-        const initial = [
-          { id: 1, type: 'summary', text: 'สรุปยอดเงินคงเหลือประจำเดือนพร้อมใช้งานแล้ว', time: new Date().toISOString(), read: false },
-        ];
-        setNotifications(initial);
-        localStorage.setItem('notifications', JSON.stringify(initial));
+        setNotifications([]);
       }
     } catch (e) {
       console.error(e);
@@ -54,7 +64,9 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
   const markAllRead = () => {
     const updated = notifications.map(n => ({ ...n, read: true }));
     setNotifications(updated);
-    localStorage.setItem('notifications', JSON.stringify(updated));
+    if (user) {
+      localStorage.setItem(`notifications_${user.id}`, JSON.stringify(updated));
+    }
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -157,7 +169,10 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
             </div>
           </div>
         </div>
-        {children}
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 8rem)' }}>
+          {children}
+          <Footer />
+        </div>
       </main>
     </div>
   );
