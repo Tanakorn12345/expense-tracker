@@ -225,13 +225,12 @@ const History = () => {
         <p>{t('addTransactionDesc')}</p>
       </div>
 
-      <div className="card" style={{ padding: '2rem' }}>
-        <div className="flex justify-between items-center mb-6">
-          <h2 style={{ fontSize: '1.25rem' }}>{t('recentTransactions')}</h2>
-          <div className="flex gap-2">
+      <div className="card history-card">
+        <div className="history-header">
+          <h2 style={{ fontSize: '1.25rem', whiteSpace: 'nowrap', margin: 0 }}>{t('recentTransactions')}</h2>
+          <div className="history-filters">
             <select 
               className="form-control" 
-              style={{ width: 'auto', minWidth: '150px' }}
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
             >
@@ -242,18 +241,9 @@ const History = () => {
               <option value="housing">{language === 'th' ? 'ที่พัก/บ้าน' : 'Housing'}</option>
               <option value="transportation">{language === 'th' ? 'เดินทาง' : 'Transportation'}</option>
             </select>
-            <button className="btn btn-outline" onClick={handleExportPDF} style={{ padding: '8px 12px' }}>
-              <Download size={16} className="mr-2" style={{ marginRight: '8px' }} />
-              Export
-            </button>
-            <button className="btn" onClick={handleDeleteAll} style={{ padding: '8px 12px', background: 'var(--danger)', color: 'white' }}>
-              <Trash2 size={16} className="mr-2" style={{ marginRight: '8px' }} />
-              Delete All
-            </button>
             <input 
               type="date" 
               className="form-control" 
-              style={{ width: 'auto', display: 'inline-block' }}
               value={filterDate}
               onChange={(e) => {
                 setFilterDate(e.target.value);
@@ -265,7 +255,6 @@ const History = () => {
             />
             <select 
               className="form-control" 
-              style={{ width: 'auto', display: 'inline-block' }}
               value={filterMonth}
               onChange={(e) => {
                 setFilterMonth(e.target.value);
@@ -279,10 +268,18 @@ const History = () => {
                 </option>
               ))}
             </select>
+            <button className="btn btn-outline" onClick={handleExportPDF} style={{ padding: '8px 12px', justifyContent: 'center', display: 'flex', alignItems: 'center' }}>
+              <Download size={16} className="mr-2" style={{ marginRight: '8px' }} />
+              Export
+            </button>
+            <button className="btn" onClick={handleDeleteAll} style={{ padding: '8px 12px', background: 'var(--danger)', color: 'white', justifyContent: 'center', display: 'flex', alignItems: 'center' }}>
+              <Trash2 size={16} className="mr-2" style={{ marginRight: '8px' }} />
+              Delete All
+            </button>
           </div>
         </div>
 
-        <div className="table-container">
+        <div className="table-responsive">
           <table className="data-table" style={{ minWidth: '600px' }}>
             <thead>
               <tr>

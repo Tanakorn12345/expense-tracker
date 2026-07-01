@@ -732,3 +732,53 @@ select.form-control {
     display: block;
   }
 }
+
+/* History Page Responsiveness */
+.history-card {
+  padding: 1.5rem !important;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.history-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  width: 100%;
+}
+
+.history-filters > * {
+  flex: 1 1 auto;
+  min-width: 120px;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 768px) {
+  .history-header {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+  .history-filters {
+    width: auto;
+    justify-content: flex-end;
+  }
+  .history-filters > * {
+    flex: 0 1 auto;
+  }
+  .history-card {
+    padding: 2rem !important;
+  }
+}
