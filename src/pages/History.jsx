@@ -15,7 +15,7 @@ import { fetchWithAuth } from '../utils/api';
 
 const History = () => {
   const { transactions, isLoading } = useTransactions();
-  const { t, getMonthName } = useLanguage();
+  const { t, getMonthName, language } = useLanguage();
   const [filterMonth, setFilterMonth] = useState('all');
   const [filterDate, setFilterDate] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');

@@ -312,13 +312,28 @@ const Dashboard = () => {
           
           <div className="mt-8">
             <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-3">
-                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>{t('recentTransactions')}</h3>
+              <h3 style={{ fontSize: '1.1rem', margin: 0 }}>{t('recentTransactions')}</h3>
+              
+              <div style={{ position: 'relative' }}>
                 <select 
-                  className="form-control" 
-                  style={{ width: 'auto', padding: '4px 10px', fontSize: '0.85rem' }}
+                  style={{ 
+                    padding: '6px 32px 6px 16px', 
+                    fontSize: '0.85rem',
+                    borderRadius: '20px',
+                    appearance: 'none',
+                    background: 'var(--bg-body)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--text-main)',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                    outline: 'none',
+                    transition: 'all 0.2s ease'
+                  }}
                   value={filterCategory}
                   onChange={(e) => setFilterCategory(e.target.value)}
+                  onMouseOver={(e) => e.target.style.borderColor = 'var(--primary-main)'}
+                  onMouseOut={(e) => e.target.style.borderColor = 'var(--border)'}
                 >
                   <option value="all">{language === 'th' ? 'ทุกหมวดหมู่' : 'All Categories'}</option>
                   <option value="income">{language === 'th' ? 'รายรับทั้งหมด' : 'All Income'}</option>
@@ -327,10 +342,10 @@ const Dashboard = () => {
                   <option value="housing">{language === 'th' ? 'ที่พัก/บ้าน' : 'Housing'}</option>
                   <option value="transportation">{language === 'th' ? 'เดินทาง' : 'Transportation'}</option>
                 </select>
+                <div style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--primary-main)' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </div>
               </div>
-              <button className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.85rem' }} onClick={() => navigate('/history')}>
-                {t('viewAll')}
-              </button>
             </div>
             {isLoading ? (
               <p>{t('loading')}</p>
