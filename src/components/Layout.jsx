@@ -50,6 +50,19 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
     }
   }, [location.pathname]);
 
+  useEffect(() => {
+    const handleUpdate = () => {
+      if (user) {
+        const storedNotifs = localStorage.getItem(`notifications_${user.id}`);
+        if (storedNotifs) {
+          setNotifications(JSON.parse(storedNotifs));
+        }
+      }
+    };
+    window.addEventListener('notifications_updated', handleUpdate);
+    return () => window.removeEventListener('notifications_updated', handleUpdate);
+  }, [user]);
+
   // Handle click outside to close notifications
   useEffect(() => {
     const handleClickOutside = (event) => {

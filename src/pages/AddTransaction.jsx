@@ -13,6 +13,7 @@ import { fetchWithAuth } from '../utils/api';
 import { useTransactions } from '../hooks/useTransactions';
 import { useLanguage } from '../contexts/LanguageContext';
 import Swal from 'sweetalert2';
+import { notifyUser } from '../utils/notifications';
 
 const AddTransaction = () => {
   const navigate = useNavigate();
@@ -88,15 +89,10 @@ const AddTransaction = () => {
       if (response.ok) {
         // Add to local notifications
         try {
-          const storedNotifs = JSON.parse(localStorage.getItem('notifications') || '[]');
-          const newNotif = {
-            id: Date.now(),
-            type: 'transaction',
-            text: `เพิ่มรายการ${isExpense ? 'รายจ่าย' : 'รายรับ'}ใหม่: ${payload.title} (฿${payload.amount.toLocaleString()})`,
-            time: new Date().toISOString(),
-            read: false
-          };
-          localStorage.setItem('notifications', JSON.stringify([newNotif, ...storedNotifs]));
+          const user = JSON.parse(localStorage.getItem('user'));
+          if (user) {
+            notifyUser(user, `เพิ่มรายการ${isExpense ? 'รายจ่าย' : 'รายรับ'}ใหม่: ${payload.title} (฿${payload.amount.toLocaleString()})`, 'transaction');
+          }
         } catch(e) {
           console.error(e);
         }

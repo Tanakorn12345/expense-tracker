@@ -10,6 +10,7 @@ import autoTable from 'jspdf-autotable';
 import { SarabunFont } from '../assets/fonts/Sarabun';
 import CategoryIcon from '../components/CategoryIcon';
 import { fetchWithAuth } from '../utils/api';
+import { notifyUser } from '../utils/notifications';
 
 
 
@@ -239,7 +240,16 @@ const History = () => {
       filename = engMonths[parseInt(filterMonth)].toLowerCase();
     }
     
-    doc.save(`${filename}-transaction.pdf`);
+    doc.save(`fintrack_report_${filename}.pdf`);
+
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+        notifyUser(user, `คุณได้ส่งออกรายงานรูปแบบ PDF เรียบร้อยแล้ว (${filename})`, 'summary');
+      }
+    } catch(e) {
+      console.error(e);
+    }
   };
 
   const handleDeleteAll = async () => {
