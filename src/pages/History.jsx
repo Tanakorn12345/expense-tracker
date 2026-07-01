@@ -139,6 +139,21 @@ const History = () => {
       tableRows.push(transactionData);
     });
 
+    let reportIncome = 0;
+    let reportExpense = 0;
+    filteredTransactions.forEach(t => {
+      if (t.category?.type === 'income') reportIncome += t.amount;
+      if (t.category?.type === 'expense') reportExpense += t.amount;
+    });
+
+    let systemIncome = 0;
+    let systemExpense = 0;
+    transactions.forEach(t => {
+      if (t.category?.type === 'income') systemIncome += t.amount;
+      if (t.category?.type === 'expense') systemExpense += t.amount;
+    });
+    const systemBalance = systemIncome - systemExpense;
+
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
@@ -172,6 +187,34 @@ const History = () => {
         doc.text("FinTrack", footerLogoX + footerLogoSize + 3, pageHeight - 5);
       }
     });
+
+    let finalY = doc.lastAutoTable.finalY || 43;
+
+    if (finalY > pageHeight - 60) {
+      doc.addPage();
+      finalY = 20;
+    }
+
+    doc.setFillColor(243, 246, 249);
+    doc.setDrawColor(220, 225, 230);
+    doc.roundedRect(14, finalY + 10, pageWidth - 28, 45, 2, 2, 'FD');
+    
+    doc.setFont("Sarabun");
+    doc.setFontSize(12);
+    
+    doc.setTextColor(50, 50, 50);
+    doc.text(`สรุปตามช่วงเวลาที่เลือก (ในรายงานนี้):`, 20, finalY + 22);
+    
+    doc.setTextColor(39, 174, 96); // Green
+    doc.text(`รายรับรวม: +฿${reportIncome.toLocaleString()}`, 20, finalY + 32);
+    
+    doc.setTextColor(231, 76, 60); // Red
+    doc.text(`รายจ่ายรวม: -฿${reportExpense.toLocaleString()}`, 90, finalY + 32);
+    
+    // System Balance
+    doc.setTextColor(0, 51, 102); // Primary Blue
+    doc.setFontSize(14);
+    doc.text(`เงินคงเหลือที่มีอยู่ในระบบทั้งหมด: ฿${systemBalance.toLocaleString()}`, 20, finalY + 45);
 
     let filename = 'all-months';
     if (filterDate) {
