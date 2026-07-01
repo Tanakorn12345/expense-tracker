@@ -4,20 +4,18 @@ import {
   LayoutDashboard, 
   ArrowRightLeft, 
   LogOut,
-  Wallet,
   History as HistoryIcon
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import Logo from './Logo';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const { t } = useLanguage();
   return (
     <div className={`sidebar ${isOpen ? 'open' : ''}`}>
-      <div className="sidebar-logo">
-        <div className="logo-icon">
-          <Wallet size={20} color="white" />
-        </div>
-        <h2 style={{ fontSize: '1.25rem' }}>FinTrack</h2>
+      <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <Logo size={32} />
+        <h2 style={{ fontSize: '1.35rem', margin: 0, fontWeight: 700, letterSpacing: '0.5px' }}>FinTrack</h2>
       </div>
       
       <ul className="nav-links">

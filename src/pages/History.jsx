@@ -78,12 +78,28 @@ const History = () => {
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
 
+    // Helper to draw Fintrack Logo
+    const drawFintrackLogo = (x, y, size) => {
+      doc.setFillColor(0, 51, 102);
+      doc.roundedRect(x, y, size, size, size * 0.2, size * 0.2, 'F');
+      
+      doc.setFillColor(255, 255, 255);
+      doc.rect(x + size * 0.3, y + size * 0.25, size * 0.12, size * 0.5, 'F'); // stem
+      doc.rect(x + size * 0.4, y + size * 0.25, size * 0.3, size * 0.12, 'F'); // top bar
+      doc.rect(x + size * 0.4, y + size * 0.45, size * 0.2, size * 0.12, 'F'); // mid bar
+
+      doc.setDrawColor(16, 185, 129); // #10b981 green
+      doc.setLineWidth(size * 0.08);
+      doc.line(x + size * 0.5, y + size * 0.7, x + size * 0.8, y + size * 0.4); // diagonal
+      doc.line(x + size * 0.8, y + size * 0.4, x + size * 0.6, y + size * 0.4); // arrow top
+      doc.line(x + size * 0.8, y + size * 0.4, x + size * 0.8, y + size * 0.6); // arrow right
+    };
+
     // Header Logo
-    doc.setFillColor(0, 51, 102); // var(--primary-main)
-    doc.rect(14, 12, 35, 10, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(14);
-    doc.text("Fintrack", 18, 19);
+    drawFintrackLogo(14, 12, 10);
+    doc.setTextColor(0, 51, 102);
+    doc.setFontSize(16);
+    doc.text("FinTrack", 27, 19);
 
     // Title
     doc.setTextColor(50, 50, 50);
@@ -147,11 +163,13 @@ const History = () => {
         const textWidth = doc.getTextWidth(footerText);
         doc.text(footerText, (pageWidth - textWidth) / 2, pageHeight - 15);
         
-        doc.setFillColor(0, 51, 102);
-        doc.rect((pageWidth - 25) / 2, pageHeight - 10, 25, 6, 'F');
-        doc.setTextColor(255, 255, 255);
+        const footerLogoSize = 6;
+        const footerLogoX = (pageWidth - footerLogoSize - 18) / 2;
+        drawFintrackLogo(footerLogoX, pageHeight - 10, footerLogoSize);
+        
+        doc.setTextColor(0, 51, 102);
         doc.setFontSize(10);
-        doc.text("Fintrack", (pageWidth - 17) / 2, pageHeight - 6);
+        doc.text("FinTrack", footerLogoX + footerLogoSize + 3, pageHeight - 5);
       }
     });
 
