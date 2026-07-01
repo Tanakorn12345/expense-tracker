@@ -4,27 +4,21 @@ import { useTransactions } from '../hooks/useTransactions';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ShoppingCart, Banknote, Home, ArrowRightLeft, Car, Download, Trash2 } from 'lucide-react';
 import TransactionRow from '../components/Dashboard/TransactionRow';
-import { fetchWithAuth } from '../utils/api';
 import Swal from 'sweetalert2';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { SarabunFont } from '../assets/fonts/Sarabun';
+import CategoryIcon from '../components/CategoryIcon';
+import { fetchWithAuth } from '../utils/api';
 
-const getIcon = (categoryName) => {
-  switch (categoryName) {
-    case 'Food': return <ShoppingCart size={16} />;
-    case 'Income': return <Banknote size={16} />;
-    case 'Housing': return <Home size={16} />;
-    case 'Transportation': return <Car size={16} />;
-    default: return <ArrowRightLeft size={16} />;
-  }
-};
+
 
 const History = () => {
   const { transactions, isLoading } = useTransactions();
   const { t, getMonthName } = useLanguage();
   const [filterMonth, setFilterMonth] = useState('all');
   const [filterDate, setFilterDate] = useState('');
+  const [filterCategory, setFilterCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredTransactions = transactions.filter(tItem => {
@@ -44,19 +38,24 @@ const History = () => {
     }
     
     // Search query filter
+    let matchesSearch = true;
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      const titleMatch = tItem.title?.toLowerCase().includes(query);
-      const categoryMatch = tItem.category?.name?.toLowerCase().includes(query);
-      const subtitleMatch = tItem.subtitle?.toLowerCase().includes(query);
-      const amountMatch = tItem.amount?.toString().includes(query);
-      
-      if (!titleMatch && !categoryMatch && !subtitleMatch && !amountMatch) {
-        return false;
-      }
+      matchesSearch = (
+        tItem.title?.toLowerCase().includes(query) ||
+        tItem.category?.name?.toLowerCase().includes(query) ||
+        tItem.subtitle?.toLowerCase().includes(query) ||
+        tItem.amount?.toString().includes(query)
+      );
     }
-    
-    return true;
+
+    // Category filter
+    let matchesCategory = true;
+    if (filterCategory !== 'all') {
+      matchesCategory = (tItem.category?.name?.toLowerCase() === filterCategory.toLowerCase() || tItem.category?.type?.toLowerCase() === filterCategory.toLowerCase());
+    }
+
+    return matchesSearch && matchesCategory;
   });
 
   const handleExportPDF = () => {
@@ -167,6 +166,19 @@ const History = () => {
         <div className="flex justify-between items-center mb-6">
           <h2 style={{ fontSize: '1.25rem' }}>{t('recentTransactions')}</h2>
           <div className="flex gap-2">
+            <select 
+              className="form-control" 
+              style={{ width: 'auto', minWidth: '150px' }}
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+            >
+              <option value="all">{language === 'th' ? 'ทุกหมวดหมู่' : 'All Categories'}</option>
+              <option value="income">{language === 'th' ? 'รายรับทั้งหมด' : 'All Income'}</option>
+              <option value="expense">{language === 'th' ? 'รายจ่ายทั้งหมด' : 'All Expenses'}</option>
+              <option value="food">{language === 'th' ? 'อาหาร' : 'Food'}</option>
+              <option value="housing">{language === 'th' ? 'ที่พัก/บ้าน' : 'Housing'}</option>
+              <option value="transportation">{language === 'th' ? 'เดินทาง' : 'Transportation'}</option>
+            </select>
             <button className="btn btn-outline" onClick={handleExportPDF} style={{ padding: '8px 12px' }}>
               <Download size={16} className="mr-2" style={{ marginRight: '8px' }} />
               Export
@@ -221,7 +233,7 @@ const History = () => {
               {filteredTransactions.map(tItem => (
                 <TransactionRow 
                   key={tItem.id}
-                  icon={getIcon(tItem.category?.name || tItem.subtitle)} 
+                  icon={<CategoryIcon categoryName={tItem.category?.name || tItem.subtitle} />} 
                   title={tItem.title} 
                   subtitle={tItem.subtitle} 
                   category={tItem.category?.name || tItem.subtitle} 

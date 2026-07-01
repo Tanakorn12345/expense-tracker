@@ -21,15 +21,17 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { useLanguage } from '../contexts/LanguageContext';
 import Swal from 'sweetalert2';
 import { fetchWithAuth } from '../utils/api';
+import CategoryIcon from '../components/CategoryIcon';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { t, getMonthName, translateInsight } = useLanguage();
+  const { t, getMonthName, translateInsight, language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   
   const currentMonthStr = new Date().getMonth().toString();
   const [filterMonth, setFilterMonth] = useState(currentMonthStr);
   const [filterDate, setFilterDate] = useState('');
+  const [filterCategory, setFilterCategory] = useState('all');
   const currentYearStr = new Date().getFullYear().toString();
 
   const { transactions, stats, forecast, isLoading, refresh } = useTransactions(filterMonth, currentYearStr);
@@ -124,24 +126,28 @@ const Dashboard = () => {
       if (localDate !== filterDate) return false;
     }
 
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    const titleMatch = tItem.title?.toLowerCase().includes(query);
-    const categoryMatch = tItem.category?.name?.toLowerCase().includes(query);
-    const subtitleMatch = tItem.subtitle?.toLowerCase().includes(query);
-    const amountMatch = tItem.amount?.toString().includes(query);
-    return titleMatch || categoryMatch || subtitleMatch || amountMatch;
-  });
+    if (!searchQuery && filterCategory === 'all') return true;
 
-  const getIcon = (category) => {
-    switch (category) {
-      case 'Food': 
-      case 'อาหาร': return <ShoppingCart size={20} />;
-      case 'Income': return <Banknote size={20} />;
-      case 'Housing': return <Home size={20} />;
-      default: return <ArrowRightLeft size={20} />;
+    // Search filter
+    let matchesSearch = true;
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      matchesSearch = (
+        tItem.title?.toLowerCase().includes(query) ||
+        tItem.category?.name?.toLowerCase().includes(query) ||
+        tItem.subtitle?.toLowerCase().includes(query) ||
+        tItem.amount?.toString().includes(query)
+      );
     }
-  };
+
+    // Category filter
+    let matchesCategory = true;
+    if (filterCategory !== 'all') {
+      matchesCategory = (tItem.category?.name?.toLowerCase() === filterCategory.toLowerCase() || tItem.category?.type?.toLowerCase() === filterCategory.toLowerCase());
+    }
+
+    return matchesSearch && matchesCategory;
+  });
 
   const chartData = [
     {
@@ -306,7 +312,22 @@ const Dashboard = () => {
           
           <div className="mt-8">
             <div className="flex justify-between items-center mb-4">
-              <h3 style={{ fontSize: '1.1rem' }}>{t('recentTransactions')}</h3>
+              <div className="flex items-center gap-3">
+                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>{t('recentTransactions')}</h3>
+                <select 
+                  className="form-control" 
+                  style={{ width: 'auto', padding: '4px 10px', fontSize: '0.85rem' }}
+                  value={filterCategory}
+                  onChange={(e) => setFilterCategory(e.target.value)}
+                >
+                  <option value="all">{language === 'th' ? 'ทุกหมวดหมู่' : 'All Categories'}</option>
+                  <option value="income">{language === 'th' ? 'รายรับทั้งหมด' : 'All Income'}</option>
+                  <option value="expense">{language === 'th' ? 'รายจ่ายทั้งหมด' : 'All Expenses'}</option>
+                  <option value="food">{language === 'th' ? 'อาหาร' : 'Food'}</option>
+                  <option value="housing">{language === 'th' ? 'ที่พัก/บ้าน' : 'Housing'}</option>
+                  <option value="transportation">{language === 'th' ? 'เดินทาง' : 'Transportation'}</option>
+                </select>
+              </div>
               <button className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.85rem' }} onClick={() => navigate('/history')}>
                 {t('viewAll')}
               </button>
@@ -322,7 +343,7 @@ const Dashboard = () => {
                     {filteredTransactions.slice(0, 5).map(tItem => (
                       <TransactionRow 
                         key={tItem.id}
-                        icon={getIcon(tItem.category?.name || tItem.subtitle)} 
+                        icon={<CategoryIcon categoryName={tItem.category?.name || tItem.subtitle} />} 
                         title={tItem.title} 
                         subtitle={tItem.subtitle} 
                         category={tItem.category?.name || tItem.subtitle} 

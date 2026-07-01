@@ -4,9 +4,7 @@ const TransactionRow = ({ icon, title, subtitle, category, badgeClass, badgeStyl
   <tr>
     <td>
       <div className="flex items-center gap-4">
-        <div style={{ width: '40px', height: '40px', background: '#f8fafc', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-          {icon}
-        </div>
+        {icon}
         <div>
           <div style={{ fontWeight: 600 }}>{title}</div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{subtitle}</div>
