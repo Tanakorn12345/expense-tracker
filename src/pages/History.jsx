@@ -228,54 +228,59 @@ const History = () => {
       <div className="card history-card">
         <div className="history-header">
           <h2 style={{ fontSize: '1.25rem', whiteSpace: 'nowrap', margin: 0 }}>{t('recentTransactions')}</h2>
-          <div className="history-filters">
-            <select 
-              className="form-control" 
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-            >
-              <option value="all">{language === 'th' ? 'ทุกหมวดหมู่' : 'All Categories'}</option>
-              <option value="income">{language === 'th' ? 'รายรับทั้งหมด' : 'All Income'}</option>
-              <option value="expense">{language === 'th' ? 'รายจ่ายทั้งหมด' : 'All Expenses'}</option>
-              <option value="food">{language === 'th' ? 'อาหาร' : 'Food'}</option>
-              <option value="housing">{language === 'th' ? 'ที่พัก/บ้าน' : 'Housing'}</option>
-              <option value="transportation">{language === 'th' ? 'เดินทาง' : 'Transportation'}</option>
-            </select>
-            <input 
-              type="date" 
-              className="form-control" 
-              value={filterDate}
-              onChange={(e) => {
-                setFilterDate(e.target.value);
-                if (e.target.value) {
-                  const d = new Date(e.target.value);
-                  setFilterMonth(d.getMonth().toString());
-                }
-              }}
-            />
-            <select 
-              className="form-control" 
-              value={filterMonth}
-              onChange={(e) => {
-                setFilterMonth(e.target.value);
-                setFilterDate(''); // Clear specific date when month is changed
-              }}
-            >
-              <option value="all">{t('allTime')}</option>
-              {Array.from({ length: 12 }).map((_, i) => (
-                <option key={i} value={i.toString()}>
-                  {getMonthName(i)}
-                </option>
-              ))}
-            </select>
-            <button className="btn btn-outline" onClick={handleExportPDF} style={{ padding: '8px 12px', justifyContent: 'center', display: 'flex', alignItems: 'center' }}>
-              <Download size={16} className="mr-2" style={{ marginRight: '8px' }} />
-              Export
-            </button>
-            <button className="btn" onClick={handleDeleteAll} style={{ padding: '8px 12px', background: 'var(--danger)', color: 'white', justifyContent: 'center', display: 'flex', alignItems: 'center' }}>
-              <Trash2 size={16} className="mr-2" style={{ marginRight: '8px' }} />
-              Delete All
-            </button>
+          <div className="history-filters-row">
+            <div className="history-filters-group">
+              <select 
+                className="form-control" 
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+              >
+                <option value="all">{language === 'th' ? 'ทุกหมวดหมู่' : 'All Categories'}</option>
+                <option value="income">{language === 'th' ? 'รายรับทั้งหมด' : 'All Income'}</option>
+                <option value="expense">{language === 'th' ? 'รายจ่ายทั้งหมด' : 'All Expenses'}</option>
+                <option value="food">{language === 'th' ? 'อาหาร' : 'Food'}</option>
+                <option value="housing">{language === 'th' ? 'ที่พัก/บ้าน' : 'Housing'}</option>
+                <option value="transportation">{language === 'th' ? 'เดินทาง' : 'Transportation'}</option>
+              </select>
+              <input 
+                type="date" 
+                className="form-control" 
+                value={filterDate}
+                onChange={(e) => {
+                  setFilterDate(e.target.value);
+                  if (e.target.value) {
+                    const d = new Date(e.target.value);
+                    setFilterMonth(d.getMonth().toString());
+                  }
+                }}
+              />
+              <select 
+                className="form-control" 
+                value={filterMonth}
+                onChange={(e) => {
+                  setFilterMonth(e.target.value);
+                  setFilterDate(''); // Clear specific date when month is changed
+                }}
+              >
+                <option value="all">{t('allTime')}</option>
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <option key={i} value={i.toString()}>
+                    {getMonthName(i)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="history-actions-group">
+              <button className="btn btn-outline" onClick={handleExportPDF} style={{ padding: '8px 12px', justifyContent: 'center', display: 'flex', alignItems: 'center' }}>
+                <Download size={16} className="mr-2" style={{ marginRight: '8px' }} />
+                Export
+              </button>
+              <button className="btn" onClick={handleDeleteAll} style={{ padding: '8px 12px', background: 'var(--danger)', color: 'white', justifyContent: 'center', display: 'flex', alignItems: 'center' }}>
+                <Trash2 size={16} className="mr-2" style={{ marginRight: '8px' }} />
+                Delete All
+              </button>
+            </div>
           </div>
         </div>
 
