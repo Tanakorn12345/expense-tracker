@@ -1,3 +1,5 @@
+import Swal from 'sweetalert2';
+
 export const notifyUser = (user, text, type = 'info') => {
   if (!user) return;
   const key = `notifications_${user.id}`;
@@ -11,4 +13,15 @@ export const notifyUser = (user, text, type = 'info') => {
   };
   localStorage.setItem(key, JSON.stringify([newNotif, ...existing]));
   window.dispatchEvent(new Event('notifications_updated'));
+
+  // Show a toast notification
+  Swal.fire({
+    toast: true,
+    position: 'top-end',
+    icon: type === 'transaction' ? 'success' : 'info',
+    title: text,
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+  });
 };
