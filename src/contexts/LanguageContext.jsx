@@ -11,6 +11,7 @@ const translations = {
     upgradeDesc: "เข้าถึงการวิเคราะห์เชิงลึกและรายงานภาษี",
     search: "ค้นหารายการ...",
     premiumMember: "สมาชิกระดับพรีเมียม",
+    normalMember: "สมาชิกระดับปกติ",
     transaction: "รายการ",
     allTime: "ทุกช่วงเวลา",
     
@@ -82,6 +83,7 @@ const translations = {
     upgradeDesc: "Access advanced portfolio analytics and tax reporting.",
     search: "Search transactions...",
     premiumMember: "Premium Member",
+    normalMember: "Standard Member",
     transaction: "Transaction",
     allTime: "All Time",
     

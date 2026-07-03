@@ -121,14 +121,14 @@ const Savings = () => {
         </div>
         <div className="top-bar-actions">
           <button className="btn btn-primary" onClick={handleCreateGoal}>
-            <PlusCircle size={20} />
+            <PlusCircle size={20} style={{marginRight : '10px'}} />
             {language === 'th' ? 'สร้างเป้าหมาย' : 'Create Goal'}
           </button>
         </div>
       </div>
 
       <div className="stats-grid">
-        <div className="card stat-card" style={{ background: 'linear-gradient(135deg, var(--primary-main) 0%, var(--primary-light) 100%)', color: 'white' }}>
+        <div className="card stat-card" style={{ background: 'linear-gradient(135deg, #1D3557 0%, #028090 50%, #00A896 100%)', color: 'white' }}>
           <div className="stat-label" style={{ color: 'rgba(255,255,255,0.8)' }}>
             {language === 'th' ? 'เงินออมทั้งหมด' : 'Total Savings'}
           </div>

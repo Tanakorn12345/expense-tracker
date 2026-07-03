@@ -174,7 +174,9 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
             <div className="user-profile">
               <div className="user-info">
                 <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{user?.name || 'User'}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('premiumMember')}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  {user?.isPro ? t('premiumMember') : t('normalMember')}
+                </div>
               </div>
               <div className="avatar-circle">
                 {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}

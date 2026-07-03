@@ -60,7 +60,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             <p style={{ opacity: 0.8, fontSize: '0.75rem' }}>{t('upgradeDesc')}</p>
           </div>
         ) : (
-          <div className="upgrade-card" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
+          <div className="upgrade-card" style={{ background: 'linear-gradient(135deg, #1D3557 0%, #028090 50%, #00A896 100%)'}}>
             <h4 style={{ marginBottom: '0.5rem', color: '#fff' }}>Pro Member</h4>
             <p style={{ opacity: 0.9, fontSize: '0.75rem', color: '#fff' }}>
               {language === 'th' ? 'คุณเป็นสมาชิกระดับ Pro แล้ว' : 'You are a Pro member'}
