@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import Footer from '../components/Footer';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -68,47 +69,138 @@ const Dashboard = () => {
         const prevBalance = prevIncome - prevExpense;
 
         if (prevBalance > 0) {
-          Swal.fire({
-            title: 'ทบยอดเดือนที่แล้ว?',
-            text: `คุณมียอดคงเหลือจากเดือนที่แล้ว ฿${prevBalance.toLocaleString()} ต้องการนำมาเป็นรายรับเริ่มต้นของเดือนนี้หรือไม่?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: 'var(--success)',
-            cancelButtonColor: 'var(--text-muted)',
-            confirmButtonText: 'ใช่, นำยอดมาทบ',
-            cancelButtonText: 'ไม่เป็นไร'
-          }).then(async (result) => {
-            if (result.isConfirmed) {
-              try {
-                // Ensure date is 1st of current month
-                const targetDate = new Date(currentYear, currentMonth, 1);
-                // Adjust for local timezone offset to avoid previous day
-                const localDateStr = new Date(targetDate.getTime() - (targetDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-                
-                const response = await fetchWithAuth('/api/transactions', {
-                  method: 'POST',
-                  body: JSON.stringify({
-                    title: 'ยอดยกมา',
-                    subtitle: 'อื่นๆ',
-                    categoryName: 'Income',
-                    type: 'income',
-                    amount: prevBalance,
-                    date: localDateStr
-                  }),
-                });
-                if (response.ok) {
-                  localStorage.setItem(rolloverKey, 'true');
-                  Swal.fire('สำเร็จ!', 'เพิ่มยอดยกมาเรียบร้อยแล้ว', 'success');
-                  if (refresh) refresh();
-                  else window.location.reload();
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
+          if (user.isPro) {
+            Swal.fire({
+              title: language === 'th' ? 'จัดการยอดคงเหลือเดือนที่แล้ว' : 'Manage Last Month Balance',
+              text: language === 'th' 
+                ? `คุณมียอดคงเหลือจากเดือนที่แล้ว ฿${prevBalance.toLocaleString()} ต้องการจัดการอย่างไร?`
+                : `You have a remaining balance of ฿${prevBalance.toLocaleString()} from last month.`,
+              icon: 'question',
+              showDenyButton: true,
+              showCancelButton: true,
+              confirmButtonColor: 'var(--success)',
+              denyButtonColor: 'var(--primary-light)',
+              cancelButtonColor: 'var(--text-muted)',
+              confirmButtonText: language === 'th' ? 'ทบเป็นรายรับเดือนนี้' : 'Rollover to this month',
+              denyButtonText: language === 'th' ? 'เก็บเข้าการออม' : 'Save to Savings',
+              cancelButtonText: language === 'th' ? 'ไม่ทำอะไร' : 'Do nothing'
+            }).then(async (result) => {
+              if (result.isConfirmed) {
+                // Rollover
+                try {
+                  const targetDate = new Date(currentYear, currentMonth, 1);
+                  const localDateStr = new Date(targetDate.getTime() - (targetDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+                  
+                  const response = await fetchWithAuth('/api/transactions', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                      title: 'ยอดยกมา',
+                      subtitle: 'อื่นๆ',
+                      categoryName: 'Income',
+                      type: 'income',
+                      amount: prevBalance,
+                      date: localDateStr
+                    }),
+                  });
+                  if (response.ok) {
+                    localStorage.setItem(rolloverKey, 'true');
+                    Swal.fire('สำเร็จ!', 'เพิ่มยอดยกมาเรียบร้อยแล้ว', 'success');
+                    if (refresh) refresh();
+                    else window.location.reload();
+                  }
+                } catch(e) {
+                  console.error(e);
                 }
-              } catch(e) {
-                console.error(e);
+              } else if (result.isDenied) {
+                // Save to Savings
+                try {
+                  // Fetch goals first to let user select
+                  const res = await fetchWithAuth('/api/savings');
+                  if (res.ok) {
+                    const data = await res.json();
+                    const goals = data.goals;
+                    
+                    if (goals.length === 0) {
+                      Swal.fire('Error', language === 'th' ? 'คุณยังไม่มีเป้าหมายการออม กรุณาสร้างเป้าหมายก่อน' : 'No savings goals found. Please create one first.', 'error');
+                      return;
+                    }
+                    
+                    const inputOptions = {};
+                    goals.forEach(g => {
+                      inputOptions[g.id] = g.name;
+                    });
+                    
+                    const { value: selectedGoalId } = await Swal.fire({
+                      title: language === 'th' ? 'เลือกเป้าหมายการออม' : 'Select Savings Goal',
+                      input: 'select',
+                      inputOptions,
+                      inputPlaceholder: language === 'th' ? 'เลือกเป้าหมาย' : 'Select a goal',
+                      showCancelButton: true
+                    });
+                    
+                    if (selectedGoalId) {
+                      const addRes = await fetchWithAuth(`/api/savings/goals/${selectedGoalId}/add`, {
+                        method: 'POST',
+                        body: JSON.stringify({ amount: prevBalance })
+                      });
+                      
+                      if (addRes.ok) {
+                        localStorage.setItem(rolloverKey, 'true');
+                        Swal.fire('สำเร็จ!', language === 'th' ? 'นำยอดเงินเก็บเข้าการออมเรียบร้อยแล้ว' : 'Saved to savings successfully', 'success');
+                        setTimeout(() => navigate('/savings'), 1500);
+                      }
+                    }
+                  }
+                } catch(e) {
+                  console.error(e);
+                }
+              } else {
+                localStorage.setItem(rolloverKey, 'true');
               }
-            } else {
-              localStorage.setItem(rolloverKey, 'true');
-            }
-          });
+            });
+          } else {
+            // Free user standard rollover
+            Swal.fire({
+              title: 'ทบยอดเดือนที่แล้ว?',
+              text: `คุณมียอดคงเหลือจากเดือนที่แล้ว ฿${prevBalance.toLocaleString()} ต้องการนำมาเป็นรายรับเริ่มต้นของเดือนนี้หรือไม่?`,
+              icon: 'question',
+              showCancelButton: true,
+              confirmButtonColor: 'var(--success)',
+              cancelButtonColor: 'var(--text-muted)',
+              confirmButtonText: 'ใช่, นำยอดมาทบ',
+              cancelButtonText: 'ไม่เป็นไร'
+            }).then(async (result) => {
+              if (result.isConfirmed) {
+                try {
+                  const targetDate = new Date(currentYear, currentMonth, 1);
+                  const localDateStr = new Date(targetDate.getTime() - (targetDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+                  
+                  const response = await fetchWithAuth('/api/transactions', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                      title: 'ยอดยกมา',
+                      subtitle: 'อื่นๆ',
+                      categoryName: 'Income',
+                      type: 'income',
+                      amount: prevBalance,
+                      date: localDateStr
+                    }),
+                  });
+                  if (response.ok) {
+                    localStorage.setItem(rolloverKey, 'true');
+                    Swal.fire('สำเร็จ!', 'เพิ่มยอดยกมาเรียบร้อยแล้ว', 'success');
+                    if (refresh) refresh();
+                    else window.location.reload();
+                  }
+                } catch(e) {
+                  console.error(e);
+                }
+              } else {
+                localStorage.setItem(rolloverKey, 'true');
+              }
+            });
+          }
         } else {
           localStorage.setItem(rolloverKey, 'true');
         }

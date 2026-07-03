@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Wallet, Lock, Loader2 } from 'lucide-react';
+import Footer from '../components/Footer';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -112,16 +113,19 @@ const Login = () => {
           </div>
         </div>
       </div>
+      <Footer />
 
       <style>{`
         .login-page {
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
           min-height: 100vh;
           background: radial-gradient(circle at top right, #f8fafc, #e2e8f0);
           padding: 1.5rem;
           width: 100%;
+          gap: 1.5rem;
         }
         .login-container {
           width: 100%;

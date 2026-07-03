@@ -13,8 +13,10 @@
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "lucide-react": "^1.11.0",
+    "promptpay-qr": "^0.5.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
+    "react-qr-code": "^2.2.0",
     "react-router-dom": "^7.14.2",
     "recharts": "^3.9.0",
     "sweetalert2": "^11.26.25"

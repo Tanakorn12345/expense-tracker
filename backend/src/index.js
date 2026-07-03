@@ -5,6 +5,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
+const savingsRoutes = require('./routes/savingsRoutes');
 const { initCronJobs } = require('./services/cronJobs');
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/savings', savingsRoutes);
 
 // Global Error Handler Middleware
 app.use((err, req, res, next) => {

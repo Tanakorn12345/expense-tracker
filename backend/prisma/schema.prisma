@@ -12,7 +12,10 @@ model User {
   email        String        @unique
   name         String?
   password     String
+  isPro        Boolean       @default(false)
   transactions Transaction[]
+  savingsGoals SavingsGoal[]
+  savingsTx    SavingsTransaction[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 }
@@ -42,6 +45,36 @@ model Transaction {
   category    Category @relation(fields: [categoryId], references: [id])
   categoryId  Int
 
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SavingsGoal {
+  id            Int      @id @default(autoincrement())
+  name          String
+  targetAmount  Float
+  currentAmount Float    @default(0)
+  
+  user          User     @relation(fields: [userId], references: [id])
+  userId        Int
+  
+  transactions  SavingsTransaction[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model SavingsTransaction {
+  id          Int      @id @default(autoincrement())
+  amount      Float
+  date        DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  
+  goal        SavingsGoal @relation(fields: [goalId], references: [id])
+  goalId      Int
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
