@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import { useTransactions } from '../hooks/useTransactions';
 import { useLanguage } from '../contexts/LanguageContext';
-import { ShoppingCart, Banknote, Home, ArrowRightLeft, Car, Download, Trash2 } from 'lucide-react';
+import { Download, Trash2, History as HistoryIcon } from 'lucide-react';
 import TransactionRow from '../components/Dashboard/TransactionRow';
 import Swal from 'sweetalert2';
 import { jsPDF } from 'jspdf';
@@ -289,8 +289,13 @@ const History = () => {
   return (
     <Layout searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <div className="page-header" style={{ marginBottom: '2rem' }}>
-        <h1>{t('history')}</h1>
-        <p>{t('addTransactionDesc')}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
+          <HistoryIcon size={28} style={{ color: 'gray', flexShrink: 0 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'flex-start' }}>
+            <h1 style={{ margin: 0 }}>{t('history')}</h1>
+            <p style={{ margin: 0 }}>{t('addTransactionDesc')}</p>
+          </div>
+        </div>
       </div>
 
       <div className="card history-card">

@@ -12,7 +12,8 @@ import {
   Home,
   ArrowRightLeft,
   AlertTriangle,
-  Info
+  Info,
+  LayoutDashboard
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTransactions } from '../hooks/useTransactions';
@@ -269,50 +270,55 @@ const Dashboard = () => {
   return (
     <Layout searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <div className="dashboard-header">
-        <div className="header-title">
-          <h1>{t('overviewTitle')}</h1>
-          <p>{t('overviewDesc')}</p>
-          {transactions.length > 0 && (() => {
-            try {
-              const validTxs = transactions.filter(t => t.createdAt || t.date);
-              if (validTxs.length === 0) return null;
-              
-              const latest = [...validTxs].sort((a, b) => {
-                const dA = new Date(a.createdAt || a.date).getTime();
-                const dB = new Date(b.createdAt || b.date).getTime();
-                return (isNaN(dB) ? 0 : dB) - (isNaN(dA) ? 0 : dA);
-              })[0];
-              
-              const latestTime = new Date(latest.createdAt || latest.date);
-              if (isNaN(latestTime.getTime())) return null;
+        <div className="header-title" style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', flex: 1, marginTop: '6px' }}>
+          <LayoutDashboard size={28} style={{ color: 'gray', flexShrink: 0, marginTop: '22px' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', alignItems: 'flex-start', minWidth: 0, justifyContent: 'flex-start' }}>
+            <h1 style={{ margin: 0, lineHeight: 1.2, paddingTop: '3px' }}>{t('overviewTitle')}</h1>
+            <p style={{ margin: 0, lineHeight: 1.4 }}>{t('overviewDesc')}</p>
+            {transactions.length > 0 && (() => {
+              try {
+                const validTxs = transactions.filter(t => t.createdAt || t.date);
+                if (validTxs.length === 0) return null;
 
-              return (
-                <div style={{ 
-                  marginTop: '0.5rem', 
-                  display: 'inline-flex', 
-                  alignItems: 'center', 
-                  gap: '6px',
-                  fontSize: '0.78rem',
-                  color: 'var(--text-muted)',
-                  background: 'var(--bg-body)',
-                  padding: '4px 10px',
-                  borderRadius: '20px',
-                  border: '1px solid var(--border)'
-                }}>
-                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--success)', display: 'inline-block', flexShrink: 0 }}></span>
-                  {language === 'th' ? 'บันทึกล่าสุด: ' : 'Last saved: '}
-                  {latestTime.toLocaleString(language === 'th' ? 'th-TH' : 'en-US', {
-                    day: 'numeric', month: 'short', year: 'numeric',
-                    hour: '2-digit', minute: '2-digit'
-                  })}
-                </div>
-              );
-            } catch (e) {
-              console.error(e);
-              return null;
-            }
-          })()}
+                const latest = [...validTxs].sort((a, b) => {
+                  const dA = new Date(a.createdAt || a.date).getTime();
+                  const dB = new Date(b.createdAt || b.date).getTime();
+                  return (isNaN(dB) ? 0 : dB) - (isNaN(dA) ? 0 : dA);
+                })[0];
+
+                const latestTime = new Date(latest.createdAt || latest.date);
+                if (isNaN(latestTime.getTime())) return null;
+
+                return (
+                  <div style={{
+                    marginTop: '0.25rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '0.78rem',
+                    color: 'var(--text-muted)',
+                    background: 'var(--bg-body)',
+                    padding: '4px 10px',
+                    borderRadius: '20px',
+                    border: '1px solid var(--border)',
+                    alignSelf: 'flex-start'
+                  }}>
+                    <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--success)', display: 'inline-block', flexShrink: 0 }}></span>
+                    {language === 'th' ? 'บันทึกล่าสุด: ' : 'Last saved: '}
+                    {latestTime.toLocaleString(language === 'th' ? 'th-TH' : 'en-US', {
+                      day: 'numeric', month: 'short', year: 'numeric',
+                      hour: '2-digit', minute: '2-digit'
+                    })}
+                  </div>
+                );
+              } catch (e) {
+                console.error(e);
+                return null;
+              }
+            })()}
+          </div>
         </div>
+
         <div className="date-picker flex gap-4">
           <input 
             type="date" 
