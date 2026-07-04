@@ -843,3 +843,60 @@ select.form-control {
   color: var(--text-main);
 }
 
+/* SweetAlert2 Custom Theme */
+.swal2-popup {
+  border-radius: var(--radius-lg) !important;
+  font-family: 'Inter', 'Outfit', sans-serif !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.swal2-title {
+  color: var(--primary-main) !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 600 !important;
+}
+
+.swal2-html-container {
+  color: var(--text-main) !important;
+}
+
+.swal2-confirm {
+  background-color: var(--primary-main) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 10px 24px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+.swal2-confirm:hover {
+  background-color: var(--primary-light) !important;
+  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.2) !important;
+}
+
+.swal2-cancel, .swal2-deny {
+  background-color: transparent !important;
+  color: var(--text-muted) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 10px 24px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+.swal2-cancel:hover, .swal2-deny:hover {
+  background-color: #f1f5f9 !important;
+  color: var(--text-main) !important;
+}
+
+.swal2-input, .swal2-select, .swal2-textarea {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 12px !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.swal2-input:focus, .swal2-select:focus, .swal2-textarea:focus {
+  border-color: var(--primary-main) !important;
+  box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1) !important;
+  outline: none !important;
+}

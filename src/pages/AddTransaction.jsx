@@ -91,7 +91,7 @@ const AddTransaction = () => {
         try {
           const user = JSON.parse(localStorage.getItem('user'));
           if (user) {
-            notifyUser(user, `เพิ่มรายการ${isExpense ? 'รายจ่าย' : 'รายรับ'}ใหม่: ${payload.title} (฿${payload.amount.toLocaleString()})`, 'transaction');
+            notifyUser(user, `ทำธุรกรรม ${payload.title} (฿${payload.amount.toLocaleString()}) สำเร็จ และส่งข้อมูลแจ้งเตือนไปยังอีเมลของคุณเรียบร้อยแล้ว`, 'transaction');
           }
         } catch(e) {
           console.error(e);
