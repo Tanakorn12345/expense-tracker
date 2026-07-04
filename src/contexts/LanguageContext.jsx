@@ -14,6 +14,8 @@ const translations = {
     normalMember: "สมาชิกระดับปกติ",
     transaction: "รายการ",
     allTime: "ทุกช่วงเวลา",
+    calculatorTitle: "คำนวณราคา ไทยช่วยไทย",
+    calculatorDesc: "คำนวณส่วนลด 60/40 (รัฐออกให้สูงสุด 200 บาท/วัน)",
     
     // Dashboard
     overviewTitle: "ภาพรวมการเงิน (Financial Overview)",
@@ -86,6 +88,8 @@ const translations = {
     normalMember: "Standard Member",
     transaction: "Transaction",
     allTime: "All Time",
+    calculatorTitle: "Thai Chuy Thai Calculator",
+    calculatorDesc: "Calculate 60/40 co-pay (Gov pays up to 200 THB/day)",
     
     // Dashboard
     overviewTitle: "Financial Overview",

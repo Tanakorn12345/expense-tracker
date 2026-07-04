@@ -5,7 +5,8 @@ import {
   ArrowRightLeft, 
   LogOut,
   History as HistoryIcon,
-  PiggyBank
+  PiggyBank,
+  Calculator
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import Logo from './Logo';
@@ -44,12 +45,20 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           </NavLink>
         </li>
         {isPro && (
-          <li className="nav-item">
-            <NavLink to="/savings" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsOpen && setIsOpen(false)}>
-              <PiggyBank size={20} />
-              <span>{language === 'th' ? 'การออม' : 'Savings'}</span>
-            </NavLink>
-          </li>
+          <>
+            <li className="nav-item">
+              <NavLink to="/savings" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsOpen && setIsOpen(false)}>
+                <PiggyBank size={20} />
+                <span>{language === 'th' ? 'การออม' : 'Savings'}</span>
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/calculator" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsOpen && setIsOpen(false)}>
+                <Calculator size={20} />
+                <span>{language === 'th' ? 'ไทยช่วยไทย' : 'Co-Pay'}</span>
+              </NavLink>
+            </li>
+          </>
         )}
       </ul>
 
