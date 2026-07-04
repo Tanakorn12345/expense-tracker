@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { useLanguage } from '../contexts/LanguageContext';
 import { fetchWithAuth } from '../utils/api';
-import { PlusCircle, Target, ArrowUpRight, Loader2 } from 'lucide-react';
+import { PlusCircle, Target, ArrowUpRight, Loader2 , PiggyBank} from 'lucide-react';
 import Swal from 'sweetalert2';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
@@ -115,9 +115,12 @@ const Savings = () => {
   return (
     <Layout>
       <div className="dashboard-header">
-        <div className="header-title">
-          <h1>{language === 'th' ? 'การออมของคุณ' : 'Your Savings'}</h1>
-          <p>{language === 'th' ? 'จัดการและติดตามเป้าหมายการออม' : 'Manage and track your savings goals'}</p>
+        <div className="header-title flex-column" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
+          <PiggyBank size={28} style={{ color: 'gray', flexShrink: 0 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'flex-start' }}>
+            <h1 style={{ margin: 0 }}>{language === 'th' ? 'การออมของคุณ' : 'Your Savings'}</h1>
+            <p style={{ margin: 0 }}>{language === 'th' ? 'จัดการและติดตามเป้าหมายการออม' : 'Manage and track your savings goals'}</p>
+          </div>
         </div>
         <div className="top-bar-actions">
           <button className="btn btn-primary" onClick={handleCreateGoal}>
@@ -125,6 +128,7 @@ const Savings = () => {
             {language === 'th' ? 'สร้างเป้าหมาย' : 'Create Goal'}
           </button>
         </div>
+        
       </div>
 
       <div className="stats-grid">

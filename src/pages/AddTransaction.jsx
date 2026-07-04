@@ -6,7 +6,8 @@ import {
   Info, 
   MapPin, 
   UploadCloud,
-  Loader2
+  Loader2,
+  ArrowRightLeft
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../utils/api';
@@ -123,8 +124,13 @@ const AddTransaction = () => {
   return (
     <Layout>
       <div className="page-header">
-        <h1>{t('addTransactionTitle')}</h1>
-        <p>{t('addTransactionDesc')}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
+          <ArrowRightLeft size={28} style={{ color: 'gray', flexShrink: 0 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'flex-start' }}>
+            <h1 style={{ margin: 0 }}>{t('addTransactionTitle')}</h1>
+            <p style={{ margin: 0 }}>{t('addTransactionDesc')}</p>
+          </div>
+        </div>
       </div>
 
       <div className="main-grid">
