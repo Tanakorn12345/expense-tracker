@@ -72,7 +72,7 @@ const CoPayCalculator = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
             {/* Gov Pays */}
             <div className="stat-card" style={{ background: 'rgba(0, 168, 232, 0.1)', border: '1px solid rgba(0, 168, 232, 0.2)', textAlign: 'center' }}>
               <div className="stat-title" style={{ color: 'var(--primary-light)', fontSize: '1rem', fontWeight: 600 }}>
