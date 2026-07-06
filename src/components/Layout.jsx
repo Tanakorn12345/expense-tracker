@@ -136,7 +136,10 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
 
             {/* Notifications */}
             <div className="notification-wrapper" ref={notifRef}>
-              <div className="bell-icon" onClick={() => setShowNotifications(!showNotifications)}>
+              <div className="bell-icon" onClick={() => {
+                setShowNotifications(!showNotifications);
+                if (!showNotifications) markAllRead();
+              }}>
                 <Bell size={20} color="var(--text-muted)" />
                 {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
               </div>
@@ -145,9 +148,6 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                 <div className="notification-dropdown">
                   <div className="dropdown-header">
                     <h4>{language === 'th' ? 'การแจ้งเตือน' : 'Notifications'}</h4>
-                    <button onClick={markAllRead} style={{ fontSize: '0.8rem', color: 'var(--primary-main)', background: 'none', border: 'none', cursor: 'pointer' }}>
-                      {language === 'th' ? 'อ่านทั้งหมด' : 'Mark all as read'}
-                    </button>
                   </div>
                   <div className="dropdown-body">
                     {notifications.length === 0 ? (

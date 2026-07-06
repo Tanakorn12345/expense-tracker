@@ -358,16 +358,10 @@ const History = () => {
         </div>
 
         <div className="table-responsive">
-          <table className="data-table" style={{ minWidth: '600px' }}>
-            <thead>
-              <tr>
-                <th>{t('transaction')}</th>
-                <th>{t('category')}</th>
-                <th>{t('date')}</th>
-                <th style={{ textAlign: 'right' }}>{t('amount')}</th>
-              </tr>
-            </thead>
-            <tbody>
+          <div className="data-list" style={{ width: '100%' }}>
+            <div style={{ display: 'none' }}>
+            </div>
+            <div>
               {filteredTransactions.map(tItem => (
                 <TransactionRow 
                   key={tItem.id}
@@ -383,14 +377,12 @@ const History = () => {
                 />
               ))}
               {!isLoading && filteredTransactions.length === 0 && (
-                <tr>
-                  <td colSpan="4" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-                    No transactions found for this period.
-                  </td>
-                </tr>
+                <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+                  No transactions found for this period.
+                </div>
               )}
-            </tbody>
-          </table>
+            </div>
+          </div>
         </div>
       </div>
     </Layout>
