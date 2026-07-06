@@ -19,10 +19,14 @@ import { notifyUser } from '../utils/notifications';
 const AddTransaction = () => {
   const navigate = useNavigate();
   const { forecast, transactions } = useTransactions();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [isExpense, setIsExpense] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [categories, setCategories] = useState({ expense: [], income: [] });
+  const [isCoPayMode, setIsCoPayMode] = useState(false);
+  const [amount, setAmount] = useState('');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isPro = user?.isPro || false;
 
   useEffect(() => {
     fetchWithAuth('/api/categories')
@@ -42,7 +46,16 @@ const AddTransaction = () => {
     const categoryInput = document.querySelector('select').value;
     const descriptionInput = document.querySelector('textarea').value;
     
-    const parsedAmount = parseFloat(amountInput) || 0;
+    let parsedAmount = parseFloat(amountInput) || 0;
+    
+    let finalTitle = descriptionInput || (isExpense ? t('expense') : t('income'));
+
+    if (isExpense && isCoPayMode) {
+      let govPays = parsedAmount * 0.6;
+      if (govPays > 200) govPays = 200;
+      parsedAmount = parsedAmount - govPays;
+      finalTitle = finalTitle + ' (ไทยช่วยไทย)';
+    }
 
     // Expense Limit Check
     if (isExpense) {
@@ -73,7 +86,7 @@ const AddTransaction = () => {
     setIsSaving(true);
     
     const payload = {
-      title: descriptionInput || (isExpense ? t('expense') : t('income')),
+      title: finalTitle,
       subtitle: isExpense ? categoryInput : document.querySelector('select').value,
       categoryName: isExpense ? categoryInput : 'Income',
       type: isExpense ? 'expense' : 'income',
@@ -163,9 +176,42 @@ const AddTransaction = () => {
                   placeholder="0.00" 
                   autoFocus 
                   style={{ color: isExpense ? 'var(--danger)' : 'var(--success)' }}
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
                 />
               </div>
             </div>
+
+            {isExpense && isPro && (
+              <div style={{ margin: '1rem 0', padding: '1rem', background: isCoPayMode ? 'rgba(0, 168, 232, 0.05)' : 'var(--bg-card)', border: isCoPayMode ? '1px solid rgba(0, 168, 232, 0.3)' : '1px solid var(--border)', borderRadius: '12px', transition: 'all 0.3s' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setIsCoPayMode(!isCoPayMode)}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <img src="/thai-chuy-thai.png" alt="Thai Chuy Thai" style={{ width: '1.5em', height: '1.5em', objectFit: 'contain' }} />
+                    <span style={{ fontWeight: 600 }}>{language === 'th' ? 'ใช้สิทธิ์โครงการไทยช่วยไทย (60/40)' : 'Use Thai Chuy Thai (60/40)'}</span>
+                  </div>
+                  <div className={`toggle-switch ${isCoPayMode ? 'active' : ''}`} style={{ width: '40px', height: '20px', borderRadius: '10px', background: isCoPayMode ? 'var(--primary-main)' : 'var(--text-muted)', position: 'relative', transition: 'background 0.3s' }}>
+                    <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: 'white', position: 'absolute', top: '2px', left: isCoPayMode ? '22px' : '2px', transition: 'left 0.3s' }}></div>
+                  </div>
+                </div>
+                
+                {isCoPayMode && (
+                  <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px dashed var(--border)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{language === 'th' ? 'รัฐจ่าย (60%)' : 'Gov Pays'}</div>
+                      <div style={{ fontWeight: 600, color: 'var(--primary-main)' }}>
+                        ฿{Math.min((parseFloat(amount) || 0) * 0.6, 200).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{language === 'th' ? 'คุณจ่าย (40%)' : 'You Pay'}</div>
+                      <div style={{ fontWeight: 600, color: 'var(--danger)', fontSize: '1.1rem' }}>
+                        ฿{((parseFloat(amount) || 0) - Math.min((parseFloat(amount) || 0) * 0.6, 200)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="form-grid">
               <div className="form-group">

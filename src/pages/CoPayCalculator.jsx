@@ -52,8 +52,8 @@ const CoPayCalculator = () => {
         </div>
       </div>
 
-      <div className="main-grid" style={{ gridTemplateColumns: '1fr', maxWidth: '800px', margin: '0 auto' }}>
-        <div className="card" style={{ padding: '2rem' }}>
+      <div className="main-grid" style={{ gridTemplateColumns: '1fr', maxWidth: '800px', margin: '2rem auto' }}>
+        <div className="card" style={{ padding: '2rem', borderRadius: '32px' }}>
           
           <div className="form-group" style={{ marginBottom: '2rem' }}>
             <label style={{ fontWeight: 600, fontSize: '1.1rem', color: 'var(--primary-main)' }}>
@@ -65,7 +65,7 @@ const CoPayCalculator = () => {
                 className="form-control"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                placeholder={language === 'th' ? 'ระบุราคาเต็ม' : 'Enter full price'}
+                placeholder={language === 'th' ? 'ระบุราคา' : 'Enter full price'}
                 style={{ fontSize: '1.5rem', padding: '1rem', height: 'auto', textAlign: 'center', fontWeight: '600' }}
                 min="0"
               />
@@ -74,7 +74,7 @@ const CoPayCalculator = () => {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
             {/* Gov Pays */}
-            <div className="stat-card" style={{ background: 'rgba(0, 168, 232, 0.1)', border: '1px solid rgba(0, 168, 232, 0.2)', textAlign: 'center' }}>
+            <div className="stat-card" style={{ background: 'rgba(0, 168, 232, 0.1)', border: '1px solid rgba(0, 168, 232, 0.2)', textAlign: 'center', borderRadius: '24px' }}>
               <div className="stat-title" style={{ color: 'var(--primary-light)', fontSize: '1rem', fontWeight: 600 }}>
                 {language === 'th' ? 'รัฐออกให้ (60%)' : 'Government Pays (60%)'}
               </div>
@@ -89,7 +89,7 @@ const CoPayCalculator = () => {
             </div>
 
             {/* User Pays */}
-            <div className="stat-card" style={{ background: 'rgba(39, 174, 96, 0.1)', border: '1px solid rgba(39, 174, 96, 0.2)', textAlign: 'center' }}>
+            <div className="stat-card" style={{ background: 'rgba(39, 174, 96, 0.1)', border: '1px solid rgba(39, 174, 96, 0.2)', textAlign: 'center', borderRadius: '24px' }}>
               <div className="stat-title" style={{ color: 'var(--success)', fontSize: '1rem', fontWeight: 600 }}>
                 {language === 'th' ? 'เราจ่ายเอง (40%)' : 'You Pay (40%)'}
               </div>
