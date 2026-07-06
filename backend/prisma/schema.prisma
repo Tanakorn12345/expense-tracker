@@ -12,6 +12,7 @@ model User {
   email        String        @unique
   name         String?
   password     String
+  profilePic   String?       @db.Text
   isPro        Boolean       @default(false)
   transactions Transaction[]
   savingsGoals SavingsGoal[]

@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 const ProUpgradeModal = ({ isOpen, onClose, onSuccess }) => {
   const { t, language } = useLanguage();
   const [step, setStep] = useState(1); // 1: QR, 2: Uploading/Verifying, 3: Success
+  const [showFeatures, setShowFeatures] = useState(false);
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const fileInputRef = useRef(null);
@@ -67,46 +68,88 @@ const ProUpgradeModal = ({ isOpen, onClose, onSuccess }) => {
               {language === 'th' ? 'อัปเกรดเป็น ' : 'Upgrade to '}
            <span className="pro-badge" style={{ padding: '4px 8px', borderRadius: '4px', backgroundImage: 'linear-gradient(135deg, #1D3557 0%, #028090 50%, #00A896 100%)', color: '#fff', fontSize: '1rem', display: 'inline-block', fontWeight: 'bold' }}>PRO</span>
 
-
-
             </h2>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', textAlign: 'center', lineHeight: '1.6', padding : '10px' }}>
-            {language === 'th' 
-              ? 'สามารถอัพเกรดฟีเจอร์ใหม่ๆ ได้แล้วที่นี่ เพียงจ่ายเพิ่ม 10 บาท ผ่าน QR code ด้านล่างนี้' 
-              : 'Upgrade to get new features here! Just pay 10 THB via the QR code below.'}
-          </p>
+            
+            {showFeatures ? (
+              <div style={{ padding: '1rem 0' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left', marginBottom: '2rem' }}>
+                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                    <div style={{ fontSize: '1.5rem' }}>🇹🇭</div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '0.25rem' }}>คำนวณราคาไทยช่วยไทย</strong>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.4' }}>คำนวณและหักยอด 60/40 อัตโนมัติเมื่อเพิ่มรายจ่าย (รัฐออก 60% สูงสุด 200 บ.)</span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                    <div style={{ fontSize: '1.5rem' }}>🎯</div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '0.25rem' }}>เป้าหมายการออม</strong>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.4' }}>ตั้งเป้าหมายและบันทึกเงินออมแยกส่วนได้อย่างอิสระ</span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                    <div style={{ fontSize: '1.5rem' }}>👑</div>
+                    <div>
+                      <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '0.25rem' }}>สถานะพิเศษ</strong>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.4' }}>รับแบดจ์ PRO ประจำโปรไฟล์และธีมสีพิเศษ พร้อมใช้งานแบบไม่มีโฆษณา</span>
+                    </div>
+                  </div>
+                </div>
+                <button className="btn btn-outline" style={{ width: '100%', padding: '12px' }} onClick={() => setShowFeatures(false)}>
+                  {language === 'th' ? 'ย้อนกลับไปชำระเงิน' : 'Back to Payment'}
+                </button>
+              </div>
+            ) : (
+              <>
+                <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', textAlign: 'center', lineHeight: '1.6', padding : '10px' }}>
+                {language === 'th' 
+                  ? 'สามารถอัพเกรดฟีเจอร์ใหม่ๆ ได้แล้วที่นี่ เพียงจ่ายเพิ่ม 10 บาท ผ่าน QR code ด้านล่างนี้' 
+                  : 'Upgrade to get new features here! Just pay 10 THB via the QR code below.'}
+                </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/2/28/Thai_QR_Logo.svg" 
-              alt="Thai QR Payment" 
-              style={{ height: '30px', marginBottom: '1rem' }}
-            />
-            <div style={{ background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid var(--border)', display: 'inline-block' }}>
-              <QRCode value={payload} size={180} />
-            </div>
-          </div>  
-            <div className="amount-display" style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '15px 0' }}>
-              10.00 THB
-            </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1.5rem' }}>
+                  <img 
+                    src="https://upload.wikimedia.org/wikipedia/commons/2/28/Thai_QR_Logo.svg" 
+                    alt="Thai QR Payment" 
+                    style={{ height: '30px', marginBottom: '1rem' }}
+                  />
+                  <div style={{ background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid var(--border)', display: 'inline-block' }}>
+                    <QRCode value={payload} size={180} />
+                  </div>
+                </div>  
+                <div className="amount-display" style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '15px 0' }}>
+                  10.00 THB
+                </div>
 
-            <div className="upload-section" style={{ marginTop: '10px' }}>
-              <input 
-                type="file" 
-                accept="image/*" 
-                ref={fileInputRef} 
-                onChange={handleFileChange} 
-                style={{ display: 'none' }} 
-              />
-              <button 
-                className="btn btn-primary" 
-                style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px' , margin: '10px'}}
-                onClick={() => fileInputRef.current.click()}
-              >
-                <UploadCloud size={20} style={{ marginRight: '10px' }} />
-                {language === 'th' ? 'อัปโหลดสลิปโอนเงิน' : 'Upload Transfer Slip'}
-              </button>
-            </div>
+                <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                  <button 
+                    onClick={() => setShowFeatures(true)}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary-main)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}
+                  >
+                    {language === 'th' ? 'ดูรายละเอียดฟีเจอร์ PRO' : 'View PRO Features Details'}
+                  </button>
+                </div>
+
+                <div className="upload-section" style={{ marginTop: '10px' }}>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    ref={fileInputRef} 
+                    onChange={handleFileChange} 
+                    style={{ display: 'none' }} 
+                  />
+                  
+                  <button 
+                    className="btn btn-primary upload-btn"
+                    onClick={() => fileInputRef.current.click()}
+                    style={{ width: '100%', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                  >
+                    <UploadCloud size={20} />
+                    {language === 'th' ? 'อัปโหลดสลิปโอนเงิน' : 'Upload Payment Slip'}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
 

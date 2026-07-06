@@ -6,5 +6,6 @@ const authMiddleware = require('../middleware/authMiddleware');
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.post('/upgrade', authMiddleware, authController.upgrade);
+router.put('/profile-pic', authMiddleware, authController.updateProfilePic);
 
 module.exports = router;

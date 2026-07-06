@@ -3,7 +3,9 @@ import Sidebar from './Sidebar';
 import Footer from './Footer';
 import { Search, Bell, Globe, Menu, X, CheckCircle, Info } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { fetchWithAuth } from '../utils/api';
 import { useLocation } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const Layout = ({ children, searchQuery, setSearchQuery }) => {
   const { t, language, toggleLanguage } = useLanguage();
@@ -13,6 +15,69 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
   const [notifications, setNotifications] = useState([]);
   const notifRef = useRef(null);
   const location = useLocation();
+  const fileInputRef = useRef(null);
+  const [profilePic, setProfilePic] = useState(null);
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+    if (storedUser?.id) {
+      if (storedUser.profilePic) {
+        setProfilePic(storedUser.profilePic);
+      } else {
+        const localPic = localStorage.getItem(`profilePic_${storedUser.id}`);
+        if (localPic) setProfilePic(localPic);
+      }
+    }
+  }, []);
+
+  const handleProfileClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleProfileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        setProfilePic(reader.result);
+        
+        try {
+          const res = await fetchWithAuth('/api/auth/profile-pic', {
+            method: 'PUT',
+            body: JSON.stringify({ profilePic: reader.result })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            localStorage.setItem('user', JSON.stringify(data.user));
+            setUser(data.user);
+            Swal.fire({
+              icon: 'success',
+              title: language === 'th' ? 'อัปเดตโปรไฟล์แล้ว' : 'Profile Updated',
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        } catch (error) {
+          console.error('Failed to update profile pic', error);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const hour = new Date().getHours();
+  let greetingTh = 'สวัสดี';
+  let greetingEn = 'Hello';
+  if (hour >= 5 && hour < 12) {
+    greetingTh = 'สวัสดีตอนเช้า';
+    greetingEn = 'Good morning';
+  } else if (hour >= 12 && hour < 17) {
+    greetingTh = 'สวัสดีตอนบ่าย';
+    greetingEn = 'Good afternoon';
+  } else if (hour >= 17 && hour < 22) {
+    greetingTh = 'สวัสดีตอนเย็น';
+    greetingEn = 'Good evening';
+  }
 
   // Close sidebar on route change
   useEffect(() => {
@@ -173,13 +238,52 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
             {/* User Profile */}
             <div className="user-profile">
               <div className="user-info">
-                <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{user?.name || 'User'}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  {user?.isPro ? t('premiumMember') : t('normalMember')}
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
+                  {language === 'th' ? greetingTh : greetingEn},
                 </div>
+                <div style={{ fontWeight: 600, fontSize: '1rem' }}>{user?.name || 'User'}</div>
               </div>
-              <div className="avatar-circle">
-                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+              <div 
+                className="avatar-circle" 
+                onClick={handleProfileClick}
+                style={{ 
+                  cursor: 'pointer', 
+                  backgroundImage: profilePic ? `url(${profilePic})` : 'none', 
+                  backgroundSize: 'cover', 
+                  backgroundPosition: 'center', 
+                  position: 'relative',
+                  overflow: 'visible' // allow badge to stick out
+                }}
+                title={language === 'th' ? 'คลิกเพื่อเปลี่ยนรูปโปรไฟล์' : 'Click to change profile picture'}
+              >
+                {!profilePic && (user?.name ? user.name.charAt(0).toUpperCase() : 'U')}
+                
+                {/* PRO Badge */}
+                {user?.isPro && (
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '-4px',
+                    right: '-4px',
+                    background: 'linear-gradient(135deg, #1D3557 0%, #028090 50%, #00A896 100%)',
+                    color: '#fff',
+                    fontSize: '0.6rem',
+                    fontWeight: 'bold',
+                    padding: '2px 6px',
+                    borderRadius: '8px',
+                    border: '2px solid #fff',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    zIndex: 2
+                  }}>
+                    PRO
+                  </div>
+                )}
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  style={{ display: 'none' }} 
+                  accept="image/*" 
+                  onChange={handleProfileChange} 
+                />
               </div>
             </div>
           </div>
