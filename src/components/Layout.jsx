@@ -258,7 +258,7 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                 onClick={handleProfileClick}
                 style={{ 
                   cursor: user?.isPro ? 'pointer' : 'default', 
-                  backgroundImage: (user?.isPro && profilePic) ? `url(${profilePic})` : 'none', 
+                  backgroundImage: (user?.isPro && profilePic) ? `url(${profilePic})` : '', 
                   backgroundSize: 'cover', 
                   backgroundPosition: 'center', 
                   position: 'relative',
