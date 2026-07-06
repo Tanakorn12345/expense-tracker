@@ -225,10 +225,7 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
                   {language === 'th' ? greetingTh : greetingEn},
                 </div>
-                <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{user?.name || 'User'}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--primary-main)', fontWeight: 500 }}>
-                  {user?.isPro ? t('premiumMember') : t('normalMember')}
-                </div>
+                <div style={{ fontWeight: 600, fontSize: '1rem' }}>{user?.name || 'User'}</div>
               </div>
               <div 
                 className="avatar-circle" 
@@ -238,11 +235,32 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                   backgroundImage: profilePic ? `url(${profilePic})` : 'none', 
                   backgroundSize: 'cover', 
                   backgroundPosition: 'center', 
-                  position: 'relative' 
+                  position: 'relative',
+                  overflow: 'visible' // allow badge to stick out
                 }}
                 title={language === 'th' ? 'คลิกเพื่อเปลี่ยนรูปโปรไฟล์' : 'Click to change profile picture'}
               >
                 {!profilePic && (user?.name ? user.name.charAt(0).toUpperCase() : 'U')}
+                
+                {/* PRO Badge */}
+                {user?.isPro && (
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '-4px',
+                    right: '-4px',
+                    background: 'linear-gradient(135deg, #1D3557 0%, #028090 50%, #00A896 100%)',
+                    color: '#fff',
+                    fontSize: '0.6rem',
+                    fontWeight: 'bold',
+                    padding: '2px 6px',
+                    borderRadius: '8px',
+                    border: '2px solid #fff',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    zIndex: 2
+                  }}>
+                    PRO
+                  </div>
+                )}
                 <input 
                   type="file" 
                   ref={fileInputRef} 
