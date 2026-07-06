@@ -450,8 +450,8 @@ const Dashboard = () => {
             ) : filteredTransactions.length === 0 ? (
               <p className="text-muted" style={{ textAlign: 'center', padding: '2rem' }}>{t('noTransactions')}</p>
             ) : (
-              <div className="table-container">
-                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '400px' }}>
+              <div className="table-responsive">
+                <table className="data-table" style={{ width: '100%', minWidth: '500px' }}>
                   <tbody>
                     {filteredTransactions.slice(0, 5).map(tItem => (
                       <TransactionRow 

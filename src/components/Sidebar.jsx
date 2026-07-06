@@ -54,7 +54,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             </li>
             <li className="nav-item">
               <NavLink to="/calculator" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsOpen && setIsOpen(false)}>
-                <Calculator size={20} />
+                <img src="/thai-chuy-thai.png" alt="Thai Chuy Thai" style={{ width: '1.25em', height: '1.25em', objectFit: 'contain' }} />
                 <span>{language === 'th' ? 'ไทยช่วยไทย' : 'Co-Pay'}</span>
               </NavLink>
             </li>

@@ -3,7 +3,7 @@ import React from 'react';
 const TransactionRow = ({ icon, title, subtitle, category, badgeClass, badgeStyle, date, amount, isNegative }) => (
   <tr>
     <td>
-      <div className="flex items-center gap-4">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         {icon}
         <div>
           <div style={{ fontWeight: 600 }}>{title}</div>

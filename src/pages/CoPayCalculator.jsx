@@ -41,7 +41,7 @@ const CoPayCalculator = () => {
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{  padding: '10px', borderRadius: '12px', color: 'gray', display: 'flex' }}>
-            <Calculator size={28} />
+            <img src="/thai-chuy-thai.png" alt="Thai Chuy Thai" style={{ width: '1.75em', height: '1.75em', objectFit: 'contain' }} />
           </div>
           <div>
             <h1 style={{ marginBottom: '0.25rem' }}>{t('calculatorTitle') || (language === 'th' ? 'คำนวณราคา ไทยช่วยไทย' : 'Thai Chuy Thai Calculator')}</h1>
@@ -72,7 +72,7 @@ const CoPayCalculator = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
             {/* Gov Pays */}
             <div className="stat-card" style={{ background: 'rgba(0, 168, 232, 0.1)', border: '1px solid rgba(0, 168, 232, 0.2)', textAlign: 'center' }}>
               <div className="stat-title" style={{ color: 'var(--primary-light)', fontSize: '1rem', fontWeight: 600 }}>
