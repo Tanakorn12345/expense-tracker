@@ -3,6 +3,7 @@ import Sidebar from './Sidebar';
 import Footer from './Footer';
 import { Search, Bell, Globe, Menu, X, CheckCircle, Info } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { fetchWithAuth } from '../utils/api';
 import { useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
@@ -20,8 +21,12 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
     if (storedUser?.id) {
-      const pic = localStorage.getItem(`profilePic_${storedUser.id}`);
-      if (pic) setProfilePic(pic);
+      if (storedUser.profilePic) {
+        setProfilePic(storedUser.profilePic);
+      } else {
+        const localPic = localStorage.getItem(`profilePic_${storedUser.id}`);
+        if (localPic) setProfilePic(localPic);
+      }
     }
   }, []);
 
@@ -29,21 +34,32 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
     fileInputRef.current?.click();
   };
 
-  const handleProfileChange = (e) => {
+  const handleProfileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
         setProfilePic(reader.result);
-        if (user?.id) {
-          localStorage.setItem(`profilePic_${user.id}`, reader.result);
+        
+        try {
+          const res = await fetchWithAuth('/api/auth/profile-pic', {
+            method: 'PUT',
+            body: JSON.stringify({ profilePic: reader.result })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            localStorage.setItem('user', JSON.stringify(data.user));
+            setUser(data.user);
+            Swal.fire({
+              icon: 'success',
+              title: language === 'th' ? 'อัปเดตโปรไฟล์แล้ว' : 'Profile Updated',
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        } catch (error) {
+          console.error('Failed to update profile pic', error);
         }
-        Swal.fire({
-          icon: 'success',
-          title: language === 'th' ? 'อัปเดตโปรไฟล์แล้ว' : 'Profile Updated',
-          showConfirmButton: false,
-          timer: 1500
-        });
       };
       reader.readAsDataURL(file);
     }

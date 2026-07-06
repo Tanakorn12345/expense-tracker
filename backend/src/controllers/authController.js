@@ -22,7 +22,7 @@ const authController = {
       });
 
       const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
-      res.status(201).json({ token, user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro } });
+      res.status(201).json({ token, user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic } });
     } catch (error) {
       next(error);
     }
@@ -43,7 +43,7 @@ const authController = {
       }
 
       const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
-      res.json({ token, user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro } });
+      res.json({ token, user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic } });
     } catch (error) {
       next(error);
     }
@@ -60,7 +60,26 @@ const authController = {
         data: { isPro: true }
       });
 
-      res.json({ message: 'Upgraded to Pro successfully', user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro } });
+      res.json({ message: 'Upgraded to Pro successfully', user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic } });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async updateProfilePic(req, res, next) {
+    try {
+      if (!req.user || !req.user.id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      const { profilePic } = req.body;
+
+      const user = await prisma.user.update({
+        where: { id: req.user.id },
+        data: { profilePic }
+      });
+
+      res.json({ message: 'Profile picture updated', user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic } });
     } catch (error) {
       next(error);
     }
