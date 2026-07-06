@@ -66,9 +66,25 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
               showConfirmButton: false,
               timer: 1500
             });
+          } else {
+            // Revert state if failed
+            const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+            setProfilePic(storedUser.profilePic || null);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: language === 'th' ? 'รูปภาพมีขนาดใหญ่เกินไป หรืออัปโหลดไม่สำเร็จ' : 'Image is too large or upload failed.'
+            });
           }
         } catch (error) {
           console.error('Failed to update profile pic', error);
+          const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+          setProfilePic(storedUser.profilePic || null);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: language === 'th' ? 'เกิดข้อผิดพลาดในการเชื่อมต่อ' : 'Connection error occurred.'
+          });
         }
       };
       reader.readAsDataURL(file);
@@ -279,7 +295,7 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                     right: '-4px',
                     background: 'linear-gradient(135deg, #1D3557 0%, #028090 50%, #00A896 100%)',
                     color: '#fff',
-                    fontSize: '0.6rem',
+                    fontSize: '0.4rem',
                     fontWeight: 'bold',
                     padding: '2px 6px',
                     borderRadius: '8px',
