@@ -31,7 +31,17 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
   }, []);
 
   const handleProfileClick = () => {
-    fileInputRef.current?.click();
+    if (user?.isPro) {
+      fileInputRef.current?.click();
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: language === 'th' ? 'เฉพาะผู้ใช้ PRO' : 'PRO Users Only',
+        text: language === 'th' ? 'อัปเกรดเป็น PRO เพื่อปรับแต่งรูปโปรไฟล์ของคุณ!' : 'Upgrade to PRO to customize your profile picture!',
+        showConfirmButton: true,
+        confirmButtonText: language === 'th' ? 'ตกลง' : 'OK'
+      });
+    }
   };
 
   const handleProfileChange = async (e) => {
@@ -247,16 +257,19 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                 className="avatar-circle" 
                 onClick={handleProfileClick}
                 style={{ 
-                  cursor: 'pointer', 
-                  backgroundImage: profilePic ? `url(${profilePic})` : 'none', 
+                  cursor: user?.isPro ? 'pointer' : 'default', 
+                  backgroundImage: (user?.isPro && profilePic) ? `url(${profilePic})` : 'none', 
                   backgroundSize: 'cover', 
                   backgroundPosition: 'center', 
                   position: 'relative',
                   overflow: 'visible' // allow badge to stick out
                 }}
-                title={language === 'th' ? 'คลิกเพื่อเปลี่ยนรูปโปรไฟล์' : 'Click to change profile picture'}
+                title={user?.isPro 
+                  ? (language === 'th' ? 'คลิกเพื่อเปลี่ยนรูปโปรไฟล์' : 'Click to change profile picture')
+                  : (language === 'th' ? 'อัปเกรดเป็น PRO เพื่อเปลี่ยนรูปโปรไฟล์' : 'Upgrade to PRO to change profile picture')
+                }
               >
-                {!profilePic && (user?.name ? user.name.charAt(0).toUpperCase() : 'U')}
+                {!(user?.isPro && profilePic) && (user?.name ? user.name.charAt(0).toUpperCase() : 'U')}
                 
                 {/* PRO Badge */}
                 {user?.isPro && (
