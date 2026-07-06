@@ -41,7 +41,7 @@ const CoPayCalculator = () => {
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{  padding: '10px', borderRadius: '12px', color: 'gray', display: 'flex' }}>
-            <Calculator size={28} />
+            <img src="/thai-chuy-thai.png" alt="Thai Chuy Thai" style={{ width: 28, height: 28, objectFit: 'contain' }} />
           </div>
           <div>
             <h1 style={{ marginBottom: '0.25rem' }}>{t('calculatorTitle') || (language === 'th' ? 'คำนวณราคา ไทยช่วยไทย' : 'Thai Chuy Thai Calculator')}</h1>
