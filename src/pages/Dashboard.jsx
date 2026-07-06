@@ -450,9 +450,9 @@ const Dashboard = () => {
             ) : filteredTransactions.length === 0 ? (
               <p className="text-muted" style={{ textAlign: 'center', padding: '2rem' }}>{t('noTransactions')}</p>
             ) : (
-              <div className="table-container">
-                <div style={{ width: '100%', minWidth: '300px' }}>
-                  <div>
+              <div className="table-responsive">
+                <table className="data-table" style={{ width: '100%', minWidth: '500px' }}>
+                  <tbody>
                     {filteredTransactions.slice(0, 5).map(tItem => (
                       <TransactionRow 
                         key={tItem.id}
@@ -467,8 +467,8 @@ const Dashboard = () => {
                         isNegative={tItem.category?.type === 'expense'} 
                       />
                     ))}
-                  </div>
-                </div>
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
