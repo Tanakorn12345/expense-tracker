@@ -300,7 +300,8 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
             </div>
 
             {/* User Profile */}
-            <div className="user-profile">
+            {user && (
+              <div className="user-profile">
               <div className="user-info">
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
                   {language === 'th' ? greetingTh : greetingEn},
@@ -362,6 +363,7 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                 </span>
               </div>
             </div>
+          )}
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 8rem)' }}>
