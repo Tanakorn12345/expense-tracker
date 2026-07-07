@@ -48,44 +48,71 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = async () => {
-        setProfilePic(reader.result);
-        
-        try {
-          const res = await fetchWithAuth('/api/auth/profile-pic', {
-            method: 'PUT',
-            body: JSON.stringify({ profilePic: reader.result })
-          });
-          if (res.ok) {
-            const data = await res.json();
-            localStorage.setItem('user', JSON.stringify(data.user));
-            setUser(data.user);
-            Swal.fire({
-              icon: 'success',
-              title: language === 'th' ? 'อัปเดตโปรไฟล์แล้ว' : 'Profile Updated',
-              showConfirmButton: false,
-              timer: 1500
-            });
+      reader.onloadend = () => {
+        const img = new Image();
+        img.src = reader.result;
+        img.onload = async () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 400;
+          const MAX_HEIGHT = 400;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
           } else {
-            // Revert state if failed
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          setProfilePic(compressedDataUrl);
+          
+          try {
+            const res = await fetchWithAuth('/api/auth/profile-pic', {
+              method: 'PUT',
+              body: JSON.stringify({ profilePic: compressedDataUrl })
+            });
+            if (res.ok) {
+              const data = await res.json();
+              localStorage.setItem('user', JSON.stringify(data.user));
+              setUser(data.user);
+              Swal.fire({
+                icon: 'success',
+                title: language === 'th' ? 'อัปเดตโปรไฟล์แล้ว' : 'Profile Updated',
+                showConfirmButton: false,
+                timer: 1500
+              });
+            } else {
+              // Revert state if failed
+              const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+              setProfilePic(storedUser.profilePic || null);
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: language === 'th' ? 'รูปภาพมีขนาดใหญ่เกินไป หรืออัปโหลดไม่สำเร็จ' : 'Image is too large or upload failed.'
+              });
+            }
+          } catch (error) {
+            console.error('Failed to update profile pic', error);
             const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
             setProfilePic(storedUser.profilePic || null);
             Swal.fire({
               icon: 'error',
               title: 'Error',
-              text: language === 'th' ? 'รูปภาพมีขนาดใหญ่เกินไป หรืออัปโหลดไม่สำเร็จ' : 'Image is too large or upload failed.'
+              text: language === 'th' ? 'เกิดข้อผิดพลาดในการเชื่อมต่อ' : 'Connection error occurred.'
             });
           }
-        } catch (error) {
-          console.error('Failed to update profile pic', error);
-          const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-          setProfilePic(storedUser.profilePic || null);
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: language === 'th' ? 'เกิดข้อผิดพลาดในการเชื่อมต่อ' : 'Connection error occurred.'
-          });
-        }
+        };
       };
       reader.readAsDataURL(file);
     }
