@@ -57,12 +57,12 @@ const Login = () => {
     <div className="login-page">
       <div className="login-container">
         <div className="login-card">
-          <div className="brand-logo">
-            <div className="logo-box" style={{ background: 'transparent', padding: 0 }}>
-              <Logo size={48} />
+          <div className="brand-logo" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <Logo size={56} />
+              <h2 style={{ fontSize: '2.5rem', margin: 0, fontWeight: 700, letterSpacing: '0.5px', color: 'var(--primary)' }}>FinTrack</h2>
             </div>
-            <h2 className="brand-name">FinTrack</h2>
-            <p className="brand-tagline">Wealth Management</p>
+            <p className="brand-tagline" style={{ marginTop: '12px' }}>Wealth Management</p>
           </div>
 
           <div className="welcome-text">

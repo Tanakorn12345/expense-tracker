@@ -1,6 +1,7 @@
 const transactionService = require('../services/transactionService');
 const prisma = require('../db/prisma');
 const emailService = require('../services/emailService');
+const lineNotifyService = require('../services/lineNotifyService');
 
 const transactionController = {
   getTransactions: async (req, res, next) => {
@@ -29,12 +30,23 @@ const transactionController = {
       // Send email notification (async, don't wait for it to finish)
       if (req.user && req.user.id) {
         prisma.user.findUnique({ where: { id: req.user.id } }).then(u => {
-          if (u && u.email) {
-            emailService.sendTransactionNotification(u.email, transaction).catch(err => {
-              console.error('Failed to send email notification:', err);
-            });
+          if (u) {
+            // Email Notification
+            if (u.notifyEmail && u.email) {
+              emailService.sendTransactionNotification(u.email, transaction).catch(err => {
+                console.error('Failed to send email notification:', err);
+              });
+            }
+            
+            // LINE Notification
+            if (u.notifyLine && u.lineNotifyToken) {
+              const msg = `💸 คุณได้เพิ่มรายการใหม่\nชื่อ: ${transaction.title}\nยอดเงิน: ฿${transaction.amount}\nเมื่อ: ${new Date().toLocaleString('th-TH')}`;
+              lineNotifyService.sendNotification(u.lineNotifyToken, msg).catch(err => {
+                console.error('Failed to send LINE notification:', err);
+              });
+            }
           }
-        }).catch(err => console.error('Failed to fetch user for email:', err));
+        }).catch(err => console.error('Failed to fetch user for notification:', err));
       }
 
       res.status(201).json(transaction);

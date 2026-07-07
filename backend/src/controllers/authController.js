@@ -21,8 +21,8 @@ const authController = {
         }
       });
 
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
-      res.status(201).json({ token, user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic } });
+      const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
+      res.status(201).json({ token, user: { id: newUser.id, email: newUser.email, name: newUser.name, isPro: newUser.isPro, profilePic: newUser.profilePic, hasSetPrefs: newUser.hasSetPrefs, notifyEmail: newUser.notifyEmail, notifyLine: newUser.notifyLine, lineNotifyToken: newUser.lineNotifyToken } });
     } catch (error) {
       next(error);
     }
@@ -43,7 +43,7 @@ const authController = {
       }
 
       const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
-      res.json({ token, user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic } });
+      res.json({ token, user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic, hasSetPrefs: user.hasSetPrefs, notifyEmail: user.notifyEmail, notifyLine: user.notifyLine, lineNotifyToken: user.lineNotifyToken } });
     } catch (error) {
       next(error);
     }
@@ -74,12 +74,33 @@ const authController = {
 
       const { profilePic } = req.body;
 
-      const user = await prisma.user.update({
+      const updatedUser = await prisma.user.update({
         where: { id: req.user.id },
         data: { profilePic }
       });
 
-      res.json({ message: 'Profile picture updated', user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic } });
+      res.json({ user: { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name, isPro: updatedUser.isPro, profilePic: updatedUser.profilePic, hasSetPrefs: updatedUser.hasSetPrefs, notifyEmail: updatedUser.notifyEmail, notifyLine: updatedUser.notifyLine, lineNotifyToken: updatedUser.lineNotifyToken } });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async updateNotificationSettings(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const { notifyEmail, notifyLine, lineNotifyToken } = req.body;
+      
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: {
+          notifyEmail: notifyEmail !== undefined ? notifyEmail : true,
+          notifyLine: notifyLine !== undefined ? notifyLine : false,
+          lineNotifyToken: lineNotifyToken !== undefined ? lineNotifyToken : null,
+          hasSetPrefs: true
+        }
+      });
+      
+      res.json({ user: { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name, isPro: updatedUser.isPro, profilePic: updatedUser.profilePic, hasSetPrefs: updatedUser.hasSetPrefs, notifyEmail: updatedUser.notifyEmail, notifyLine: updatedUser.notifyLine, lineNotifyToken: updatedUser.lineNotifyToken } });
     } catch (error) {
       next(error);
     }

@@ -6,6 +6,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { fetchWithAuth } from '../utils/api';
 import { useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import NotificationSetupModal from './NotificationSetupModal';
 
 const Layout = ({ children, searchQuery, setSearchQuery }) => {
   const { t, language, toggleLanguage } = useLanguage();
@@ -17,6 +18,7 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
   const location = useLocation();
   const fileInputRef = useRef(null);
   const [profilePic, setProfilePic] = useState(null);
+  const [showNotifSetup, setShowNotifSetup] = useState(false);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -26,6 +28,9 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
       } else {
         const localPic = localStorage.getItem(`profilePic_${storedUser.id}`);
         if (localPic) setProfilePic(localPic);
+      }
+      if (storedUser.hasSetPrefs === false) {
+        setShowNotifSetup(true);
       }
     }
   }, []);
@@ -163,12 +168,7 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
           if (storedNotifs) {
             setNotifications(JSON.parse(storedNotifs));
           } else {
-            // Initial mock notifications
-            const initial = [
-              { id: 1, type: 'summary', text: 'สรุปยอดเงินคงเหลือประจำเดือนพร้อมใช้งานแล้ว', time: new Date().toISOString(), read: false },
-            ];
-            setNotifications(initial);
-            localStorage.setItem(notifKey, JSON.stringify(initial));
+            setNotifications([]);
           }
         }
       } else {
@@ -352,14 +352,35 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                   onChange={handleProfileChange} 
                 />
               </div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span className="user-name" style={{ fontSize: '0.9rem', fontWeight: 600 }}>{user.name}</span>
+                <span 
+                  onClick={() => setShowNotifSetup(true)}
+                  style={{ fontSize: '0.75rem', color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                  {language === 'th' ? 'ตั้งค่าแจ้งเตือน' : 'Notification Settings'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 8rem)' }}>
           {children}
-          <Footer />
         </div>
       </main>
+
+      <Footer />
+
+      {showNotifSetup && (
+        <NotificationSetupModal 
+          user={user} 
+          setUser={(updatedUser) => {
+            setUser(updatedUser);
+            setShowNotifSetup(false);
+          }} 
+          onClose={() => setShowNotifSetup(false)} 
+        />
+      )}
     </div>
   );
 };
