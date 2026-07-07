@@ -25,12 +25,15 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
     if (storedUser?.id) {
       if (storedUser.profilePic) {
         setProfilePic(storedUser.profilePic);
-      } else {
+      }
+      if (storedUser) {
         const localPic = localStorage.getItem(`profilePic_${storedUser.id}`);
         if (localPic) setProfilePic(localPic);
-      }
-      if (storedUser.hasSetPrefs === false) {
-        setShowNotifSetup(true);
+        
+        // Show popup for new users to set preferences
+        if (storedUser.hasSetPrefs === false) {
+          setShowNotifSetup(true);
+        }
       }
     }
   }, []);
@@ -300,19 +303,12 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
             </div>
 
             {/* User Profile */}
-            {user && (
-              <div className="user-profile">
+            <div className="user-profile">
               <div className="user-info">
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
                   {language === 'th' ? greetingTh : greetingEn},
                 </div>
                 <div style={{ fontWeight: 600, fontSize: '1rem' }}>{user?.name || 'User'}</div>
-                <div 
-                  onClick={() => setShowNotifSetup(true)}
-                  style={{ fontSize: '0.75rem', color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline', marginTop: '4px' }}
-                >
-                  {language === 'th' ? 'ตั้งค่าแจ้งเตือน' : 'Notification Settings'}
-                </div>
               </div>
               <div 
                 className="avatar-circle" 
@@ -360,16 +356,14 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                 />
               </div>
             </div>
-          )}
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 8rem)' }}>
           {children}
+          <Footer />
         </div>
       </main>
-
-      <Footer />
-
+      
       {showNotifSetup && (
         <NotificationSetupModal 
           user={user} 
