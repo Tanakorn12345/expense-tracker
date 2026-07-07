@@ -307,6 +307,12 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                   {language === 'th' ? greetingTh : greetingEn},
                 </div>
                 <div style={{ fontWeight: 600, fontSize: '1rem' }}>{user?.name || 'User'}</div>
+                <div 
+                  onClick={() => setShowNotifSetup(true)}
+                  style={{ fontSize: '0.75rem', color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline', marginTop: '4px' }}
+                >
+                  {language === 'th' ? 'ตั้งค่าแจ้งเตือน' : 'Notification Settings'}
+                </div>
               </div>
               <div 
                 className="avatar-circle" 
@@ -352,15 +358,6 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                   accept="image/*" 
                   onChange={handleProfileChange} 
                 />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span className="user-name" style={{ fontSize: '0.9rem', fontWeight: 600 }}>{user.name}</span>
-                <span 
-                  onClick={() => setShowNotifSetup(true)}
-                  style={{ fontSize: '0.75rem', color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline' }}
-                >
-                  {language === 'th' ? 'ตั้งค่าแจ้งเตือน' : 'Notification Settings'}
-                </span>
               </div>
             </div>
           )}
