@@ -21,8 +21,8 @@ const authController = {
         }
       });
 
-      const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
-      res.status(201).json({ token, user: { id: newUser.id, email: newUser.email, name: newUser.name, isPro: newUser.isPro, profilePic: newUser.profilePic, hasSetPrefs: newUser.hasSetPrefs, notifyEmail: newUser.notifyEmail, notifyLine: newUser.notifyLine, lineNotifyToken: newUser.lineNotifyToken } });
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
+      res.status(201).json({ token, user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic, hasSetPrefs: user.hasSetPrefs, notifyEmail: user.notifyEmail, notifyLine: user.notifyLine, lineNotifyToken: user.lineNotifyToken } });
     } catch (error) {
       next(error);
     }

@@ -31,7 +31,7 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
         if (localPic) setProfilePic(localPic);
         
         // Show popup for new users to set preferences
-        if (storedUser.hasSetPrefs === false) {
+        if (storedUser.hasSetPrefs === false || storedUser.hasSetPrefs === undefined) {
           setShowNotifSetup(true);
         }
       }
