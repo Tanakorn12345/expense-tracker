@@ -149,16 +149,27 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
       if (currentUser) {
         // Load mock notifications specific to user
         const notifKey = `notifications_${currentUser.id}`;
-        const storedNotifs = localStorage.getItem(notifKey);
-        if (storedNotifs) {
-          setNotifications(JSON.parse(storedNotifs));
+        const lastClearKey = `notif_last_clear_${currentUser.id}`;
+        const today = new Date().toLocaleDateString();
+        const lastClearDate = localStorage.getItem(lastClearKey);
+
+        if (lastClearDate !== today) {
+          // It's a new day, clear notifications
+          localStorage.removeItem(notifKey);
+          localStorage.setItem(lastClearKey, today);
+          setNotifications([]);
         } else {
-          // Initial mock notifications
-          const initial = [
-            { id: 1, type: 'summary', text: 'สรุปยอดเงินคงเหลือประจำเดือนพร้อมใช้งานแล้ว', time: new Date().toISOString(), read: false },
-          ];
-          setNotifications(initial);
-          localStorage.setItem(notifKey, JSON.stringify(initial));
+          const storedNotifs = localStorage.getItem(notifKey);
+          if (storedNotifs) {
+            setNotifications(JSON.parse(storedNotifs));
+          } else {
+            // Initial mock notifications
+            const initial = [
+              { id: 1, type: 'summary', text: 'สรุปยอดเงินคงเหลือประจำเดือนพร้อมใช้งานแล้ว', time: new Date().toISOString(), read: false },
+            ];
+            setNotifications(initial);
+            localStorage.setItem(notifKey, JSON.stringify(initial));
+          }
         }
       } else {
         setNotifications([]);
