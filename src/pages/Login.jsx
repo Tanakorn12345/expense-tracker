@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Wallet, Lock, Loader2 } from 'lucide-react';
+import { Lock, Loader2 } from 'lucide-react';
 import Footer from '../components/Footer';
+import Logo from '../components/Logo';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -58,7 +59,7 @@ const Login = () => {
         <div className="login-card">
           <div className="brand-logo">
             <div className="logo-box" style={{ background: 'transparent', padding: 0 }}>
-              <img src="/fintrack-logo.png" alt="FinTrack Logo" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
+              <Logo size={48} />
             </div>
             <h2 className="brand-name">FinTrack</h2>
             <p className="brand-tagline">Wealth Management</p>
