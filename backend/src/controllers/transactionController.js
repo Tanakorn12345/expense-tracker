@@ -1,7 +1,6 @@
 const transactionService = require('../services/transactionService');
 const prisma = require('../db/prisma');
 const emailService = require('../services/emailService');
-const lineNotifyService = require('../services/lineNotifyService');
 
 const transactionController = {
   getTransactions: async (req, res, next) => {
@@ -35,14 +34,6 @@ const transactionController = {
             if (u.notifyEmail && u.email) {
               emailService.sendTransactionNotification(u.email, transaction).catch(err => {
                 console.error('Failed to send email notification:', err);
-              });
-            }
-            
-            // LINE Notification
-            if (u.notifyLine && u.lineNotifyToken) {
-              const msg = `💸 คุณได้เพิ่มรายการใหม่\nชื่อ: ${transaction.title}\nยอดเงิน: ฿${transaction.amount}\nเมื่อ: ${new Date().toLocaleString('th-TH')}`;
-              lineNotifyService.sendNotification(u.lineNotifyToken, msg).catch(err => {
-                console.error('Failed to send LINE notification:', err);
               });
             }
           }

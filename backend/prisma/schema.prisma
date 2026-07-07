@@ -14,9 +14,7 @@ model User {
   password     String
   profilePic   String?       @db.Text
   isPro        Boolean       @default(false)
-  lineNotifyToken String?
   notifyEmail  Boolean       @default(true)
-  notifyLine   Boolean       @default(false)
   hasSetPrefs  Boolean       @default(false)
   transactions Transaction[]
   savingsGoals SavingsGoal[]

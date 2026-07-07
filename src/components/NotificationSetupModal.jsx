@@ -6,29 +6,16 @@ import { useLanguage } from '../contexts/LanguageContext';
 const NotificationSetupModal = ({ user, setUser, onClose }) => {
   const { language } = useLanguage();
   const [notifyEmail, setNotifyEmail] = useState(user?.notifyEmail ?? true);
-  const [notifyLine, setNotifyLine] = useState(user?.notifyLine ?? false);
-  const [lineToken, setLineToken] = useState(user?.lineNotifyToken || '');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (notifyLine && !lineToken.trim()) {
-      Swal.fire({
-        icon: 'warning',
-        title: language === 'th' ? 'กรุณากรอก Token' : 'Token Required',
-        text: language === 'th' ? 'คุณเลือกการแจ้งเตือนผ่าน LINE กรุณาใส่ LINE Notify Token' : 'You selected LINE notifications. Please enter the token.'
-      });
-      return;
-    }
-
     setIsLoading(true);
     try {
       const res = await fetchWithAuth('/api/auth/notification-settings', {
         method: 'PUT',
         body: JSON.stringify({
-          notifyEmail,
-          notifyLine,
-          lineNotifyToken: notifyLine ? lineToken.trim() : null
+          notifyEmail
         })
       });
 
@@ -80,39 +67,6 @@ const NotificationSetupModal = ({ user, setUser, onClose }) => {
             />
             <span style={{ fontWeight: 500, color: 'var(--text-main)' }}>{language === 'th' ? 'แจ้งเตือนผ่าน Email' : 'Email Notifications'}</span>
           </label>
-
-          <label style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', border: '1px solid var(--border-light)', borderRadius: '12px', cursor: 'pointer', background: 'var(--card-bg)' }}>
-            <input 
-              type="checkbox" 
-              checked={notifyLine} 
-              onChange={(e) => setNotifyLine(e.target.checked)}
-              style={{ width: '18px', height: '18px', accentColor: '#00B900' }}
-            />
-            <span style={{ fontWeight: 500, color: 'var(--text-main)' }}>{language === 'th' ? 'แจ้งเตือนผ่าน LINE Notify' : 'LINE Notifications'}</span>
-          </label>
-
-          {notifyLine && (
-            <div style={{ padding: '16px', background: '#f0fdf4', borderRadius: '12px', border: '1px solid #bbf7d0', marginTop: '8px' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#166534', marginBottom: '8px' }}>
-                LINE Notify Token
-              </label>
-              <input 
-                type="text" 
-                value={lineToken}
-                onChange={(e) => setLineToken(e.target.value)}
-                placeholder="Ex: abcd1234efgh5678..."
-                className="form-control"
-                style={{ width: '100%', borderColor: '#bbf7d0', outline: 'none' }}
-              />
-              <p style={{ fontSize: '0.8rem', color: '#15803d', marginTop: '8px' }}>
-                {language === 'th' ? (
-                  <>ยังไม่มี Token? <a href="https://notify-bot.line.me/my/" target="_blank" rel="noreferrer" style={{ fontWeight: 600, textDecoration: 'underline' }}>ขอ Token ได้ที่นี่</a></>
-                ) : (
-                  <>No Token? <a href="https://notify-bot.line.me/my/" target="_blank" rel="noreferrer" style={{ fontWeight: 600, textDecoration: 'underline' }}>Get it here</a></>
-                )}
-              </p>
-            </div>
-          )}
 
           <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
             {onClose && (
