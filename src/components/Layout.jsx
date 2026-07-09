@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
-import { Search, Bell, Globe, Menu, X, CheckCircle, Info } from 'lucide-react';
+import { Search, Bell, Globe, Menu, X, CheckCircle, Info, Settings, LogOut, User, Mail } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { fetchWithAuth } from '../utils/api';
 import { useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import NotificationSetupModal from './NotificationSetupModal';
+import ProfileEditModal from './ProfileEditModal';
 
 const Layout = ({ children, searchQuery, setSearchQuery }) => {
   const { t, language, toggleLanguage } = useLanguage();
@@ -15,10 +16,12 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const notifRef = useRef(null);
+  const profileRef = useRef(null);
   const location = useLocation();
-  const fileInputRef = useRef(null);
   const [profilePic, setProfilePic] = useState(null);
   const [showNotifSetup, setShowNotifSetup] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showProfileEdit, setShowProfileEdit] = useState(false);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -39,91 +42,7 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
   }, []);
 
   const handleProfileClick = () => {
-    if (user?.isPro) {
-      fileInputRef.current?.click();
-    } else {
-      Swal.fire({
-        icon: 'info',
-        title: language === 'th' ? 'เฉพาะผู้ใช้ PRO' : 'PRO Users Only',
-        text: language === 'th' ? 'อัปเกรดเป็น PRO เพื่อปรับแต่งรูปโปรไฟล์ของคุณ!' : 'Upgrade to PRO to customize your profile picture!',
-        showConfirmButton: true,
-        confirmButtonText: language === 'th' ? 'ตกลง' : 'OK'
-      });
-    }
-  };
-
-  const handleProfileChange = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const img = new Image();
-        img.src = reader.result;
-        img.onload = async () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 400;
-          const MAX_HEIGHT = 400;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-          setProfilePic(compressedDataUrl);
-          
-          try {
-            const res = await fetchWithAuth('/api/auth/profile-pic', {
-              method: 'PUT',
-              body: JSON.stringify({ profilePic: compressedDataUrl })
-            });
-            if (res.ok) {
-              const data = await res.json();
-              localStorage.setItem('user', JSON.stringify(data.user));
-              setUser(data.user);
-              Swal.fire({
-                icon: 'success',
-                title: language === 'th' ? 'อัปเดตโปรไฟล์แล้ว' : 'Profile Updated',
-                showConfirmButton: false,
-                timer: 1500
-              });
-            } else {
-              // Revert state if failed
-              const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-              setProfilePic(storedUser.profilePic || null);
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: language === 'th' ? 'รูปภาพมีขนาดใหญ่เกินไป หรืออัปโหลดไม่สำเร็จ' : 'Image is too large or upload failed.'
-              });
-            }
-          } catch (error) {
-            console.error('Failed to update profile pic', error);
-            const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-            setProfilePic(storedUser.profilePic || null);
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: language === 'th' ? 'เกิดข้อผิดพลาดในการเชื่อมต่อ' : 'Connection error occurred.'
-            });
-          }
-        };
-      };
-      reader.readAsDataURL(file);
-    }
+    setShowProfileMenu(!showProfileMenu);
   };
 
   const hour = new Date().getHours();
@@ -195,11 +114,14 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
     return () => window.removeEventListener('notifications_updated', handleUpdate);
   }, [user]);
 
-  // Handle click outside to close notifications
+  // Handle click outside to close notifications and profile menu
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (notifRef.current && !notifRef.current.contains(event.target)) {
         setShowNotifications(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setShowProfileMenu(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -303,7 +225,7 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
             </div>
 
             {/* User Profile */}
-            <div className="user-profile">
+            <div className="user-profile" ref={profileRef} style={{ position: 'relative' }}>
               <div className="user-info">
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
                   {language === 'th' ? greetingTh : greetingEn},
@@ -314,17 +236,13 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                 className="avatar-circle" 
                 onClick={handleProfileClick}
                 style={{ 
-                  cursor: user?.isPro ? 'pointer' : 'default', 
+                  cursor: 'pointer', 
                   backgroundImage: (user?.isPro && profilePic) ? `url(${profilePic})` : '', 
                   backgroundSize: 'cover', 
                   backgroundPosition: 'center', 
                   position: 'relative',
                   overflow: 'visible' // allow badge to stick out
                 }}
-                title={user?.isPro 
-                  ? (language === 'th' ? 'คลิกเพื่อเปลี่ยนรูปโปรไฟล์' : 'Click to change profile picture')
-                  : (language === 'th' ? 'อัปเกรดเป็น PRO เพื่อเปลี่ยนรูปโปรไฟล์' : 'Upgrade to PRO to change profile picture')
-                }
               >
                 {!(user?.isPro && profilePic) && (user?.name ? user.name.charAt(0).toUpperCase() : 'U')}
                 
@@ -347,14 +265,38 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                     PRO
                   </div>
                 )}
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  style={{ display: 'none' }} 
-                  accept="image/*" 
-                  onChange={handleProfileChange} 
-                />
               </div>
+
+              {showProfileMenu && (
+                <div className="profile-dropdown">
+                  <div className="profile-dropdown-header">
+                    <div style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--text-main)', marginBottom: '4px' }}>
+                      {user?.name || 'User'}
+                    </div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                      {user?.email || 'email@example.com'}
+                    </div>
+                  </div>
+                  <div className="profile-dropdown-body">
+                    <button className="profile-dropdown-item" onClick={() => { setShowProfileEdit(true); setShowProfileMenu(false); }}>
+                      <User size={18} />
+                      <span>{language === 'th' ? 'แก้ไขโปรไฟล์' : 'Edit Profile'}</span>
+                    </button>
+                    <button className="profile-dropdown-item" onClick={() => { setShowNotifSetup(true); setShowProfileMenu(false); }}>
+                      <Settings size={18} />
+                      <span>{language === 'th' ? 'ตั้งค่าการแจ้งเตือน' : 'Notification Settings'}</span>
+                    </button>
+                    <div className="profile-dropdown-divider"></div>
+                    <button className="profile-dropdown-item logout" onClick={() => {
+                      localStorage.removeItem('token');
+                      window.location.href = '/';
+                    }}>
+                      <LogOut size={18} />
+                      <span>{language === 'th' ? 'ออกจากระบบ' : 'Logout'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -372,6 +314,19 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
             setShowNotifSetup(false);
           }} 
           onClose={() => setShowNotifSetup(false)} 
+        />
+      )}
+
+      {showProfileEdit && (
+        <ProfileEditModal 
+          user={user} 
+          setUser={(updatedUser) => {
+            setUser(updatedUser);
+            if (updatedUser.profilePic) {
+              setProfilePic(updatedUser.profilePic);
+            }
+          }} 
+          onClose={() => setShowProfileEdit(false)} 
         />
       )}
     </div>

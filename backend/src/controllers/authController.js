@@ -102,6 +102,31 @@ const authController = {
     } catch (error) {
       next(error);
     }
+  },
+
+  async updateProfile(req, res, next) {
+    try {
+      const { name, email } = req.body;
+      const userId = req.user.id;
+
+      if (!name || !email) {
+        return res.status(400).json({ message: 'Name and email are required' });
+      }
+
+      const existingUser = await prisma.user.findUnique({ where: { email } });
+      if (existingUser && existingUser.id !== userId) {
+        return res.status(409).json({ message: 'ไม่สามารถใช้อีเมลนี้ได้ เนื่องจากผู้ใช้ท่านอื่นใช้แล้ว' });
+      }
+
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: { name, email }
+      });
+
+      res.json({ user: { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name, isPro: updatedUser.isPro, profilePic: updatedUser.profilePic, hasSetPrefs: updatedUser.hasSetPrefs, notifyEmail: updatedUser.notifyEmail } });
+    } catch (error) {
+      next(error);
+    }
   }
 };
 
