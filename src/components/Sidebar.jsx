@@ -76,11 +76,6 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             </p>
           </div>
         )}
-        
-        <NavLink to="/" className="nav-link" onClick={() => localStorage.removeItem('token')}>
-          <LogOut size={20} />
-          <span>{t('logout')}</span>
-        </NavLink>
       </div>
 
       <ProUpgradeModal 

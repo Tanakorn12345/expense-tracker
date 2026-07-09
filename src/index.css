@@ -727,6 +727,12 @@ select.form-control {
   background: #f8fafc;
 }
 
+.profile-dropdown-header div {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
 .profile-dropdown-body {
   padding: 8px 0;
 }
