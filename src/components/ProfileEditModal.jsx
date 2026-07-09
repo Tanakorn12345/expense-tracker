@@ -120,7 +120,7 @@ const ProfileEditModal = ({ user, setUser, onClose }) => {
 
       const data = await res.json();
 
-      if (res.status === 409) {
+      if (res.status === 409 || (data.message && data.message.includes('ผู้ใช้ท่านอื่นใช้แล้ว'))) {
         setEmailError(data.message || 'ไม่สามารถใช้อีเมลนี้ได้ เนื่องจากผู้ใช้ท่านอื่นใช้แล้ว');
       } else if (res.ok) {
         localStorage.setItem('user', JSON.stringify(data.user));
@@ -137,11 +137,15 @@ const ProfileEditModal = ({ user, setUser, onClose }) => {
       }
     } catch (error) {
       console.error(error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: error.message
-      });
+      if (error.message && (error.message.includes('ผู้ใช้ท่านอื่นใช้แล้ว') || error.message.includes('Unique constraint'))) {
+        setEmailError('ไม่สามารถใช้อีเมลนี้ได้ เนื่องจากผู้ใช้ท่านอื่นใช้แล้ว');
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.message
+        });
+      }
     } finally {
       setIsLoading(false);
     }

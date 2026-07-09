@@ -118,10 +118,18 @@ const authController = {
         return res.status(409).json({ message: 'ไม่สามารถใช้อีเมลนี้ได้ เนื่องจากผู้ใช้ท่านอื่นใช้แล้ว' });
       }
 
-      const updatedUser = await prisma.user.update({
-        where: { id: userId },
-        data: { name, email }
-      });
+      let updatedUser;
+      try {
+        updatedUser = await prisma.user.update({
+          where: { id: userId },
+          data: { name, email }
+        });
+      } catch (err) {
+        if (err.code === 'P2002') {
+          return res.status(409).json({ message: 'ไม่สามารถใช้อีเมลนี้ได้ เนื่องจากผู้ใช้ท่านอื่นใช้แล้ว' });
+        }
+        throw err;
+      }
 
       res.json({ user: { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name, isPro: updatedUser.isPro, profilePic: updatedUser.profilePic, hasSetPrefs: updatedUser.hasSetPrefs, notifyEmail: updatedUser.notifyEmail } });
     } catch (error) {
