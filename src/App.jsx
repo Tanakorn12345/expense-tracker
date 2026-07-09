@@ -7,11 +7,13 @@ import History from './pages/History';
 import Savings from './pages/Savings';
 import CoPayCalculator from './pages/CoPayCalculator';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 function App() {
   return (
-    <LanguageProvider>
-      <Router>
+    <ThemeProvider>
+      <LanguageProvider>
+        <Router>
         <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
@@ -24,6 +26,7 @@ function App() {
         </Routes>
       </Router>
     </LanguageProvider>
+    </ThemeProvider>
   );
 }
 

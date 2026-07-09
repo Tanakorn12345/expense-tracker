@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
-import { Search, Bell, Globe, Menu, X, CheckCircle, Info, Settings, LogOut, User, Mail } from 'lucide-react';
+import { Search, Bell, Globe, Menu, X, CheckCircle, Info, Settings, LogOut, User, Mail, Moon, Sun } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { fetchWithAuth } from '../utils/api';
 import { useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -11,6 +12,7 @@ import ProfileEditModal from './ProfileEditModal';
 
 const Layout = ({ children, searchQuery, setSearchQuery }) => {
   const { t, language, toggleLanguage } = useLanguage();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [user, setUser] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -285,6 +287,13 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                     <button className="profile-dropdown-item" onClick={() => { setShowNotifSetup(true); setShowProfileMenu(false); }}>
                       <Settings size={18} />
                       <span>{language === 'th' ? 'ตั้งค่าการแจ้งเตือน' : 'Notification Settings'}</span>
+                    </button>
+                    <button className="profile-dropdown-item" onClick={(e) => {
+                      e.stopPropagation();
+                      toggleTheme();
+                    }}>
+                      {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+                      <span>{language === 'th' ? (isDarkMode ? 'โหมดสว่าง' : 'โหมดมืด') : (isDarkMode ? 'Light Mode' : 'Dark Mode')}</span>
                     </button>
                     <div className="profile-dropdown-divider"></div>
                     <button className="profile-dropdown-item logout" onClick={() => {
