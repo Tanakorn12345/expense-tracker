@@ -1107,3 +1107,13 @@ select.form-control {
 .custom-toggle input:checked + .custom-toggle-slider:before {
   transform: translateX(20px);
 }
+
+/* Responsive Table */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-responsive table {
+  min-width: 600px; /* Ensure table doesn't shrink too much */
+}

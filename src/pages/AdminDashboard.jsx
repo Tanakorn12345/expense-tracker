@@ -68,10 +68,10 @@ const AdminDashboard = () => {
       html: `
         <div style="text-align: left;">
           <label style="display:block; margin-bottom: 5px;">Name:</label>
-          <input id="swal-input1" class="swal2-input" value="${user.name || ''}" placeholder="Name">
+          <input id="swal-input1" class="swal2-input" value="${user.name || ''}" placeholder="Name" style="max-width: 100%; box-sizing: border-box; width: calc(100% - 2rem);">
           
           <label style="display:block; margin-top: 15px; margin-bottom: 5px;">Email:</label>
-          <input id="swal-input2" class="swal2-input" value="${user.email}" placeholder="Email">
+          <input id="swal-input2" class="swal2-input" value="${user.email}" placeholder="Email" style="max-width: 100%; box-sizing: border-box; width: calc(100% - 2rem);">
           
           <label style="display:flex; align-items:center; margin-top: 15px; cursor: pointer;">
             <label class="custom-toggle" style="margin-right: 12px;">
@@ -118,9 +118,9 @@ const AdminDashboard = () => {
       title: language === 'th' ? 'สร้างผู้ใช้ใหม่' : 'Create User',
       html: `
         <div style="text-align: left;">
-          <input id="swal-create1" class="swal2-input" placeholder="Name">
-          <input id="swal-create2" class="swal2-input" placeholder="Email (required)">
-          <input type="password" id="swal-create3" class="swal2-input" placeholder="Password (required)">
+          <input id="swal-create1" class="swal2-input" placeholder="Name" style="max-width: 100%; box-sizing: border-box; width: calc(100% - 2rem);">
+          <input id="swal-create2" class="swal2-input" placeholder="Email (required)" style="max-width: 100%; box-sizing: border-box; width: calc(100% - 2rem);">
+          <input type="password" id="swal-create3" class="swal2-input" placeholder="Password (required)" style="max-width: 100%; box-sizing: border-box; width: calc(100% - 2rem);">
           <label style="display:flex; align-items:center; margin-top: 15px; margin-left: 5px; cursor: pointer;">
             <label class="custom-toggle" style="margin-right: 12px;">
               <input type="checkbox" id="swal-create4">
@@ -166,7 +166,7 @@ const AdminDashboard = () => {
   return (
     <Layout>
       <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
-        <div className="header-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div className="header-title" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <div>
             <h1>{language === 'th' ? 'แอดมิน แดชบอร์ด' : 'Admin Dashboard'}</h1>
             <p style={{ color: 'var(--text-muted)' }}>{language === 'th' ? 'จัดการผู้ใช้และดูภาพรวมของระบบ' : 'Manage users and system overview'}</p>
