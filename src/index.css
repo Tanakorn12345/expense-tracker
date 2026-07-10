@@ -40,33 +40,33 @@
 
 body.dark-mode {
     /* Primary Palette */
-    --primary-dark: #82C8FF;
-    --primary-main: #3399FF;
-    --primary-light: #0077D4;
-    --accent: #00D4FF;
+    --primary-dark: #0f172a;
+    --primary-main: #3b82f6;
+    --primary-light: #60a5fa;
+    --accent: #38bdf8;
     
     /* Semantic Colors */
-    --success: #2ECC71;
-    --danger: #FF6B6B;
-    --warning: #F2C94C;
-    --income: #2ECC71;
-    --expense: #FF6B6B;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --income: #10b981;
+    --expense: #ef4444;
     
-    /* Neutral Palette */
-    --bg-body: #0F172A;
-    --bg-card: #1E293B;
-    --text-main: #F8FAFC;
-    --text-muted: #94A3B8;
-    --border: #334155;
-    --bg-hover: #0F172A;
-    --bg-hover-danger: #3f1515;
+    /* Neutral Palette (Slate/Navy Tone) */
+    --bg-body: #020617;
+    --bg-card: rgba(15, 23, 42, 0.75);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: rgba(51, 65, 85, 0.5);
+    --bg-hover: rgba(30, 41, 59, 0.8);
+    --bg-hover-danger: rgba(69, 10, 10, 0.6);
     
     /* Shadows & Glass */
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -1px rgba(0,0,0,0.2);
-    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.3), 0 4px 6px -2px rgba(0,0,0,0.2);
-    --glass: rgba(30, 41, 59, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -4px rgba(0, 0, 0, 0.7);
+    --glass: rgba(15, 23, 42, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.05);
 }
 
 * {
@@ -81,6 +81,7 @@ body {
     color: var(--text-main);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 h1, h2, h3, h4 {
@@ -115,7 +116,8 @@ h1, h2, h3, h4 {
     display: flex;
     flex-direction: column;
     z-index: 100;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, background-color 0.4s ease;
+    border-right: 1px solid var(--border);
 }
 
 .sidebar-logo {
@@ -176,14 +178,16 @@ h1, h2, h3, h4 {
     font-size: 0.85rem;
 }
 
-/* Cards & Sections */
+/* Common Card Styles */
 .card {
     background: var(--bg-card);
     border-radius: var(--radius-lg);
     padding: 1.5rem;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
     border: 1px solid var(--border);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, background-color 0.4s ease, border-color 0.4s ease;
 }
 
 .card:hover {
@@ -744,7 +748,7 @@ select.form-control {
   position: absolute;
   top: 50px;
   right: 0;
-  width: 220px;
+  width: 240px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -752,6 +756,8 @@ select.form-control {
   z-index: 200;
   overflow: hidden;
   animation: fadeIn 0.2s ease-out;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .profile-dropdown-header {
@@ -801,6 +807,43 @@ select.form-control {
   height: 1px;
   background: var(--border);
   margin: 4px 0;
+}
+
+/* Theme Toggle Switch */
+.theme-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.theme-switch {
+  position: relative;
+  width: 48px;
+  height: 24px;
+  background-color: var(--border);
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.theme-switch.dark {
+  background-color: var(--primary-main);
+}
+.theme-switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.theme-switch.dark .theme-switch-knob {
+  transform: translateX(24px);
 }
 
 /* Mobile Sidebar Overlay & Menu Button */

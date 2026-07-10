@@ -288,13 +288,20 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                       <Settings size={18} />
                       <span>{language === 'th' ? 'ตั้งค่าการแจ้งเตือน' : 'Notification Settings'}</span>
                     </button>
-                    <button className="profile-dropdown-item" onClick={(e) => {
+                    <div className="profile-dropdown-item" onClick={(e) => {
                       e.stopPropagation();
                       toggleTheme();
                     }}>
-                      {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-                      <span>{language === 'th' ? (isDarkMode ? 'โหมดสว่าง' : 'โหมดมืด') : (isDarkMode ? 'Light Mode' : 'Dark Mode')}</span>
-                    </button>
+                      <div className="theme-toggle-container">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          {isDarkMode ? <Moon size={18} color="var(--primary-main)" /> : <Sun size={18} color="var(--warning)" />}
+                          <span>{language === 'th' ? (isDarkMode ? 'โหมดมืด' : 'โหมดสว่าง') : (isDarkMode ? 'Dark Mode' : 'Light Mode')}</span>
+                        </div>
+                        <div className={`theme-switch ${isDarkMode ? 'dark' : ''}`}>
+                          <div className="theme-switch-knob"></div>
+                        </div>
+                      </div>
+                    </div>
                     <div className="profile-dropdown-divider"></div>
                     <button className="profile-dropdown-item logout" onClick={() => {
                       localStorage.removeItem('token');
