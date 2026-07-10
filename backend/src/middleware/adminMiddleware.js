@@ -8,7 +8,7 @@ const adminMiddleware = async (req, res, next) => {
 
   try {
     const user = await prisma.user.findUnique({ where: { id: req.user.id } });
-    if (!user || user.email !== 'tanakorn.tip@student.mahidol.edu') {
+    if (!user || user.email !== process.env.ADMIN_EMAIL) {
       return res.status(403).json({ error: 'Access denied. Admin privileges required.' });
     }
     next();
