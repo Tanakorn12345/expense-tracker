@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { useLanguage } from '../contexts/LanguageContext';
 import { fetchWithAuth } from '../utils/api';
-import { PlusCircle, Target, ArrowUpRight, Loader2 , PiggyBank} from 'lucide-react';
+import { PlusCircle, Target, ArrowUpRight, Loader2 , PiggyBank, Edit, Trash2, CheckCircle2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
@@ -97,6 +97,67 @@ const Savings = () => {
     }
   };
 
+  const handleEditGoal = async (goal) => {
+    const { value: formValues } = await Swal.fire({
+      title: language === 'th' ? 'แก้ไขเป้าหมาย' : 'Edit Goal',
+      html:
+        `<input id="swal-edit1" class="swal2-input" value="${goal.name}" placeholder="${language === 'th' ? 'ชื่อเป้าหมาย' : 'Goal Name'}" style="max-width: 100%; box-sizing: border-box; width: calc(100% - 2rem);">` +
+        `<input id="swal-edit2" class="swal2-input" type="number" value="${goal.targetAmount}" placeholder="${language === 'th' ? 'จำนวนเงินเป้าหมาย' : 'Target Amount'}" style="max-width: 100%; box-sizing: border-box; width: calc(100% - 2rem);">`,
+      focusConfirm: false,
+      showCancelButton: true,
+      preConfirm: () => {
+        return [
+          document.getElementById('swal-edit1').value,
+          document.getElementById('swal-edit2').value
+        ]
+      }
+    });
+
+    if (formValues) {
+      const [name, targetAmount] = formValues;
+      if (!name || !targetAmount) return;
+
+      try {
+        const res = await fetchWithAuth(`/api/savings/goals/${goal.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({ name, targetAmount })
+        });
+        if (res.ok) {
+          fetchSavingsData();
+          Swal.fire('Success', language === 'th' ? 'อัปเดตเป้าหมายสำเร็จ' : 'Goal updated successfully', 'success');
+        }
+      } catch (e) {
+        Swal.fire('Error', 'Failed to update goal', 'error');
+      }
+    }
+  };
+
+  const handleDeleteGoal = async (goalId) => {
+    const result = await Swal.fire({
+      title: language === 'th' ? 'คุณแน่ใจหรือไม่?' : 'Are you sure?',
+      text: language === 'th' ? 'คุณต้องการลบเป้าหมายนี้และประวัติการออมทั้งหมดของเป้าหมายนี้ใช่หรือไม่?' : 'Do you want to delete this goal and all its savings history?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: language === 'th' ? 'ใช่, ลบเลย!' : 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const res = await fetchWithAuth(`/api/savings/goals/${goalId}`, {
+          method: 'DELETE'
+        });
+        if (res.ok) {
+          fetchSavingsData();
+          Swal.fire('Deleted!', language === 'th' ? 'เป้าหมายถูกลบแล้ว' : 'Goal has been deleted.', 'success');
+        }
+      } catch (e) {
+        Swal.fire('Error', 'Failed to delete goal', 'error');
+      }
+    }
+  };
+
   // Group transactions by month for chart
   const monthlyData = transactions.reduce((acc, curr) => {
     const month = new Date(curr.date).toLocaleString(language === 'th' ? 'th-TH' : 'en-US', { month: 'short', year: 'numeric' });
@@ -107,6 +168,9 @@ const Savings = () => {
   
   const chartData = Object.values(monthlyData).reverse();
   const totalSavings = goals.reduce((sum, goal) => sum + goal.currentAmount, 0);
+
+  const activeGoals = goals.filter(g => g.currentAmount < g.targetAmount);
+  const completedGoals = goals.filter(g => g.currentAmount >= g.targetAmount);
 
   if (loading) {
     return <Layout><div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}><Loader2 className="animate-spin" size={48} /></div></Layout>;
@@ -149,23 +213,41 @@ const Savings = () => {
             {language === 'th' ? 'เป้าหมายการออม' : 'Savings Goals'}
           </h3>
           
-          {goals.length === 0 ? (
-            <p className="no-notifs">{language === 'th' ? 'ยังไม่มีเป้าหมายการออม' : 'No savings goals yet.'}</p>
+          {activeGoals.length === 0 ? (
+            <p className="no-notifs">{language === 'th' ? 'คุณยังไม่มีเป้าหมายการออมในขณะนี้' : 'No active savings goals yet.'}</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              {goals.map(goal => {
+              {activeGoals.map(goal => {
                 const percent = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
                 return (
                   <div key={goal.id} style={{ padding: '1rem', border: '1px solid var(--border)', borderRadius: '12px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '12px' }}>
                       <h4 style={{ margin: 0, wordBreak: 'break-word', flex: '1 1 auto' }}>{goal.name}</h4>
-                      <button 
-                        className="btn btn-outline" 
-                        style={{ padding: '4px 12px', fontSize: '0.85rem', flexShrink: 0 }}
-                        onClick={() => handleAddMoney(goal.id, goal.name)}
-                      >
-                        <ArrowUpRight size={16} /> {language === 'th' ? 'เพิ่มเงิน' : 'Add'}
-                      </button>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button 
+                          className="btn btn-outline" 
+                          style={{ padding: '4px 8px', fontSize: '0.85rem' }}
+                          onClick={() => handleEditGoal(goal)}
+                          title={language === 'th' ? 'แก้ไข' : 'Edit'}
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button 
+                          className="btn btn-outline" 
+                          style={{ padding: '4px 8px', fontSize: '0.85rem', color: 'var(--danger)', borderColor: 'var(--danger)' }}
+                          onClick={() => handleDeleteGoal(goal.id)}
+                          title={language === 'th' ? 'ลบ' : 'Delete'}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                        <button 
+                          className="btn btn-outline" 
+                          style={{ padding: '4px 12px', fontSize: '0.85rem', flexShrink: 0 }}
+                          onClick={() => handleAddMoney(goal.id, goal.name)}
+                        >
+                          <ArrowUpRight size={16} /> {language === 'th' ? 'เพิ่มเงิน' : 'Add'}
+                        </button>
+                      </div>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
                       <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>฿{goal.currentAmount.toLocaleString()}</span>
@@ -180,6 +262,49 @@ const Savings = () => {
             </div>
           )}
         </div>
+
+        {completedGoals.length > 0 && (
+          <div className="card">
+            <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <CheckCircle2 size={20} color="var(--success)" />
+              {language === 'th' ? 'ประวัติการออม (สำเร็จแล้ว)' : 'History Savings (Completed)'}
+            </h3>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {completedGoals.map(goal => {
+                const percent = 100;
+                return (
+                  <div key={goal.id} style={{ padding: '1rem', border: '1px solid var(--success)', borderRadius: '12px', background: 'rgba(39, 174, 96, 0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '12px' }}>
+                      <h4 style={{ margin: 0, wordBreak: 'break-word', flex: '1 1 auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {goal.name}
+                        <span style={{ fontSize: '0.75rem', background: 'var(--success)', color: 'white', padding: '2px 8px', borderRadius: '12px' }}>Success</span>
+                      </h4>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button 
+                          className="btn btn-outline" 
+                          style={{ padding: '4px 8px', fontSize: '0.85rem', color: 'var(--danger)', borderColor: 'var(--danger)' }}
+                          onClick={() => handleDeleteGoal(goal.id)}
+                          title={language === 'th' ? 'ลบ' : 'Delete'}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
+                      <span style={{ fontWeight: 600, color: 'var(--success)' }}>฿{goal.currentAmount.toLocaleString()}</span>
+                      <span>{language === 'th' ? 'เป้าหมาย:' : 'Target:'} ฿{goal.targetAmount.toLocaleString()}</span>
+                    </div>
+                    <div style={{ width: '100%', height: '8px', background: 'var(--border)', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ width: `${percent}%`, height: '100%', background: 'var(--success)', transition: 'width 0.5s ease' }}></div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
 
         <div className="card">
           <h3 style={{ marginBottom: '1.5rem' }}>{language === 'th' ? 'สถิติการออมแต่ละเดือน' : 'Monthly Savings'}</h3>

@@ -8,5 +8,7 @@ router.use(authMiddleware);
 router.get('/', savingsController.getSavings);
 router.post('/goals', savingsController.createGoal);
 router.post('/goals/:id/add', savingsController.addMoney);
+router.put('/goals/:id', savingsController.updateGoal);
+router.delete('/goals/:id', savingsController.deleteGoal);
 
 module.exports = router;

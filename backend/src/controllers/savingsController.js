@@ -79,6 +79,65 @@ const savingsController = {
     } catch (error) {
       next(error);
     }
+  },
+
+  // Update a savings goal (name, targetAmount)
+  async updateGoal(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { name, targetAmount } = req.body;
+
+      // Verify goal belongs to user
+      const goal = await prisma.savingsGoal.findUnique({
+        where: { id: parseInt(id) }
+      });
+      
+      if (!goal || goal.userId !== req.user.id) {
+        return res.status(404).json({ message: 'Goal not found' });
+      }
+
+      const updatedGoal = await prisma.savingsGoal.update({
+        where: { id: parseInt(id) },
+        data: {
+          name: name || goal.name,
+          targetAmount: targetAmount ? parseFloat(targetAmount) : goal.targetAmount
+        }
+      });
+
+      res.json(updatedGoal);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // Delete a savings goal
+  async deleteGoal(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      // Verify goal belongs to user
+      const goal = await prisma.savingsGoal.findUnique({
+        where: { id: parseInt(id) }
+      });
+      
+      if (!goal || goal.userId !== req.user.id) {
+        return res.status(404).json({ message: 'Goal not found' });
+      }
+
+      // Delete associated transactions first
+      await prisma.savingsTransaction.deleteMany({
+        where: { goalId: parseInt(id) }
+      });
+
+      // Delete the goal
+      await prisma.savingsGoal.delete({
+        where: { id: parseInt(id) }
+      });
+
+      res.json({ message: 'Goal deleted successfully' });
+    } catch (error) {
+      next(error);
+    }
   }
 };
 
