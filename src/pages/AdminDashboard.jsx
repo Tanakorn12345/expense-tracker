@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../utils/api';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Trash2, Edit, Plus, Eye, Check, X } from 'lucide-react';
+import { Trash2, Edit, Plus, Eye, Check, X, UserPlus } from 'lucide-react';
 import Layout from '../components/Layout';
 import Swal from 'sweetalert2';
 import '../index.css';
@@ -74,7 +74,10 @@ const AdminDashboard = () => {
           <input id="swal-input2" class="swal2-input" value="${user.email}" placeholder="Email">
           
           <label style="display:flex; align-items:center; margin-top: 15px; cursor: pointer;">
-            <input type="checkbox" id="swal-input3" style="margin-right: 10px; width: 20px; height: 20px;" ${user.isPro ? 'checked' : ''}>
+            <label class="custom-toggle" style="margin-right: 12px;">
+              <input type="checkbox" id="swal-input3" ${user.isPro ? 'checked' : ''}>
+              <span class="custom-toggle-slider"></span>
+            </label>
             Is Pro User
           </label>
         </div>
@@ -119,7 +122,10 @@ const AdminDashboard = () => {
           <input id="swal-create2" class="swal2-input" placeholder="Email (required)">
           <input type="password" id="swal-create3" class="swal2-input" placeholder="Password (required)">
           <label style="display:flex; align-items:center; margin-top: 15px; margin-left: 5px; cursor: pointer;">
-            <input type="checkbox" id="swal-create4" style="margin-right: 10px; width: 20px; height: 20px;">
+            <label class="custom-toggle" style="margin-right: 12px;">
+              <input type="checkbox" id="swal-create4">
+              <span class="custom-toggle-slider"></span>
+            </label>
             Is Pro User
           </label>
         </div>
@@ -165,8 +171,8 @@ const AdminDashboard = () => {
             <h1>{language === 'th' ? 'แอดมิน แดชบอร์ด' : 'Admin Dashboard'}</h1>
             <p style={{ color: 'var(--text-muted)' }}>{language === 'th' ? 'จัดการผู้ใช้และดูภาพรวมของระบบ' : 'Manage users and system overview'}</p>
           </div>
-        <button onClick={handleCreateUser} className="upgrade-btn" style={{ background: 'var(--primary-main)', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Plus size={18} />
+        <button onClick={handleCreateUser} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <UserPlus size={18} />
           {language === 'th' ? 'เพิ่มผู้ใช้' : 'Add User'}
         </button>
       </div>

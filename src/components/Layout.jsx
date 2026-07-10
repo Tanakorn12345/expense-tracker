@@ -270,9 +270,7 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                   </div>
                 )}
               </div>
-              <div className="user-info">
-                <h4>{user?.name || 'User'}</h4>
-              </div>
+
 
               {showProfileMenu && (
                 <div className="profile-dropdown">

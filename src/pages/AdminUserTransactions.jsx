@@ -64,30 +64,6 @@ const AdminUserTransactions = () => {
         <p style={{ color: 'var(--text-muted)' }}>{user?.email} {user?.isPro && <span style={{ color: 'var(--warning)', fontWeight: 'bold' }}>(Pro)</span>}</p>
       </div>
 
-      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--bg-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <TrendingUp size={24} color={balance >= 0 ? 'var(--income)' : 'var(--expense)'} />
-          </div>
-          <div>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>{language === 'th' ? 'ยอดเงินคงเหลือทั้งหมด' : 'Total Balance'}</p>
-            <h3 style={{ margin: 0, fontSize: '1.5rem', color: balance >= 0 ? 'var(--income)' : 'var(--expense)' }}>
-              ฿{balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-            </h3>
-          </div>
-        </div>
-        
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--bg-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Clock size={24} color="var(--primary-light)" />
-          </div>
-          <div>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>{language === 'th' ? 'จำนวนธุรกรรม' : 'Total Transactions'}</p>
-            <h3 style={{ margin: 0, fontSize: '1.5rem' }}>{transactions.length}</h3>
-          </div>
-        </div>
-      </div>
-
       <div className="card">
         <h3 style={{ marginBottom: '1.5rem' }}>{language === 'th' ? 'ประวัติธุรกรรม' : 'Transaction History'}</h3>
         {transactions.length === 0 ? (
@@ -124,6 +100,16 @@ const AdminUserTransactions = () => {
                   </tr>
                 ))}
               </tbody>
+              <tfoot>
+                <tr style={{ background: 'var(--bg-hover)', borderTop: '2px solid var(--border)' }}>
+                  <td colSpan="3" style={{ padding: '16px', fontWeight: 'bold', textAlign: 'right' }}>
+                    {language === 'th' ? 'รวมทั้งหมด (' + transactions.length + ' ธุรกรรม):' : 'Total (' + transactions.length + ' transactions):'}
+                  </td>
+                  <td style={{ padding: '16px', fontWeight: 'bold', textAlign: 'right', color: balance >= 0 ? 'var(--income)' : 'var(--expense)' }}>
+                    ฿{balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  </td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         )}
