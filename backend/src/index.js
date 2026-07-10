@@ -6,6 +6,9 @@ const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const savingsRoutes = require('./routes/savingsRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const authenticate = require('./middleware/authMiddleware');
+const adminMiddleware = require('./middleware/adminMiddleware');
 const { initCronJobs } = require('./services/cronJobs');
 
 const app = express();
@@ -20,6 +23,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/savings', savingsRoutes);
+app.use('/api/admin', authenticate, adminMiddleware, adminRoutes);
 
 // Global Error Handler Middleware
 app.use((err, req, res, next) => {

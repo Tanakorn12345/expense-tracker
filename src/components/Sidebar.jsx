@@ -6,7 +6,9 @@ import {
   LogOut,
   History as HistoryIcon,
   PiggyBank,
-  Calculator
+  Calculator,
+  Shield,
+  Crown
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import Logo from './Logo';
@@ -18,6 +20,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const isPro = user?.isPro || false;
+  const isAdmin = user?.email === 'tanakorn.tip@student.mahidol.edu';
+  
   return (
     <div className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -44,6 +48,14 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             <span>{t('history')}</span>
           </NavLink>
         </li>
+        {isAdmin && (
+          <li className="nav-item">
+            <NavLink to="/admin" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsOpen && setIsOpen(false)}>
+              <Shield size={20} />
+              <span>{language === 'th' ? 'แอดมิน แดชบอร์ด' : 'Admin Dashboard'}</span>
+            </NavLink>
+          </li>
+        )}
         {isPro && (
           <>
             <li className="nav-item">
@@ -63,16 +75,19 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       </ul>
 
       <div className="sidebar-footer">
-        {!isPro ? (
+        {!isPro && !isAdmin ? (
           <div className="upgrade-card" style={{ cursor: 'pointer' }} onClick={() => setIsProModalOpen(true)}>
             <h4 style={{ marginBottom: '0.5rem' }}>{t('upgradePro')}</h4>
             <p style={{ opacity: 0.8, fontSize: '0.75rem' }}>{t('upgradeDesc')}</p>
           </div>
         ) : (
           <div className="upgrade-card" style={{ background: 'linear-gradient(135deg, #1D3557 0%, #028090 50%, #00A896 100%)'}}>
-            <h4 style={{ marginBottom: '0.5rem', color: '#fff' }}>Pro Member</h4>
+            <h4 style={{ marginBottom: '0.5rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {isAdmin ? <span style={{ color: '#FFD700' }}>Pro ADMIN</span> : 'Pro Member'}
+              {isAdmin && <Crown size={16} color="#FFD700" />}
+            </h4>
             <p style={{ opacity: 0.9, fontSize: '0.75rem', color: '#fff' }}>
-              {language === 'th' ? 'คุณเป็นสมาชิกระดับ Pro แล้ว' : 'You are a Pro member'}
+              {isAdmin ? 'Administrator Access' : (language === 'th' ? 'คุณเป็นสมาชิกระดับ Pro แล้ว' : 'You are a Pro member')}
             </p>
           </div>
         )}

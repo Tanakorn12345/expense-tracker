@@ -16,6 +16,8 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
   const [user, setUser] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  
+  const isAdmin = user?.email === 'tanakorn.tip@student.mahidol.edu';
   const [notifications, setNotifications] = useState([]);
   const notifRef = useRef(null);
   const profileRef = useRef(null);
@@ -246,26 +248,16 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                   overflow: 'visible' // allow badge to stick out
                 }}
               >
-                {!(user?.isPro && profilePic) && (user?.name ? user.name.charAt(0).toUpperCase() : 'U')}
-                
-                {/* PRO Badge */}
-                {user?.isPro && (
-                  <div style={{
-                    position: 'absolute',
-                    bottom: '-4px',
-                    right: '-4px',
-                    background: 'linear-gradient(135deg, #1D3557 0%, #028090 50%, #00A896 100%)',
-                    color: '#fff',
-                    fontSize: '0.4rem',
-                    fontWeight: 'bold',
-                    padding: '2px 6px',
-                    borderRadius: '8px',
-                    border: '2px solid #fff',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                    zIndex: 2
-                  }}>
-                    PRO
-                  </div>
+                {!(user?.isPro && profilePic) && !(isAdmin && profilePic) && (user?.name ? user.name.charAt(0).toUpperCase() : 'U')}
+              </div>
+              <div className="user-info">
+                <h4>{user?.name || 'User'}</h4>
+                {isAdmin ? (
+                  <span className="pro-badge" style={{ backgroundColor: '#FFD700', color: '#1E293B', fontWeight: 'bold' }}>Pro ADMIN</span>
+                ) : user?.isPro ? (
+                  <span className="pro-badge">Pro</span>
+                ) : (
+                  <span className="free-badge">Free</span>
                 )}
               </div>
 
@@ -273,10 +265,17 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
                 <div className="profile-dropdown">
                   <div className="profile-dropdown-header">
                     <div style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--text-main)', marginBottom: '4px' }}>
-                      {user?.name || 'User'}
+                      <h4>{user?.name || 'User'}</h4>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{user?.email || 'user@example.com'}</p>
+                    <div style={{ marginTop: '8px' }}>
+                      {isAdmin ? (
+                        <span className="pro-badge" style={{ backgroundColor: '#FFD700', color: '#1E293B', fontWeight: 'bold', display: 'inline-block' }}>Pro ADMIN</span>
+                      ) : user?.isPro ? (
+                        <span className="pro-badge" style={{ display: 'inline-block' }}>Pro</span>
+                      ) : (
+                        <span className="free-badge" style={{ display: 'inline-block' }}>Free</span>
+                      )}
                     </div>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      {user?.email || 'email@example.com'}
                     </div>
                   </div>
                   <div className="profile-dropdown-body">
