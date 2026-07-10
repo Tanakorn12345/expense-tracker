@@ -26,7 +26,9 @@ const AdminUserTransactions = () => {
     try {
       setLoading(true);
       const res = await fetchWithAuth(`/api/admin/users/${id}/transactions`);
-      setData(res);
+      if (!res.ok) throw new Error('Failed to load user transactions');
+      const data = await res.json();
+      setData(data);
     } catch (error) {
       console.error(error);
       Swal.fire('Error', 'Failed to load user transactions', 'error');

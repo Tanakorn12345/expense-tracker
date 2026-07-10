@@ -26,7 +26,9 @@ const AdminDashboard = () => {
   const loadUsers = async () => {
     setLoading(true);
     try {
-      const data = await fetchWithAuth('/api/admin/users');
+      const res = await fetchWithAuth('/api/admin/users');
+      if (!res.ok) throw new Error('Failed to load users');
+      const data = await res.json();
       setUsers(data);
     } catch (error) {
       console.error('Failed to load users', error);
@@ -50,7 +52,8 @@ const AdminDashboard = () => {
 
     if (result.isConfirmed) {
       try {
-        await fetchWithAuth(`/api/admin/users/${id}`, { method: 'DELETE' });
+        const res = await fetchWithAuth(`/api/admin/users/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Failed to delete user');
         Swal.fire('Deleted!', 'User deleted successfully.', 'success');
         loadUsers();
       } catch (error) {
@@ -91,10 +94,14 @@ const AdminDashboard = () => {
 
     if (formValues) {
       try {
-        await fetchWithAuth(`/api/admin/users/${user.id}`, {
+        const res = await fetchWithAuth(`/api/admin/users/${user.id}`, {
           method: 'PUT',
           body: JSON.stringify(formValues)
         });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.message || data.error || 'Failed to update user');
+        }
         Swal.fire('Saved!', 'User updated successfully.', 'success');
         loadUsers();
       } catch (error) {
@@ -134,10 +141,14 @@ const AdminDashboard = () => {
 
     if (formValues) {
       try {
-        await fetchWithAuth(`/api/admin/users`, {
+        const res = await fetchWithAuth(`/api/admin/users`, {
           method: 'POST',
           body: JSON.stringify(formValues)
         });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.message || data.error || 'Failed to create user');
+        }
         Swal.fire('Created!', 'User created successfully.', 'success');
         loadUsers();
       } catch (error) {
