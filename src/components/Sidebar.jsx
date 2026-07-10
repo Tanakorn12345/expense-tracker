@@ -82,10 +82,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           </div>
         ) : (
           <div className="upgrade-card" style={{ background: 'linear-gradient(135deg, #1D3557 0%, #028090 50%, #00A896 100%)'}}>
-            <h4 style={{ marginBottom: '0.5rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {isAdmin ? <span style={{ color: '#FFD700' }}>Pro ADMIN</span> : 'Pro Member'}
-              {isAdmin && <Crown size={16} color="#FFD700" />}
-            </h4>
+            <h4 style={{ marginBottom: '0.5rem', color: '#fff' }}>{isAdmin ? 'Pro ADMIN' : 'Pro Member'}</h4>
             <p style={{ opacity: 0.9, fontSize: '0.75rem', color: '#fff' }}>
               {isAdmin ? 'Administrator Access' : (language === 'th' ? 'คุณเป็นสมาชิกระดับ Pro แล้ว' : 'You are a Pro member')}
             </p>

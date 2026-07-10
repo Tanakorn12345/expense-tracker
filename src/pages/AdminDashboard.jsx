@@ -152,8 +152,8 @@ const AdminDashboard = () => {
         <div className="header-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <div>
             <h1>{language === 'th' ? 'แอดมิน แดชบอร์ด' : 'Admin Dashboard'}</h1>
-          <p style={{ color: 'var(--text-muted)' }}>{language === 'th' ? 'จัดการผู้ใช้และดูภาพรวมของระบบ' : 'Manage users and system overview'}</p>
-        </div>
+            <p style={{ color: 'var(--text-muted)' }}>{language === 'th' ? 'จัดการผู้ใช้และดูภาพรวมของระบบ' : 'Manage users and system overview'}</p>
+          </div>
         <button onClick={handleCreateUser} className="upgrade-btn" style={{ background: 'var(--primary-main)', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Plus size={18} />
           {language === 'th' ? 'เพิ่มผู้ใช้' : 'Add User'}
