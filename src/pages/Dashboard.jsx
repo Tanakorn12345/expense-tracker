@@ -268,7 +268,7 @@ const Dashboard = () => {
   };
 
   return (
-    <Layout searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
+    <Layout searchQuery={searchQuery} setSearchQuery={setSearchQuery} showSearch={true}>
       <div className="dashboard-header">
         <div className="header-title" style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', flex: 1, marginTop: '6px' }}>
           <LayoutDashboard size={28} style={{ color: 'gray', flexShrink: 0, marginTop: '22px' }} />

@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 import NotificationSetupModal from './NotificationSetupModal';
 import ProfileEditModal from './ProfileEditModal';
 
-const Layout = ({ children, searchQuery, setSearchQuery }) => {
+const Layout = ({ children, searchQuery, setSearchQuery, showSearch = false }) => {
   const { t, language, toggleLanguage } = useLanguage();
   const { isDarkMode, toggleTheme } = useTheme();
   const [user, setUser] = useState(null);
@@ -157,29 +157,31 @@ const Layout = ({ children, searchQuery, setSearchQuery }) => {
             <button className="mobile-menu-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
               <Menu size={24} color="var(--text-main)" />
             </button>
-            <div className="search-box" style={{ flex: 1, maxWidth: '360px', minWidth: 0 }}>
-              <div style={{ position: 'relative' }}>
-                <Search 
-                  size={16} 
-                  style={{ 
-                    position: 'absolute', 
-                    left: '12px', 
-                    top: '50%', 
-                    transform: 'translateY(-50%)', 
-                    color: 'var(--text-muted)',
-                    pointerEvents: 'none'
-                  }} 
-                />
-                <input 
-                  type="text" 
-                  placeholder={t('search')} 
-                  className="form-control search-input" 
-                  style={{ paddingLeft: '36px', width: '100%' }}
-                  value={searchQuery || ''}
-                  onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
-                />
+            {showSearch && (
+              <div className="search-box" style={{ flex: 1, maxWidth: '360px', minWidth: 0 }}>
+                <div style={{ position: 'relative' }}>
+                  <Search 
+                    size={16} 
+                    style={{ 
+                      position: 'absolute', 
+                      left: '12px', 
+                      top: '50%', 
+                      transform: 'translateY(-50%)', 
+                      color: 'var(--text-muted)',
+                      pointerEvents: 'none'
+                    }} 
+                  />
+                  <input 
+                    type="text" 
+                    placeholder={t('search')} 
+                    className="form-control search-input" 
+                    style={{ paddingLeft: '36px', width: '100%' }}
+                    value={searchQuery || ''}
+                    onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
           
           <div className="top-bar-actions">

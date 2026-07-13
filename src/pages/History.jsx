@@ -287,7 +287,7 @@ const History = () => {
   };
 
   return (
-    <Layout searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
+    <Layout searchQuery={searchQuery} setSearchQuery={setSearchQuery} showSearch={true}>
       <div className="page-header" style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
           <HistoryIcon size={28} style={{ color: 'gray', flexShrink: 0 }} />
