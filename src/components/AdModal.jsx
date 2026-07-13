@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
+import ProUpgradeModal from './ProUpgradeModal';
 
 export default function AdModal({ ad, onClose }) {
   const [timeLeft, setTimeLeft] = useState(20);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showProUpgrade, setShowProUpgrade] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,7 +17,7 @@ export default function AdModal({ ad, onClose }) {
     } else {
       onClose(); // Auto close when timer hits 0
     }
-  }, [timeLeft, onClose]);
+  }, [timeLeft]); // Removed onClose to prevent timer resetting on parent re-renders
 
   useEffect(() => {
     // Carousel
@@ -29,16 +32,17 @@ export default function AdModal({ ad, onClose }) {
   if (!ad) return null;
 
   const handleUpgrade = () => {
-    onClose();
-    // Use the existing logic or redirect to trigger upgrade modal
-    // Assuming Settings page has the upgrade logic or we can pass state
-    navigate('/settings', { state: { openUpgradeModal: true } });
+    setShowProUpgrade(true);
   };
 
-  return (
+  if (showProUpgrade) {
+    return <ProUpgradeModal isOpen={true} onClose={onClose} onSuccess={() => window.location.reload()} />;
+  }
+
+  const modalContent = (
     <div style={{
-      position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-      backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 9999,
+      position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+      backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 999999,
       display: 'flex', justifyContent: 'center', alignItems: 'center',
       backdropFilter: 'blur(10px)'
     }}>
@@ -87,4 +91,6 @@ export default function AdModal({ ad, onClose }) {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

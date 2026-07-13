@@ -62,7 +62,9 @@ const Dashboard = () => {
     if (!user.isPro) {
       fetchAd();
     }
+  }, []);
 
+  useEffect(() => {
     if (transactions.length === 0) return;
     
     const now = new Date();

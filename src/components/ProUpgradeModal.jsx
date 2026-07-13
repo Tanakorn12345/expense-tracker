@@ -5,6 +5,7 @@ import { X, UploadCloud, CheckCircle, Loader2 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { fetchWithAuth } from '../utils/api';
 import Swal from 'sweetalert2';
+import { createPortal } from 'react-dom';
 
 const ProUpgradeModal = ({ isOpen, onClose, onSuccess }) => {
   const { t, language } = useLanguage();
@@ -16,7 +17,7 @@ const ProUpgradeModal = ({ isOpen, onClose, onSuccess }) => {
   
   // Example Phone Number for PromptPay
   const mobileNumber = '0832511456';
-  const amount = 10;
+  const amount = 199.00; // Amount in THB
   const payload = generatePayload(mobileNumber, { amount });
 
   const handleFileChange = (e) => {
@@ -56,8 +57,8 @@ const ProUpgradeModal = ({ isOpen, onClose, onSuccess }) => {
 
   if (!isOpen) return null;
 
-  return (
-    <div className="modal-overlay">
+  const modalContent = (
+    <div className="modal-overlay" style={{ zIndex: 999999 }}>
       <div className="modal-content pro-modal">
         <button className="modal-close" onClick={onClose}><X size={20} /></button>
         
@@ -74,21 +75,21 @@ const ProUpgradeModal = ({ isOpen, onClose, onSuccess }) => {
               <div style={{ padding: '1rem 0' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left', marginBottom: '2rem' }}>
                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-                    <div style={{ fontSize: '1.5rem' }}>🇹🇭</div>
+                    <div style={{ fontSize: '1.5rem' }}>🇹</div>
                     <div>
                       <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '0.25rem' }}>คำนวณราคาไทยช่วยไทย</strong>
                       <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.4' }}>คำนวณและหักยอด 60/40 อัตโนมัติเมื่อเพิ่มรายจ่าย (รัฐออก 60% สูงสุด 200 บ.)</span>
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-                    <div style={{ fontSize: '1.5rem' }}>🎯</div>
+                    <div style={{ fontSize: '1.5rem' }}></div>
                     <div>
                       <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '0.25rem' }}>เป้าหมายการออม</strong>
                       <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.4' }}>ตั้งเป้าหมายและบันทึกเงินออมแยกส่วนได้อย่างอิสระ</span>
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-                    <div style={{ fontSize: '1.5rem' }}>👑</div>
+                    <div style={{ fontSize: '1.5rem' }}></div>
                     <div>
                       <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '0.25rem' }}>สถานะพิเศษ</strong>
                       <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.4' }}>รับแบดจ์ PRO ประจำโปรไฟล์และธีมสีพิเศษ พร้อมใช้งานแบบไม่มีโฆษณา</span>
@@ -103,7 +104,7 @@ const ProUpgradeModal = ({ isOpen, onClose, onSuccess }) => {
               <>
                 <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', textAlign: 'center', lineHeight: '1.6', padding : '10px' }}>
                 {language === 'th' 
-                  ? 'สามารถอัพเกรดฟีเจอร์ใหม่ๆ ได้แล้วที่นี่ เพียงจ่ายเพิ่ม 10 บาท ผ่าน QR code ด้านล่างนี้' 
+                  ? 'สามารถอัพเกรดฟีเจอร์ใหม่ๆ ได้แล้วที่นี่ เพียงจ่ายเพิ่ม 199 บาท ผ่าน QR code ด้านล่างนี้' 
                   : 'Upgrade to get new features here! Just pay 10 THB via the QR code below.'}
                 </p>
 
@@ -117,8 +118,8 @@ const ProUpgradeModal = ({ isOpen, onClose, onSuccess }) => {
                     <QRCode value={payload} size={180} />
                   </div>
                 </div>  
-                <div className="amount-display" style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '15px 0' }}>
-                  10.00 THB
+                <div className="amount-display" style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '15px 0' , textAlign: 'center'}}>
+                  199.00 THB
                 </div>
 
                 <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
@@ -180,6 +181,8 @@ const ProUpgradeModal = ({ isOpen, onClose, onSuccess }) => {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default ProUpgradeModal;
