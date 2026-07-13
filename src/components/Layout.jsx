@@ -322,7 +322,9 @@ const Layout = ({ children, searchQuery, setSearchQuery, showSearch = false }) =
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 8rem)' }}>
-          {children}
+          <div className="ultra-smooth-entry">
+            {children}
+          </div>
           <Footer />
         </div>
       </main>

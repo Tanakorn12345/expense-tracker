@@ -18,6 +18,7 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const savingsRoutes = require('./routes/savingsRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const adRoutes = require('./routes/adRoutes');
 const authenticate = require('./middleware/authMiddleware');
 const adminMiddleware = require('./middleware/adminMiddleware');
 const { initCronJobs } = require('./services/cronJobs');
@@ -50,8 +51,9 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/transactions', transactionRoutes);
-app.use('/api/savings', savingsRoutes);
+app.use('/api/savings', authenticate, savingsRoutes);
 app.use('/api/admin', authenticate, adminMiddleware, adminRoutes);
+app.use('/api/ads', adRoutes);
 
 // Global Error Handler Middleware
 app.use((err, req, res, next) => {

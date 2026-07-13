@@ -81,3 +81,15 @@ model SavingsTransaction {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model Advertisement {
+  id          Int      @id @default(autoincrement())
+  description String   @db.Text
+  images      String[] // Array of base64 strings
+  ownerEmail  String
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

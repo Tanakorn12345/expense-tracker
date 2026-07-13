@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../utils/api';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Trash2, Edit, Plus, Eye, Check, X, UserPlus } from 'lucide-react';
+import { Trash2, Edit, Plus, Eye, Check, X, UserPlus, Megaphone } from 'lucide-react';
 import Layout from '../components/Layout';
 import Swal from 'sweetalert2';
 import '../index.css';
@@ -171,11 +171,17 @@ const AdminDashboard = () => {
             <h1>{language === 'th' ? 'แอดมิน แดชบอร์ด' : 'Admin Dashboard'}</h1>
             <p style={{ color: 'var(--text-muted)' }}>{language === 'th' ? 'จัดการผู้ใช้และดูภาพรวมของระบบ' : 'Manage users and system overview'}</p>
           </div>
-        <button onClick={handleCreateUser} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <UserPlus size={18} />
-          {language === 'th' ? 'เพิ่มผู้ใช้' : 'Add User'}
-        </button>
-      </div>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button onClick={() => navigate('/admin/ads')} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Megaphone size={18} />
+              {language === 'th' ? 'จัดการโฆษณา' : 'Manage Ads'}
+            </button>
+            <button onClick={handleCreateUser} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <UserPlus size={18} />
+              {language === 'th' ? 'เพิ่มผู้ใช้' : 'Add User'}
+            </button>
+          </div>
+        </div>
 
       <div className="card">
         {loading ? (

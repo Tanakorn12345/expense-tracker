@@ -8,6 +8,7 @@ import Savings from './pages/Savings';
 import CoPayCalculator from './pages/CoPayCalculator';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminUserTransactions from './pages/AdminUserTransactions';
+import AdminAds from './pages/AdminAds';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="/savings" element={<Savings />} />
         <Route path="/calculator" element={<CoPayCalculator />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/ads" element={<AdminAds />} />
         <Route path="/admin/users/:id" element={<AdminUserTransactions />} />
           {/* Redirect unknown routes to dashboard or login */}
           <Route path="*" element={<Navigate to="/" replace />} />

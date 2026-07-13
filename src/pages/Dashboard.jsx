@@ -24,11 +24,14 @@ import { useLanguage } from '../contexts/LanguageContext';
 import Swal from 'sweetalert2';
 import { fetchWithAuth } from '../utils/api';
 import CategoryIcon from '../components/CategoryIcon';
+import AdModal from '../components/AdModal';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { t, getMonthName, translateInsight, language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
+  const [ad, setAd] = useState(null);
+  const [showAd, setShowAd] = useState(false);
   
   const currentMonthStr = new Date().getMonth().toString();
   const [filterMonth, setFilterMonth] = useState(currentMonthStr);
@@ -38,7 +41,28 @@ const Dashboard = () => {
 
   const { transactions, stats, forecast, isLoading, refresh } = useTransactions(filterMonth, currentYearStr);
 
+  const fetchAd = async () => {
+    try {
+      const res = await fetchWithAuth('/api/ads/active');
+      if (res.ok) {
+        const ads = await res.json();
+        if (ads && ads.length > 0) {
+          const randomAd = ads[Math.floor(Math.random() * ads.length)];
+          setAd(randomAd);
+          setShowAd(true);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch ad', error);
+    }
+  };
+
   useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!user.isPro) {
+      fetchAd();
+    }
+
     if (transactions.length === 0) return;
     
     const now = new Date();
@@ -70,7 +94,6 @@ const Dashboard = () => {
         const prevBalance = prevIncome - prevExpense;
 
         if (prevBalance > 0) {
-          const user = JSON.parse(localStorage.getItem('user') || '{}');
           if (user.isPro) {
             Swal.fire({
               title: language === 'th' ? 'จัดการยอดคงเหลือเดือนที่แล้ว' : 'Manage Last Month Balance',
@@ -88,7 +111,6 @@ const Dashboard = () => {
               cancelButtonText: language === 'th' ? 'ไม่ทำอะไร' : 'Do nothing'
             }).then(async (result) => {
               if (result.isConfirmed) {
-                // Rollover
                 try {
                   const targetDate = new Date(currentYear, currentMonth, 1);
                   const localDateStr = new Date(targetDate.getTime() - (targetDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
@@ -114,9 +136,7 @@ const Dashboard = () => {
                   console.error(e);
                 }
               } else if (result.isDenied) {
-                // Save to Savings
                 try {
-                  // Fetch goals first to let user select
                   const res = await fetchWithAuth('/api/savings');
                   if (res.ok) {
                     const data = await res.json();
@@ -161,7 +181,6 @@ const Dashboard = () => {
               }
             });
           } else {
-            // Free user standard rollover
             Swal.fire({
               title: 'ทบยอดเดือนที่แล้ว?',
               text: `คุณมียอดคงเหลือจากเดือนที่แล้ว ฿${prevBalance.toLocaleString()} ต้องการนำมาเป็นรายรับเริ่มต้นของเดือนนี้หรือไม่?`,
@@ -212,7 +231,6 @@ const Dashboard = () => {
   }, [transactions, refresh]);
 
   const filteredTransactions = transactions.filter(tItem => {
-    // Date filter
     if (filterDate) {
       const tDate = new Date(tItem.date);
       const localDate = new Date(tDate.getTime() - (tDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
@@ -221,7 +239,6 @@ const Dashboard = () => {
 
     if (!searchQuery && filterCategory === 'all') return true;
 
-    // Search filter
     let matchesSearch = true;
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -233,7 +250,6 @@ const Dashboard = () => {
       );
     }
 
-    // Category filter
     let matchesCategory = true;
     if (filterCategory !== 'all') {
       matchesCategory = (tItem.category?.name?.toLowerCase() === filterCategory.toLowerCase() || tItem.category?.type?.toLowerCase() === filterCategory.toLowerCase());
@@ -244,7 +260,7 @@ const Dashboard = () => {
 
   const chartData = [
     {
-      name: t('jan').substring(0, 3), // We can use actual month name if we want, or just "This Month"
+      name: t('jan').substring(0, 3), 
       [t('income')]: stats?.monthlyIncome || 0,
       [t('expense')]: stats?.monthlyExpenses || 0,
     }
@@ -269,6 +285,7 @@ const Dashboard = () => {
 
   return (
     <Layout searchQuery={searchQuery} setSearchQuery={setSearchQuery} showSearch={true}>
+      {showAd && <AdModal ad={ad} onClose={() => setShowAd(false)} />}
       <div className="dashboard-header">
         <div className="header-title" style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', flex: 1, marginTop: '6px' }}>
           <LayoutDashboard size={28} style={{ color: 'gray', flexShrink: 0, marginTop: '22px' }} />
