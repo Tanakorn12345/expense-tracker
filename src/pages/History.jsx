@@ -289,9 +289,9 @@ const History = () => {
   return (
     <Layout searchQuery={searchQuery} setSearchQuery={setSearchQuery} showSearch={true}>
       <div className="page-header" style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
-          <HistoryIcon size={28} style={{ color: 'gray', flexShrink: 0 }} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flex: 1, flexWrap: 'wrap' }}>
+          <HistoryIcon size={28} style={{ color: 'gray', flexShrink: 0, marginTop: '4px' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <h1 style={{ margin: 0 }}>{t('history')}</h1>
             <p style={{ margin: 0 }}>{t('addTransactionDesc')}</p>
           </div>

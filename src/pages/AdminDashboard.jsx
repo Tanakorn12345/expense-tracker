@@ -171,7 +171,7 @@ const AdminDashboard = () => {
             <h1>{language === 'th' ? 'แอดมิน แดชบอร์ด' : 'Admin Dashboard'}</h1>
             <p style={{ color: 'var(--text-muted)' }}>{language === 'th' ? 'จัดการผู้ใช้และดูภาพรวมของระบบ' : 'Manage users and system overview'}</p>
           </div>
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <button onClick={() => navigate('/admin/ads')} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Megaphone size={18} />
               {language === 'th' ? 'จัดการโฆษณา' : 'Manage Ads'}

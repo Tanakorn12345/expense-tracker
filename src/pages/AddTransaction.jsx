@@ -137,9 +137,9 @@ const AddTransaction = () => {
   return (
     <Layout>
       <div className="page-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, flexWrap: 'wrap' }}>
-          <ArrowRightLeft size={28} style={{ color: 'gray', flexShrink: 0 }} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flex: 1, flexWrap: 'wrap' }}>
+          <ArrowRightLeft size={28} style={{ color: 'gray', flexShrink: 0, marginTop: '4px' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <h1 style={{ margin: 0 }}>{t('addTransactionTitle')}</h1>
             <p style={{ margin: 0 }}>{t('addTransactionDesc')}</p>
           </div>

@@ -60,16 +60,50 @@ export default function AdminAds() {
     }
   };
 
-  const handleImageUpload = (e) => {
+  const compressImage = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.7));
+        };
+      };
+    });
+  };
+
+  const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
     
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImages(prev => [...prev, reader.result]);
-      };
-      reader.readAsDataURL(file);
-    });
+    for (const file of files) {
+      if (file.type.startsWith('image/')) {
+        const compressedBase64 = await compressImage(file);
+        setImages(prev => [...prev, compressedBase64]);
+      }
+    }
   };
 
   const removeImage = (index) => {
@@ -185,7 +219,7 @@ export default function AdminAds() {
             <h1>{language === 'th' ? 'จัดการโฆษณา' : 'Ad Management'}</h1>
             <p style={{ color: 'var(--text-muted)' }}>{language === 'th' ? 'สร้างและจัดการป็อปอัพโฆษณา' : 'Create and manage popup advertisements'}</p>
           </div>
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <button onClick={() => navigate('/admin')} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <ArrowLeft size={18} />
               {language === 'th' ? 'กลับ' : 'Back'}
@@ -255,12 +289,12 @@ export default function AdminAds() {
                 </select>
               </div>
 
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <div style={{ flex: '1 1 200px' }}>
                   <label style={{ display: 'block', marginBottom: '0.5rem' }}>Start Date</label>
                   <input type="datetime-local" required value={startDate} onChange={(e) => setStartDate(e.target.value)} className="form-control" />
                 </div>
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: '1 1 200px' }}>
                   <label style={{ display: 'block', marginBottom: '0.5rem' }}>End Date</label>
                   <input type="datetime-local" required value={endDate} onChange={(e) => setEndDate(e.target.value)} className="form-control" />
                 </div>

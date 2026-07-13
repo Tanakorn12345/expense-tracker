@@ -179,9 +179,9 @@ const Savings = () => {
   return (
     <Layout>
       <div className="dashboard-header">
-        <div className="header-title flex-column" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
-          <PiggyBank size={28} style={{ color: 'gray', flexShrink: 0 }} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'flex-start' }}>
+        <div className="header-title flex-column" style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flex: 1, flexWrap: 'wrap' }}>
+          <PiggyBank size={28} style={{ color: 'gray', flexShrink: 0, marginTop: '4px' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <h1 style={{ margin: 0 }}>{language === 'th' ? 'การออมของคุณ' : 'Your Savings'}</h1>
             <p style={{ margin: 0 }}>{language === 'th' ? 'จัดการและติดตามเป้าหมายการออม' : 'Manage and track your savings goals'}</p>
           </div>

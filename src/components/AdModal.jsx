@@ -41,7 +41,7 @@ export default function AdModal({ ad, onClose }) {
 
   const modalContent = (
     <div style={{
-      position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 999999,
       display: 'flex', justifyContent: 'center', alignItems: 'center',
       backdropFilter: 'blur(10px)'
@@ -49,6 +49,7 @@ export default function AdModal({ ad, onClose }) {
       <div style={{
         backgroundColor: 'var(--bg-card)', borderRadius: '16px',
         padding: '2rem', width: '90%', maxWidth: '600px',
+        maxHeight: '90vh', overflowY: 'auto',
         textAlign: 'center', boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
         animation: 'pageFadeInUp 0.5s ease-out'
       }}>

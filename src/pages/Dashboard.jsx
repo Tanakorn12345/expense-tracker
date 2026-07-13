@@ -289,9 +289,9 @@ const Dashboard = () => {
     <Layout searchQuery={searchQuery} setSearchQuery={setSearchQuery} showSearch={true}>
       {showAd && <AdModal ad={ad} onClose={() => setShowAd(false)} />}
       <div className="dashboard-header">
-        <div className="header-title" style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', flex: 1, marginTop: '6px' }}>
+        <div className="header-title flex-wrap" style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', flex: 1, marginTop: '6px', flexWrap: 'wrap' }}>
           <LayoutDashboard size={28} style={{ color: 'gray', flexShrink: 0, marginTop: '22px' }} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', alignItems: 'flex-start', minWidth: 0, justifyContent: 'flex-start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', alignItems: 'flex-start', minWidth: 0, justifyContent: 'flex-start', flexWrap: 'wrap' }}>
             <h1 style={{ margin: 0, lineHeight: 1.2, paddingTop: '3px' }}>{t('overviewTitle')}</h1>
             <p style={{ margin: 0, lineHeight: 1.4 }}>{t('overviewDesc')}</p>
             {transactions.length > 0 && (() => {
@@ -428,7 +428,7 @@ const Dashboard = () => {
           </div>
           
           <div className="mt-8">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-4" style={{ flexWrap: 'wrap', gap: '1rem' }}>
               <h3 style={{ fontSize: '1.1rem', margin: 0 }}>{t('recentTransactions')}</h3>
               
               <div style={{ position: 'relative' }}>
