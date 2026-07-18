@@ -62,8 +62,8 @@ const path = require('path');
 app.use(express.static(path.join(__dirname, '../../dist')));
 
 // Fallback for React Router
-app.get('*', (req, res, next) => {
-  if (req.originalUrl.startsWith('/api')) {
+app.use((req, res, next) => {
+  if (req.method !== 'GET' || req.originalUrl.startsWith('/api')) {
     return next();
   }
   res.sendFile(path.join(__dirname, '../../dist/index.html'));
