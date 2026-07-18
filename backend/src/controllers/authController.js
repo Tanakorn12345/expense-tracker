@@ -80,7 +80,7 @@ const authController = {
       const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
       const mailOptions = {
-        from: `"Expense Tracker" <${process.env.SMTP_USER}>`,
+        from: `"Fintrack" <${process.env.SMTP_USER}>`,
         to: user.email,
         subject: 'Password Reset Request / ตั้งรหัสผ่านใหม่',
         text: `You requested a password reset.\n\nPlease click on the following link to reset your password:\n${resetUrl}\n\nIf you did not request this, please ignore this email.`
