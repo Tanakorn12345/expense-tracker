@@ -26,6 +26,9 @@ const { initCronJobs } = require('./services/cronJobs');
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+// Trust reverse proxy (e.g. Nginx, Cloudflare) for rate limiting and real IP
+app.set('trust proxy', 1);
+
 // Security Middleware
 app.use(helmet());
 
