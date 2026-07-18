@@ -44,13 +44,20 @@ const Savings = () => {
       title: language === 'th' ? 'สร้างเป้าหมายการออม' : 'Create Savings Goal',
       html:
         `<input id="swal-input1" class="swal2-input" placeholder="${language === 'th' ? 'ชื่อเป้าหมาย' : 'Goal Name'}">` +
-        `<input id="swal-input2" class="swal2-input" type="number" placeholder="${language === 'th' ? 'จำนวนเงินเป้าหมาย' : 'Target Amount'}">`,
+        `<input id="swal-input2" class="swal2-input" type="text" placeholder="${language === 'th' ? 'จำนวนเงินเป้าหมาย' : 'Target Amount'}">`,
       focusConfirm: false,
       preConfirm: () => {
-        return [
-          document.getElementById('swal-input1').value,
-          document.getElementById('swal-input2').value
-        ]
+        const name = document.getElementById('swal-input1').value;
+        const amount = document.getElementById('swal-input2').value;
+        if (!name) {
+          Swal.showValidationMessage(language === 'th' ? 'กรุณากรอกชื่อเป้าหมาย' : 'Please enter a goal name');
+          return false;
+        }
+        if (!amount || !/^\d*\.?\d*$/.test(amount)) {
+          Swal.showValidationMessage(language === 'th' ? 'ต้องการตัวเลขเท่านั้น' : 'Numbers only');
+          return false;
+        }
+        return [name, amount];
       }
     });
 
@@ -76,9 +83,14 @@ const Savings = () => {
   const handleAddMoney = async (goalId, goalName) => {
     const { value: amount } = await Swal.fire({
       title: `${language === 'th' ? 'เพิ่มเงินออม:' : 'Add savings to:'} ${goalName}`,
-      input: 'number',
+      input: 'text',
       inputPlaceholder: language === 'th' ? 'จำนวนเงิน' : 'Amount',
-      showCancelButton: true
+      showCancelButton: true,
+      inputValidator: (value) => {
+        if (!value || !/^\d*\.?\d*$/.test(value)) {
+          return language === 'th' ? 'ต้องการตัวเลขเท่านั้น' : 'Numbers only';
+        }
+      }
     });
 
     if (amount && parseFloat(amount) > 0) {

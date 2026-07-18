@@ -15,6 +15,8 @@ const authLimiter = rateLimit({
 router.post('/register', authLimiter, authController.register);
 router.post('/login', authLimiter, authController.login);
 router.post('/upgrade', authMiddleware, authController.upgrade);
+router.post('/forgot-password', authLimiter, authController.forgotPassword);
+router.post('/reset-password', authLimiter, authController.resetPassword);
 router.put('/profile-pic', authMiddleware, authController.updateProfilePic);
 router.put('/notification-settings', authMiddleware, authController.updateNotificationSettings);
 router.put('/profile', authMiddleware, authController.updateProfile);

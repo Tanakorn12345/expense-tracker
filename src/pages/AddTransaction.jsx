@@ -24,6 +24,7 @@ const AddTransaction = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [categories, setCategories] = useState({ expense: [], income: [] });
   const [isCoPayMode, setIsCoPayMode] = useState(false);
+  const [amountError, setAmountError] = useState(false);
   const [amount, setAmount] = useState('');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const isPro = user?.isPro || false;
@@ -175,11 +176,24 @@ const AddTransaction = () => {
                   className="amount-input" 
                   placeholder="0.00" 
                   autoFocus 
-                  style={{ color: isExpense ? 'var(--danger)' : 'var(--success)' }}
+                  style={{ color: isExpense ? 'var(--danger)' : 'var(--success)', borderColor: amountError ? 'red' : undefined }}
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                      setAmount(val);
+                      setAmountError(false);
+                    } else {
+                      setAmountError(true);
+                    }
+                  }}
                 />
               </div>
+              {amountError && (
+                <div style={{ color: 'red', fontSize: '0.85rem', marginTop: '0.5rem', textAlign: 'center' }}>
+                  {language === 'th' ? 'ต้องการตัวเลขเท่านั้น' : 'Numbers only'}
+                </div>
+              )}
             </div>
 
             {isExpense && isPro && (

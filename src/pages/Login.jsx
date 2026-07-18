@@ -103,6 +103,18 @@ const Login = () => {
               />
             </div>
 
+            {isLogin && (
+              <div style={{ textAlign: 'right', marginTop: '-0.5rem', marginBottom: '0.5rem' }}>
+                <a 
+                  href="#" 
+                  onClick={(e) => { e.preventDefault(); navigate('/forgot-password'); }}
+                  style={{ color: 'var(--primary-main)', fontSize: '0.85rem', textDecoration: 'none' }}
+                >
+                  Forgot password?
+                </a>
+              </div>
+            )}
+
             <button type="submit" className="submit-btn" disabled={isLoading}>
               {isLoading ? <Loader2 size={18} className="animate-spin" /> : (isLogin ? 'Sign In' : 'Sign Up')}
             </button>
