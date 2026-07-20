@@ -26,16 +26,17 @@ const ProUpgradeModal = ({ isOpen, onClose, onSuccess }) => {
       const selectedFile = e.target.files[0];
       setFile(selectedFile);
       setPreviewUrl(URL.createObjectURL(selectedFile));
-      handleUpload();
+      handleUpload(selectedFile);
     }
   };
 
-  const handleUpload = () => {
-    if (!file) return;
+  const handleUpload = (uploadFile) => {
+    const fileToUpload = uploadFile || file;
+    if (!fileToUpload) return;
     setStep(2);
     
     const reader = new FileReader();
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(fileToUpload);
     reader.onload = async () => {
       const base64Image = reader.result;
       try {
