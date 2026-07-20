@@ -19,6 +19,7 @@ const transactionRoutes = require('./routes/transactionRoutes');
 const savingsRoutes = require('./routes/savingsRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const adRoutes = require('./routes/adRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const authenticate = require('./middleware/authMiddleware');
 const adminMiddleware = require('./middleware/adminMiddleware');
 const { initCronJobs } = require('./services/cronJobs');
@@ -57,6 +58,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/savings', authenticate, savingsRoutes);
 app.use('/api/admin', authenticate, adminMiddleware, adminRoutes);
 app.use('/api/ads', adRoutes);
+app.use('/api/notifications', notificationRoutes);
 // Global Error Handler Middleware
 app.use((err, req, res, next) => {
   const statusCode = res.statusCode !== 200 ? res.statusCode : 500;

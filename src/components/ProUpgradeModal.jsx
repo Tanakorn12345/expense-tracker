@@ -9,7 +9,8 @@ import { createPortal } from 'react-dom';
 
 const ProUpgradeModal = ({ isOpen, onClose, onSuccess }) => {
   const { t, language } = useLanguage();
-  const [step, setStep] = useState(1); // 1: QR, 2: Uploading/Verifying, 3: Success
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const [step, setStep] = useState(user.proStatus === 'pending' ? 4 : 1); // 1: QR, 2: Uploading, 4: Pending
   const [showFeatures, setShowFeatures] = useState(false);
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -30,29 +31,32 @@ const ProUpgradeModal = ({ isOpen, onClose, onSuccess }) => {
   };
 
   const handleUpload = () => {
+    if (!file) return;
     setStep(2);
-    // Simulate API call for slip verification
-    setTimeout(async () => {
+    
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      const base64Image = reader.result;
       try {
-        const res = await fetchWithAuth('/api/auth/upgrade', { method: 'POST' });
+        const res = await fetchWithAuth('/api/auth/upgrade', { 
+          method: 'POST',
+          body: JSON.stringify({ slipUrl: base64Image })
+        });
         if (res.ok) {
           const data = await res.json();
           // Update local storage user
           localStorage.setItem('user', JSON.stringify(data.user));
-          setStep(3);
-          setTimeout(() => {
-            onSuccess();
-            onClose();
-          }, 2000);
+          setStep(4);
         } else {
-          Swal.fire('Error', 'Failed to upgrade to Pro', 'error');
+          Swal.fire('Error', 'Failed to submit request', 'error');
           setStep(1);
         }
       } catch (e) {
         Swal.fire('Error', 'Connection error', 'error');
         setStep(1);
       }
-    }, 2500); // Fake delay for verifying
+    };
   };
 
   if (!isOpen) return null;
@@ -162,19 +166,16 @@ const ProUpgradeModal = ({ isOpen, onClose, onSuccess }) => {
               </div>
             )}
             <Loader2 className="spinner" size={48} style={{ color: 'var(--primary-main)', margin: '0 auto 20px', animation: 'spin 1s linear infinite' }} />
-            <h3>{language === 'th' ? 'กำลังตรวจสอบสลิปโอนเงิน...' : 'Verifying slip...'}</h3>
-            <p style={{ color: 'var(--text-muted)', marginTop: '10px' }}>
-              {language === 'th' ? 'กรุณารอสักครู่ ระบบกำลังใช้ AI วิเคราะห์ข้อมูลบนสลิป' : 'Please wait, our AI is analyzing the slip.'}
-            </p>
+            <h3>{language === 'th' ? 'กำลังอัปโหลดสลิป...' : 'Uploading slip...'}</h3>
           </div>
         )}
 
-        {step === 3 && (
-          <div className="pro-step-3" style={{ textAlign: 'center', padding: '40px 20px' }}>
-            <CheckCircle size={64} style={{ color: '#10b981', margin: '0 auto 20px' }} />
-            <h3 style={{ color: '#10b981' }}>{language === 'th' ? 'การชำระเงินสำเร็จ!' : 'Payment Successful!'}</h3>
+        {step === 4 && (
+          <div className="pro-step-4" style={{ textAlign: 'center', padding: '40px 20px' }}>
+            <Loader2 className="spinner" size={64} style={{ color: '#eab308', margin: '0 auto 20px', animation: 'spin 1s linear infinite' }} />
+            <h3 style={{ color: '#eab308' }}>กำลังรอการอนุมัติจากบริษัท</h3>
             <p style={{ color: 'var(--text-muted)', marginTop: '10px' }}>
-              {language === 'th' ? 'ยินดีต้อนรับสู่ FinTrack Pro' : 'Welcome to FinTrack Pro'}
+              โปรดรอสักครู่ครับ
             </p>
           </div>
         )}

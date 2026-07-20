@@ -60,7 +60,11 @@ const Dashboard = () => {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!user.isPro) {
-      fetchAd();
+      const adShown = sessionStorage.getItem('adShown');
+      if (!adShown) {
+        fetchAd();
+        sessionStorage.setItem('adShown', 'true');
+      }
     }
   }, []);
 

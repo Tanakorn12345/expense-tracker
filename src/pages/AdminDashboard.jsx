@@ -9,6 +9,8 @@ import '../index.css';
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
+  const [proRequests, setProRequests] = useState([]);
+  const [activeTab, setActiveTab] = useState('users');
   const [loading, setLoading] = useState(true);
   const { language } = useLanguage();
   const navigate = useNavigate();
@@ -19,9 +21,10 @@ const AdminDashboard = () => {
     if (user.email !== 'tanakorn.tip@student.mahidol.edu') {
       navigate('/');
     } else {
-      loadUsers();
+      if (activeTab === 'users') loadUsers();
+      else loadProRequests();
     }
-  }, [navigate]);
+  }, [navigate, activeTab]);
 
   const loadUsers = async () => {
     setLoading(true);
@@ -35,6 +38,49 @@ const AdminDashboard = () => {
       Swal.fire('Error', 'Failed to load users', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadProRequests = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchWithAuth('/api/admin/pro-requests');
+      if (!res.ok) throw new Error('Failed to load pro requests');
+      const data = await res.json();
+      setProRequests(data);
+    } catch (error) {
+      console.error('Failed to load pro requests', error);
+      Swal.fire('Error', 'Failed to load pro requests', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApprovePro = async (id) => {
+    try {
+      const res = await fetchWithAuth(`/api/admin/pro-requests/${id}/approve`, { method: 'POST' });
+      if (res.ok) {
+        Swal.fire('Success', 'User has been approved for PRO', 'success');
+        loadProRequests();
+      } else {
+        Swal.fire('Error', 'Failed to approve', 'error');
+      }
+    } catch (e) {
+      Swal.fire('Error', 'Connection error', 'error');
+    }
+  };
+
+  const handleRejectPro = async (id) => {
+    try {
+      const res = await fetchWithAuth(`/api/admin/pro-requests/${id}/reject`, { method: 'POST' });
+      if (res.ok) {
+        Swal.fire('Success', 'User has been rejected', 'success');
+        loadProRequests();
+      } else {
+        Swal.fire('Error', 'Failed to reject', 'error');
+      }
+    } catch (e) {
+      Swal.fire('Error', 'Connection error', 'error');
     }
   };
 
@@ -166,7 +212,7 @@ const AdminDashboard = () => {
   return (
     <Layout>
       <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
-        <div className="header-title" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div className="header-title" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <div>
             <h1>{language === 'th' ? 'แอดมิน แดชบอร์ด' : 'Admin Dashboard'}</h1>
             <p style={{ color: 'var(--text-muted)' }}>{language === 'th' ? 'จัดการผู้ใช้และดูภาพรวมของระบบ' : 'Manage users and system overview'}</p>
@@ -183,9 +229,64 @@ const AdminDashboard = () => {
           </div>
         </div>
 
+        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', borderBottom: '1px solid var(--border)' }}>
+          <button 
+            onClick={() => setActiveTab('users')}
+            style={{ padding: '0.5rem 1rem', background: 'none', border: 'none', borderBottom: activeTab === 'users' ? '2px solid var(--primary-main)' : 'none', color: activeTab === 'users' ? 'var(--primary-main)' : 'var(--text-muted)', fontWeight: activeTab === 'users' ? 'bold' : 'normal', cursor: 'pointer' }}
+          >
+            Users
+          </button>
+          <button 
+            onClick={() => setActiveTab('requests')}
+            style={{ padding: '0.5rem 1rem', background: 'none', border: 'none', borderBottom: activeTab === 'requests' ? '2px solid var(--primary-main)' : 'none', color: activeTab === 'requests' ? 'var(--primary-main)' : 'var(--text-muted)', fontWeight: activeTab === 'requests' ? 'bold' : 'normal', cursor: 'pointer' }}
+          >
+            PRO Requests {proRequests.length > 0 && <span style={{ background: '#ef4444', color: 'white', borderRadius: '50%', padding: '2px 6px', fontSize: '12px', marginLeft: '5px' }}>{proRequests.length}</span>}
+          </button>
+        </div>
+
       <div className="card">
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Loading users...</div>
+          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Loading...</div>
+        ) : activeTab === 'requests' ? (
+          <div className="table-responsive">
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontWeight: 500 }}>ID</th>
+                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontWeight: 500 }}>Email</th>
+                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontWeight: 500 }}>Status</th>
+                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontWeight: 500 }}>Slip</th>
+                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontWeight: 500, textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {proRequests.length === 0 ? (
+                  <tr><td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>No pending requests</td></tr>
+                ) : proRequests.map((r) => (
+                  <tr key={r.id} style={{ borderBottom: '1px solid var(--border)', transition: 'background-color 0.2s' }} className="table-row-hover">
+                    <td style={{ padding: '16px' }}>{r.id}</td>
+                    <td style={{ padding: '16px', fontWeight: 500 }}>{r.email}</td>
+                    <td style={{ padding: '16px' }}><span style={{ background: '#fef08a', color: '#854d0e', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem' }}>Pending</span></td>
+                    <td style={{ padding: '16px' }}>
+                      {r.proSlipUrl ? (
+                        <a href={r.proSlipUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--primary-main)' }}>View Slip</a>
+                      ) : (
+                        '-'
+                      )}
+                    </td>
+                    <td style={{ padding: '16px', textAlign: 'right' }}>
+                      <button onClick={() => handleApprovePro(r.id)} style={{ background: '#22c55e', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', marginRight: '8px' }}>
+                        อนุมัติ
+                      </button>
+                      <button onClick={() => handleRejectPro(r.id)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>
+                        ปฏิเสธ
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div className="table-responsive">
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>

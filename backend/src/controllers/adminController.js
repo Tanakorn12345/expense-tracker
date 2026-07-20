@@ -167,3 +167,59 @@ exports.getUserTransactions = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch transactions' });
   }
 };
+
+exports.getProRequests = async (req, res) => {
+  try {
+    const requests = await prisma.user.findMany({
+      where: { proStatus: 'pending' },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        proStatus: true,
+        proSlipUrl: true,
+        createdAt: true
+      }
+    });
+    res.json(requests);
+  } catch (error) {
+    console.error('Error fetching pro requests:', error);
+    res.status(500).json({ error: 'Failed to fetch pro requests' });
+  }
+};
+
+exports.approveProRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await prisma.user.update({
+      where: { id: parseInt(id) },
+      data: { isPro: true, proStatus: 'approved' }
+    });
+    res.json({ message: 'Pro request approved', user });
+  } catch (error) {
+    console.error('Error approving pro request:', error);
+    res.status(500).json({ error: 'Failed to approve pro request' });
+  }
+};
+
+exports.rejectProRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await prisma.user.update({
+      where: { id: parseInt(id) },
+      data: { proStatus: 'none', proSlipUrl: null }
+    });
+
+    await prisma.notification.create({
+      data: {
+        userId: user.id,
+        message: 'ท่านยังไม่ผ่านการอนุมัติเพื่อเป็นสมาชิกระดับ PRO โปรดลองใหม่อีกครั้ง'
+      }
+    });
+
+    res.json({ message: 'Pro request rejected', user });
+  } catch (error) {
+    console.error('Error rejecting pro request:', error);
+    res.status(500).json({ error: 'Failed to reject pro request' });
+  }
+};

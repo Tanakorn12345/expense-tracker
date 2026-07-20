@@ -131,12 +131,17 @@ const authController = {
         return res.status(401).json({ message: 'Unauthorized' });
       }
 
+      const { slipUrl } = req.body;
+
       const user = await prisma.user.update({
         where: { id: req.user.id },
-        data: { isPro: true }
+        data: { 
+          proStatus: 'pending',
+          proSlipUrl: slipUrl || null
+        }
       });
 
-      res.json({ message: 'Upgraded to Pro successfully', user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic } });
+      res.json({ message: 'Upgrade request submitted', user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, proStatus: user.proStatus, profilePic: user.profilePic } });
     } catch (error) {
       next(error);
     }

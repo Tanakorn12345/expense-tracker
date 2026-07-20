@@ -8,4 +8,9 @@ router.put('/users/:id', adminController.updateUser);
 router.delete('/users/:id', adminController.deleteUser);
 router.get('/users/:id/transactions', adminController.getUserTransactions);
 
+// Pro Requests
+router.get('/pro-requests', adminController.getProRequests);
+router.post('/pro-requests/:id/approve', adminController.approveProRequest);
+router.post('/pro-requests/:id/reject', adminController.rejectProRequest);
+
 module.exports = router;

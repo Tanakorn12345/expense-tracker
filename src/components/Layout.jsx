@@ -68,6 +68,18 @@ const Layout = ({ children, searchQuery, setSearchQuery, showSearch = false }) =
     setIsSidebarOpen(false);
   }, [location.pathname]);
 
+  const fetchNotifications = async () => {
+    try {
+      const res = await fetchWithAuth('/api/notifications');
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch notifications', e);
+    }
+  };
+
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem('user');
@@ -78,25 +90,7 @@ const Layout = ({ children, searchQuery, setSearchQuery, showSearch = false }) =
       }
       
       if (currentUser) {
-        // Load mock notifications specific to user
-        const notifKey = `notifications_${currentUser.id}`;
-        const lastClearKey = `notif_last_clear_${currentUser.id}`;
-        const today = new Date().toLocaleDateString();
-        const lastClearDate = localStorage.getItem(lastClearKey);
-
-        if (lastClearDate !== today) {
-          // It's a new day, clear notifications
-          localStorage.removeItem(notifKey);
-          localStorage.setItem(lastClearKey, today);
-          setNotifications([]);
-        } else {
-          const storedNotifs = localStorage.getItem(notifKey);
-          if (storedNotifs) {
-            setNotifications(JSON.parse(storedNotifs));
-          } else {
-            setNotifications([]);
-          }
-        }
+        fetchNotifications();
       } else {
         setNotifications([]);
       }
@@ -108,10 +102,7 @@ const Layout = ({ children, searchQuery, setSearchQuery, showSearch = false }) =
   useEffect(() => {
     const handleUpdate = () => {
       if (user) {
-        const storedNotifs = localStorage.getItem(`notifications_${user.id}`);
-        if (storedNotifs) {
-          setNotifications(JSON.parse(storedNotifs));
-        }
+        fetchNotifications();
       }
     };
     window.addEventListener('notifications_updated', handleUpdate);
@@ -132,15 +123,17 @@ const Layout = ({ children, searchQuery, setSearchQuery, showSearch = false }) =
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const markAllRead = () => {
-    const updated = notifications.map(n => ({ ...n, read: true }));
-    setNotifications(updated);
-    if (user) {
-      localStorage.setItem(`notifications_${user.id}`, JSON.stringify(updated));
+  const markAllRead = async () => {
+    try {
+      await fetchWithAuth('/api/notifications/mark-all-read', { method: 'POST' });
+      const updated = notifications.map(n => ({ ...n, isRead: true }));
+      setNotifications(updated);
+    } catch (e) {
+      console.error('Failed to mark all as read', e);
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter(n => !n.isRead).length;
 
   return (
     <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
@@ -214,13 +207,13 @@ const Layout = ({ children, searchQuery, setSearchQuery, showSearch = false }) =
                       <p className="no-notifs">{language === 'th' ? 'ไม่มีการแจ้งเตือน' : 'No notifications'}</p>
                     ) : (
                       notifications.slice().reverse().map(n => (
-                        <div key={n.id} className={`notification-item ${!n.read ? 'unread' : ''}`}>
+                        <div key={n.id} className={`notification-item ${!n.isRead ? 'unread' : ''}`}>
                           <div className="notif-icon">
-                            {n.type === 'summary' ? <Info size={16} color="#3b82f6" /> : <CheckCircle size={16} color="#10b981" />}
+                            <Info size={16} color="#3b82f6" />
                           </div>
                           <div className="notif-content">
-                            <p>{n.text}</p>
-                            <span className="notif-time">{new Date(n.time).toLocaleString(language === 'th' ? 'th-TH' : 'en-US', { dateStyle: 'short', timeStyle: 'short' })}</span>
+                            <p>{n.message}</p>
+                            <span className="notif-time">{new Date(n.createdAt).toLocaleString(language === 'th' ? 'th-TH' : 'en-US', { dateStyle: 'short', timeStyle: 'short' })}</span>
                           </div>
                         </div>
                       ))

@@ -23,8 +23,34 @@ const Login = () => {
     password: ''
   });
 
+  const getPasswordStrength = (pass) => {
+    if (!pass) return { score: 0, label: '', color: 'transparent', width: '0%' };
+    
+    const hasLower = /[a-z]/.test(pass);
+    const hasUpper = /[A-Z]/.test(pass);
+    const hasNumber = /\d/.test(pass);
+    const hasLength = pass.length >= 4;
+    
+    if (!hasLower || !hasUpper || !hasNumber || !hasLength) {
+      return { score: 1, label: 'Weak (Requires 4+ chars, A-Z, a-z, 0-9)', color: '#ef4444', width: '33%' };
+    }
+    
+    if (pass.length >= 8) {
+      return { score: 3, label: 'Strong', color: '#22c55e', width: '100%' };
+    }
+    
+    return { score: 2, label: 'Medium', color: '#eab308', width: '66%' };
+  };
+
+  const strength = getPasswordStrength(formData.password);
+  const isPasswordValid = strength.score >= 2;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isLogin && !isPasswordValid) {
+      setError('Please meet the minimum password requirements.');
+      return;
+    }
     setIsLoading(true);
     setError('');
     const API_BASE_URL = import.meta.env.VITE_API_URL || '';
@@ -101,6 +127,22 @@ const Login = () => {
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
               />
+              {!isLogin && formData.password && (
+                <div className="password-strength-container">
+                  <div className="strength-bar-bg">
+                    <div 
+                      className="strength-bar-fill" 
+                      style={{ 
+                        width: strength.width, 
+                        backgroundColor: strength.color 
+                      }} 
+                    ></div>
+                  </div>
+                  <div className="strength-label" style={{ color: strength.color }}>
+                    {strength.label}
+                  </div>
+                </div>
+              )}
             </div>
 
             {isLogin && (
@@ -261,6 +303,26 @@ const Login = () => {
           font-size: 0.75rem;
           color: var(--text-muted);
           line-height: 1.5;
+        }
+        .password-strength-container {
+          margin-top: 0.75rem;
+          text-align: left;
+        }
+        .strength-bar-bg {
+          height: 6px;
+          background: #e2e8f0;
+          border-radius: 4px;
+          overflow: hidden;
+          margin-bottom: 0.5rem;
+        }
+        .strength-bar-fill {
+          height: 100%;
+          border-radius: 4px;
+          transition: all 0.3s ease-out;
+        }
+        .strength-label {
+          font-size: 0.8rem;
+          font-weight: 600;
         }
       `}</style>
     </div>
