@@ -1,4 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap');
+
+@font-face {
+  font-family: 'Metropolis Num';
+  src: url('https://fonts.cdnfonts.com/s/16308/Metropolis-Regular.woff') format('woff');
+  font-weight: 400;
+  unicode-range: U+0030-0039, U+002C, U+002E, U+0024, U+0025, U+002B, U+002D;
+}
+@font-face {
+  font-family: 'Metropolis Num';
+  src: url('https://fonts.cdnfonts.com/s/16308/Metropolis-Medium.woff') format('woff');
+  font-weight: 500;
+  unicode-range: U+0030-0039, U+002C, U+002E, U+0024, U+0025, U+002B, U+002D;
+}
+@font-face {
+  font-family: 'Metropolis Num';
+  src: url('https://fonts.cdnfonts.com/s/16308/Metropolis-SemiBold.woff') format('woff');
+  font-weight: 600;
+  unicode-range: U+0030-0039, U+002C, U+002E, U+0024, U+0025, U+002B, U+002D;
+}
+@font-face {
+  font-family: 'Metropolis Num';
+  src: url('https://fonts.cdnfonts.com/s/16308/Metropolis-Bold.woff') format('woff');
+  font-weight: 700;
+  unicode-range: U+0030-0039, U+002C, U+002E, U+0024, U+0025, U+002B, U+002D;
+}
 
 :root {
     /* Primary Palette */
@@ -113,7 +139,7 @@ html {
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Metropolis Num', 'Lato', 'IBM Plex Sans Thai', sans-serif;
     background-color: var(--bg-body);
     color: var(--text-main);
     line-height: 1.5;
@@ -122,8 +148,12 @@ body {
 }
 
 h1, h2, h3, h4 {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Metropolis Num', 'Lato', 'IBM Plex Sans Thai', sans-serif;
     font-weight: 600;
+}
+
+input, button, textarea, select {
+    font-family: inherit;
 }
 
 /* Layout Containers */
@@ -246,7 +276,7 @@ h1, h2, h3, h4 {
 
 .stat-value {
     font-size: 1.75rem;
-    font-family: 'Outfit', sans-serif;
+    font-family: inherit;
     color: var(--text-main);
 }
 
@@ -512,7 +542,7 @@ select.form-control {
 }
 .estimate-value {
   font-size: 2rem;
-  font-family: 'Outfit';
+  font-family: inherit;
 }
 .savings-badge {
   background: rgba(39, 174, 96, 0.2);
@@ -1030,13 +1060,13 @@ select.form-control {
 /* SweetAlert2 Custom Theme */
 .swal2-popup {
   border-radius: var(--radius-lg) !important;
-  font-family: 'Inter', 'Outfit', sans-serif !important;
+  font-family: inherit !important;
   box-shadow: var(--shadow-lg) !important;
 }
 
 .swal2-title {
   color: var(--primary-main) !important;
-  font-family: 'Outfit', sans-serif !important;
+  font-family: inherit !important;
   font-weight: 600 !important;
 }
 
@@ -1076,7 +1106,7 @@ select.form-control {
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-sm) !important;
   padding: 12px !important;
-  font-family: 'Inter', sans-serif !important;
+  font-family: inherit !important;
 }
 
 .swal2-input:focus, .swal2-select:focus, .swal2-textarea:focus {
