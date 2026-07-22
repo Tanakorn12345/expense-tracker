@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Loader2 } from 'lucide-react';
+import { Lock, Loader2, Mail, User } from 'lucide-react';
 import Footer from '../components/Footer';
 import Logo from '../components/Logo';
 
@@ -80,65 +80,86 @@ const Login = () => {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-container">
-        <div className="login-card">
-          <div className="brand-logo" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <Logo size={56} />
-              <h2 style={{ fontSize: '2.5rem', margin: 0, fontWeight: 700, letterSpacing: '0.5px', color: 'var(--primary)' }}>FinTrack</h2>
+    <div className="auth-layout">
+      {/* Left Side: Animated Blurred Graphic */}
+      <div className="auth-left">
+        <div className="auth-bg-image"></div>
+        <div className="auth-left-overlay"></div>
+        <div className="auth-left-content">
+          <h1>Intelligent Wealth Management</h1>
+          <p>Experience the next generation of financial tracking and insights. Secure, elegant, and designed for professionals.</p>
+        </div>
+      </div>
+
+      {/* Right Side: Form */}
+      <div className="auth-right">
+        <div className="auth-card">
+          <div className="auth-header">
+            <div className="auth-logo">
+              <Logo size={36} />
             </div>
-            <p className="brand-tagline" style={{ marginTop: '12px' }}>Wealth Management</p>
+            <h2 className="auth-title">FinTrack</h2>
+            <p className="auth-subtitle">{isLogin ? 'Welcome back to your dashboard' : 'Create your secure account'}</p>
           </div>
 
-          <div className="welcome-text">
-            <h1>{isLogin ? 'Welcome back' : 'Create an account'}</h1>
-            <p>Securely access your sophisticated financial overview and oversight dashboard.</p>
-          </div>
+          {error && (
+            <div style={{ color: '#ef4444', background: '#fef2f2', padding: '12px', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.9rem', border: '1px solid #fecaca' }}>
+              {error}
+            </div>
+          )}
 
-          {error && <div className="error-message">{error}</div>}
-
-          <form onSubmit={handleSubmit} className="auth-form">
+          <form onSubmit={handleSubmit}>
             {!isLogin && (
-              <div className="form-group">
-                <input 
-                  type="text" 
-                  placeholder="Full Name" 
-                  required 
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                />
+              <div className="auth-form-group">
+                <div className="auth-input-wrapper">
+                  <User size={20} className="auth-icon" />
+                  <input 
+                    type="text" 
+                    className="auth-input"
+                    placeholder="Full Name" 
+                    required 
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  />
+                </div>
               </div>
             )}
-            <div className="form-group">
-              <input 
-                type="email" 
-                placeholder="Email address" 
-                required 
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-              />
+            
+            <div className="auth-form-group">
+              <div className="auth-input-wrapper">
+                <Mail size={20} className="auth-icon" />
+                <input 
+                  type="email" 
+                  className="auth-input"
+                  placeholder="Email address" 
+                  required 
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                />
+              </div>
             </div>
-            <div className="form-group">
-              <input 
-                type="password" 
-                placeholder="Password" 
-                required 
-                value={formData.password}
-                onChange={(e) => setFormData({...formData, password: e.target.value})}
-              />
+
+            <div className="auth-form-group">
+              <div className="auth-input-wrapper">
+                <Lock size={20} className="auth-icon" />
+                <input 
+                  type="password" 
+                  className="auth-input"
+                  placeholder="Password" 
+                  required 
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                />
+              </div>
               {!isLogin && formData.password && (
-                <div className="password-strength-container">
-                  <div className="strength-bar-bg">
+                <div className="auth-strength-container">
+                  <div className="auth-strength-bar">
                     <div 
-                      className="strength-bar-fill" 
-                      style={{ 
-                        width: strength.width, 
-                        backgroundColor: strength.color 
-                      }} 
+                      className="auth-strength-fill" 
+                      style={{ width: strength.width, backgroundColor: strength.color }} 
                     ></div>
                   </div>
-                  <div className="strength-label" style={{ color: strength.color }}>
+                  <div className="auth-strength-label" style={{ color: strength.color }}>
                     {strength.label}
                   </div>
                 </div>
@@ -146,185 +167,38 @@ const Login = () => {
             </div>
 
             {isLogin && (
-              <div style={{ textAlign: 'right', marginTop: '-0.5rem', marginBottom: '0.5rem' }}>
+              <div style={{ textAlign: 'right', marginTop: '-0.5rem', marginBottom: '1rem' }}>
                 <a 
                   href="#" 
                   onClick={(e) => { e.preventDefault(); navigate('/forgot-password'); }}
-                  style={{ color: 'var(--primary-main)', fontSize: '0.85rem', textDecoration: 'none' }}
+                  className="auth-link"
                 >
                   Forgot password?
                 </a>
               </div>
             )}
 
-            <button type="submit" className="submit-btn" disabled={isLoading}>
+            <button type="submit" className="auth-btn" disabled={isLoading}>
               {isLoading ? <Loader2 size={18} className="animate-spin" /> : (isLogin ? 'Sign In' : 'Sign Up')}
             </button>
           </form>
 
-          <p className="toggle-mode">
+          <div style={{ textAlign: 'center', marginTop: '2rem', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
             {isLogin ? "Don't have an account? " : "Already have an account? "}
-            <span onClick={() => { setIsLogin(!isLogin); setError(''); }}>
+            <span 
+              onClick={() => { setIsLogin(!isLogin); setError(''); }}
+              className="auth-link"
+            >
               {isLogin ? 'Sign up' : 'Sign in'}
             </span>
-          </p>
+          </div>
 
-          <div className="security-note">
+          <div style={{ marginTop: '2.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', lineHeight: '1.5' }}>
             <p><Lock size={12} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }} /> Enterprise-grade security</p>
-            <p style={{ marginTop: '8px' }}>By signing in, you agree to our Terms of Service and Privacy Policy. Your data is encrypted and protected.</p>
+            <p style={{ marginTop: '4px' }}>Your data is encrypted and protected.</p>
           </div>
         </div>
       </div>
-      <Footer />
-
-      <style>{`
-        .login-page {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          min-height: 100vh;
-          background: radial-gradient(circle at top right, #f8fafc, #e2e8f0);
-          padding: 1.5rem;
-          width: 100%;
-          gap: 1.5rem;
-        }
-        .login-container {
-          width: 100%;
-          max-width: 440px;
-          animation: fadeIn 0.6s ease-out;
-        }
-        .login-card {
-          background: white;
-          padding: 3rem 2.5rem;
-          border-radius: 24px;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-          text-align: center;
-          border: 1px solid var(--border);
-        }
-        .brand-logo {
-          margin-bottom: 2rem;
-          display: inline-flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0.5rem;
-        }
-        .logo-box {
-          width: 56px;
-          height: 56px;
-          background: var(--primary-dark);
-          border-radius: 16px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          margin-bottom: 0.5rem;
-        }
-        .brand-name {
-          font-size: 1.75rem;
-          color: var(--primary-dark);
-          margin-bottom: 0.25rem;
-        }
-        .brand-tagline {
-          text-transform: uppercase;
-          font-size: 0.75rem;
-          letter-spacing: 0.1em;
-          color: var(--text-muted);
-          font-weight: 600;
-        }
-        .welcome-text h1 { font-size: 1.5rem; margin-bottom: 0.75rem; }
-        .welcome-text p {
-          color: var(--text-muted);
-          font-size: 0.95rem;
-          line-height: 1.6;
-          margin-bottom: 2rem;
-        }
-        .auth-form {
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-          margin-bottom: 1.5rem;
-        }
-        .form-group input {
-          width: 100%;
-          padding: 14px;
-          border: 1px solid var(--border);
-          border-radius: 12px;
-          background: #f8fafc;
-          font-family: inherit;
-          font-size: 0.95rem;
-          transition: all 0.2s;
-        }
-        .form-group input:focus {
-          outline: none;
-          border-color: var(--primary-dark);
-          background: white;
-          box-shadow: 0 0 0 3px rgba(10, 37, 64, 0.1);
-        }
-        .submit-btn {
-          width: 100%;
-          padding: 14px;
-          border: none;
-          border-radius: 12px;
-          background: var(--primary-dark);
-          color: white;
-          font-weight: 600;
-          font-size: 1rem;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .submit-btn:hover { background: #16365a; }
-        .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
-        .error-message {
-          color: #ef4444;
-          background: #fef2f2;
-          padding: 12px;
-          border-radius: 8px;
-          font-size: 0.85rem;
-          margin-bottom: 1.5rem;
-          text-align: left;
-        }
-        .toggle-mode {
-          font-size: 0.9rem;
-          color: var(--text-muted);
-          margin-bottom: 2rem;
-        }
-        .toggle-mode span {
-          color: var(--primary-dark);
-          font-weight: 600;
-          cursor: pointer;
-        }
-        .toggle-mode span:hover { text-decoration: underline; }
-        .security-note {
-          margin-top: 2rem;
-          font-size: 0.75rem;
-          color: var(--text-muted);
-          line-height: 1.5;
-        }
-        .password-strength-container {
-          margin-top: 0.75rem;
-          text-align: left;
-        }
-        .strength-bar-bg {
-          height: 6px;
-          background: #e2e8f0;
-          border-radius: 4px;
-          overflow: hidden;
-          margin-bottom: 0.5rem;
-        }
-        .strength-bar-fill {
-          height: 100%;
-          border-radius: 4px;
-          transition: all 0.3s ease-out;
-        }
-        .strength-label {
-          font-size: 0.8rem;
-          font-weight: 600;
-        }
-      `}</style>
     </div>
   );
 };

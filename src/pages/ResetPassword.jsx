@@ -92,198 +92,86 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-container">
-        <div className="login-card">
-          <div className="brand-logo">
-            <div className="logo-box">
-              <Logo color="white" />
+    <div className="auth-layout">
+      {/* Left Side: Animated Blurred Graphic */}
+      <div className="auth-left">
+        <div className="auth-bg-image"></div>
+        <div className="auth-left-overlay"></div>
+        <div className="auth-left-content">
+          <h1>Secure Recovery</h1>
+          <p>Get back to your intelligent wealth management dashboard quickly and safely.</p>
+        </div>
+      </div>
+
+      {/* Right Side: Form */}
+      <div className="auth-right">
+        <div className="auth-card">
+          <div className="auth-header">
+            <div className="auth-logo">
+              <Logo size={36} />
             </div>
-            <div className="brand-tagline">Secure Reset</div>
-          </div>
-          
-          <div className="welcome-text">
-            <h1>Reset Password</h1>
-            <p>Enter your new password below.</p>
+            <h2 className="auth-title">Reset Password</h2>
+            <p className="auth-subtitle">Enter your new password below.</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="auth-form">
-            <div className="form-group">
-              <input 
-                type="password" 
-                placeholder="New Password" 
-                required 
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
+          <form onSubmit={handleSubmit}>
+            <div className="auth-form-group">
+              <div className="auth-input-wrapper">
+                <Lock size={20} className="auth-icon" />
+                <input 
+                  type="password" 
+                  className="auth-input"
+                  placeholder="New Password" 
+                  required 
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
               {newPassword && (
-                <div className="password-strength-container">
-                  <div className="strength-bar-bg">
+                <div className="auth-strength-container">
+                  <div className="auth-strength-bar">
                     <div 
-                      className="strength-bar-fill" 
-                      style={{ 
-                        width: strength.width, 
-                        backgroundColor: strength.color 
-                      }} 
+                      className="auth-strength-fill" 
+                      style={{ width: strength.width, backgroundColor: strength.color }} 
                     ></div>
                   </div>
-                  <div className="strength-label" style={{ color: strength.color }}>
+                  <div className="auth-strength-label" style={{ color: strength.color }}>
                     {strength.label}
                   </div>
                 </div>
               )}
             </div>
             
-            <div className="form-group">
-              <input 
-                type="password" 
-                placeholder="Confirm New Password" 
-                required 
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
+            <div className="auth-form-group">
+              <div className="auth-input-wrapper">
+                <Lock size={20} className="auth-icon" />
+                <input 
+                  type="password" 
+                  className="auth-input"
+                  placeholder="Confirm New Password" 
+                  required 
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </div>
             </div>
 
-            <button type="submit" className="submit-btn" disabled={isLoading}>
+            <button type="submit" className="auth-btn" disabled={isLoading}>
               {isLoading ? <Loader2 size={18} className="animate-spin" /> : 'Reset Password'}
             </button>
           </form>
 
-          <div style={{ marginTop: '1.5rem' }}>
+          <div style={{ marginTop: '2rem' }}>
             <button 
               onClick={() => navigate('/login')}
-              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', width: '100%' }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', width: '100%', fontSize: '0.95rem' }}
+              className="auth-link"
             >
               <ArrowLeft size={16} /> Back to Login
             </button>
           </div>
         </div>
       </div>
-      <Footer />
-
-      <style>{`
-        .login-page {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          min-height: 100vh;
-          background: radial-gradient(circle at top right, #f8fafc, #e2e8f0);
-          padding: 1.5rem;
-          width: 100%;
-          gap: 1.5rem;
-        }
-        .login-container {
-          width: 100%;
-          max-width: 440px;
-          animation: fadeIn 0.6s ease-out;
-        }
-        .login-card {
-          background: white;
-          padding: 3rem 2.5rem;
-          border-radius: 24px;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-          text-align: center;
-          border: 1px solid var(--border);
-        }
-        .brand-logo {
-          margin-bottom: 2rem;
-          display: inline-flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0.5rem;
-        }
-        .logo-box {
-          width: 56px;
-          height: 56px;
-          background: var(--primary-dark);
-          border-radius: 16px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          margin-bottom: 0.5rem;
-        }
-        .brand-tagline {
-          text-transform: uppercase;
-          font-size: 0.75rem;
-          letter-spacing: 0.1em;
-          color: var(--text-muted);
-          font-weight: 600;
-        }
-        .welcome-text h1 { font-size: 1.5rem; margin-bottom: 0.75rem; }
-        .welcome-text p {
-          color: var(--text-muted);
-          font-size: 0.95rem;
-          line-height: 1.6;
-          margin-bottom: 2rem;
-        }
-        .auth-form {
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-          margin-bottom: 1.5rem;
-        }
-        .form-group input {
-          width: 100%;
-          padding: 14px;
-          border: 1px solid var(--border);
-          border-radius: 12px;
-          background: #f8fafc;
-          font-family: inherit;
-          transition: all 0.3s;
-        }
-        .form-group input:focus {
-          outline: none;
-          border-color: var(--primary-main);
-          background: white;
-          box-shadow: 0 0 0 4px rgba(0, 168, 232, 0.1);
-        }
-        .submit-btn {
-          background: var(--primary-main);
-          color: white;
-          border: none;
-          padding: 14px;
-          border-radius: 12px;
-          font-weight: 600;
-          font-size: 1rem;
-          cursor: pointer;
-          transition: all 0.3s;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .submit-btn:hover {
-          background: var(--primary-dark);
-          transform: translateY(-2px);
-          box-shadow: 0 10px 20px -10px var(--primary-main);
-        }
-        .submit-btn:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-          transform: none;
-        }
-        .password-strength-container {
-          margin-top: 0.75rem;
-          text-align: left;
-        }
-        .strength-bar-bg {
-          height: 6px;
-          background: #e2e8f0;
-          border-radius: 4px;
-          overflow: hidden;
-          margin-bottom: 0.5rem;
-        }
-        .strength-bar-fill {
-          height: 100%;
-          border-radius: 4px;
-          transition: all 0.3s ease-out;
-        }
-        .strength-label {
-          font-size: 0.8rem;
-          font-weight: 600;
-        }
-      `}</style>
     </div>
   );
 };

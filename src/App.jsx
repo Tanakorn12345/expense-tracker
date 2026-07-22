@@ -13,6 +13,7 @@ import AdminUserTransactions from './pages/AdminUserTransactions';
 import AdminAds from './pages/AdminAds';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import './styles/auth.css';
 
 function App() {
   return (

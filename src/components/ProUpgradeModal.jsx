@@ -205,7 +205,7 @@ const ProUpgradeModal = ({ isOpen, onClose, onSuccess }) => {
             <Loader2 className="spinner" size={64} style={{ color: '#eab308', margin: '0 auto 20px', animation: 'spin 1s linear infinite' }} />
             <h3 style={{ color: '#eab308' }}>กำลังรอการอนุมัติจากบริษัท</h3>
             <p style={{ color: 'var(--text-muted)', marginTop: '10px' }}>
-              โปรดรอสักครู่ครับ
+              โปรดรอสักครู่
             </p>
           </div>
         )}
