@@ -37,26 +37,55 @@ const ProUpgradeModal = ({ isOpen, onClose, onSuccess }) => {
     
     const reader = new FileReader();
     reader.readAsDataURL(fileToUpload);
-    reader.onload = async () => {
-      const base64Image = reader.result;
-      try {
-        const res = await fetchWithAuth('/api/auth/upgrade', { 
-          method: 'POST',
-          body: JSON.stringify({ slipUrl: base64Image })
-        });
-        if (res.ok) {
-          const data = await res.json();
-          // Update local storage user
-          localStorage.setItem('user', JSON.stringify(data.user));
-          setStep(4);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
         } else {
-          Swal.fire('Error', 'Failed to submit request', 'error');
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convert to compressed JPEG
+        const base64Image = canvas.toDataURL('image/jpeg', 0.7);
+        
+        try {
+          const res = await fetchWithAuth('/api/auth/upgrade', { 
+            method: 'POST',
+            body: JSON.stringify({ slipUrl: base64Image })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            // Update local storage user
+            localStorage.setItem('user', JSON.stringify(data.user));
+            setStep(4);
+          } else {
+            Swal.fire('Error', 'Failed to submit request', 'error');
+            setStep(1);
+          }
+        } catch (e) {
+          Swal.fire('Error', 'Connection error', 'error');
           setStep(1);
         }
-      } catch (e) {
-        Swal.fire('Error', 'Connection error', 'error');
-        setStep(1);
-      }
+      };
+      img.src = event.target.result;
     };
   };
 
