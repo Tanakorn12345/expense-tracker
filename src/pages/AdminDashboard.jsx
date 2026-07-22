@@ -159,6 +159,16 @@ const AdminDashboard = () => {
     }
   };
 
+  const showSlip = (url) => {
+    Swal.fire({
+      imageUrl: url,
+      imageAlt: 'Transfer Slip',
+      width: 'auto',
+      showConfirmButton: false,
+      showCloseButton: true
+    });
+  };
+
   const handleCreateUser = async () => {
     const { value: formValues } = await Swal.fire({
       title: language === 'th' ? 'สร้างผู้ใช้ใหม่' : 'Create User',
@@ -269,7 +279,7 @@ const AdminDashboard = () => {
                     <td style={{ padding: '16px' }}><span style={{ background: '#fef08a', color: '#854d0e', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem' }}>Pending</span></td>
                     <td style={{ padding: '16px' }}>
                       {r.proSlipUrl ? (
-                        <a href={r.proSlipUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--primary-main)' }}>View Slip</a>
+                        <button onClick={() => showSlip(r.proSlipUrl)} style={{ background: 'none', border: 'none', color: 'var(--primary-main)', cursor: 'pointer', textDecoration: 'underline' }}>View Slip</button>
                       ) : (
                         '-'
                       )}

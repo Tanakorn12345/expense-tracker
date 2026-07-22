@@ -13,6 +13,7 @@ import {
 import { useLanguage } from '../contexts/LanguageContext';
 import Logo from './Logo';
 import ProUpgradeModal from './ProUpgradeModal';
+import Swal from 'sweetalert2';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const { t, language } = useLanguage();
@@ -76,10 +77,17 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
       <div className="sidebar-footer">
         {!isPro && !isAdmin ? (
-          <div className="upgrade-card" style={{ cursor: 'pointer' }} onClick={() => setIsProModalOpen(true)}>
-            <h4 style={{ marginBottom: '0.5rem' }}>{t('upgradePro')}</h4>
-            <p style={{ opacity: 0.8, fontSize: '0.75rem' }}>{t('upgradeDesc')}</p>
-          </div>
+          user.proStatus === 'pending' ? (
+            <div className="upgrade-card" style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }} onClick={() => Swal.fire(language === 'th' ? 'โปรดรอสักครู่' : 'Please Wait', language === 'th' ? 'กำลังส่งคำขอการสมัครสมาชิกแบบ PRO โปรดรอสักครู่ เราจะส่งการแจ้งเตือนกลับอีกครั้ง' : 'Sending PRO subscription request, please wait. We will notify you again.', 'info')}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#fff' }}>{language === 'th' ? 'รอดำเนินการ' : 'Pending Approval'}</h4>
+              <p style={{ opacity: 0.9, fontSize: '0.75rem', color: '#fff' }}>{language === 'th' ? 'กำลังตรวจสอบการสมัคร PRO ของคุณ' : 'We are verifying your PRO request'}</p>
+            </div>
+          ) : (
+            <div className="upgrade-card" style={{ cursor: 'pointer' }} onClick={() => setIsProModalOpen(true)}>
+              <h4 style={{ marginBottom: '0.5rem' }}>{t('upgradePro')}</h4>
+              <p style={{ opacity: 0.8, fontSize: '0.75rem' }}>{t('upgradeDesc')}</p>
+            </div>
+          )
         ) : (
           <div className="upgrade-card" style={{ background: 'linear-gradient(135deg, #1D3557 0%, #028090 50%, #00A896 100%)'}}>
             <h4 style={{ marginBottom: '0.5rem', color: '#fff' }}>{isAdmin ? 'Pro ADMIN' : 'Pro Member'}</h4>
