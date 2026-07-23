@@ -44,6 +44,13 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [isDarkMode]);
 
+  // Helper to adjust color brightness
+  const adjustColor = (color, amount) => {
+    return '#' + color.replace(/^#/, '').replace(/../g, c => 
+      ('0'+Math.min(255, Math.max(0, parseInt(c, 16) + amount)).toString(16)).slice(-2)
+    );
+  };
+
   // Apply custom user theme color
   useEffect(() => {
     const checkUserTheme = () => {
@@ -52,14 +59,22 @@ export const ThemeProvider = ({ children }) => {
         if (userStr) {
           const user = JSON.parse(userStr);
           if (user.themeColor) {
-            document.documentElement.style.setProperty('--primary-main', user.themeColor);
-            // Optionally set other related colors like dark/light based on themeColor if needed, or just let them inherit
-            // In a real app we might use a color library to generate shades, but for now we'll set main.
+            const main = user.themeColor;
+            document.documentElement.style.setProperty('--primary-main', main);
+            document.documentElement.style.setProperty('--primary-light', adjustColor(main, 40));
+            document.documentElement.style.setProperty('--primary-dark', adjustColor(main, -30));
+            document.documentElement.style.setProperty('--accent', adjustColor(main, 80));
           } else {
             document.documentElement.style.removeProperty('--primary-main');
+            document.documentElement.style.removeProperty('--primary-light');
+            document.documentElement.style.removeProperty('--primary-dark');
+            document.documentElement.style.removeProperty('--accent');
           }
         } else {
           document.documentElement.style.removeProperty('--primary-main');
+          document.documentElement.style.removeProperty('--primary-light');
+          document.documentElement.style.removeProperty('--primary-dark');
+          document.documentElement.style.removeProperty('--accent');
         }
       } catch (e) {
         console.error('Error parsing user for theme', e);
