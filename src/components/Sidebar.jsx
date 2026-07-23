@@ -55,7 +55,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               margin: 0, 
               fontWeight: 700, 
               letterSpacing: '0.5px', 
-              lineHeight: '1.1',
+              lineHeight: '1.3',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis'
