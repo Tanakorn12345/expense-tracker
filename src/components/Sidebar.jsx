@@ -46,7 +46,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <Logo size={32} />
         {customApp ? (
-          <div style={{ display: 'flex', flexDirection: 'column', width: '100%', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', overflow: 'hidden' }}>
             <h2 style={{ 
               fontSize: 'clamp(1rem, 5vw, 1.35rem)', 
               margin: 0, 
@@ -64,7 +64,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               fontWeight: 600, 
               opacity: 0.7, 
               textAlign: 'right', 
-              marginTop: '-2px',
+              marginTop: '-4px',
               letterSpacing: '0.5px' 
             }}>
               BY FINTRACK
