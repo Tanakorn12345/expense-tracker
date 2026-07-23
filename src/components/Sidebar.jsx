@@ -41,9 +41,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     };
   }, []);
   
+  const isShortName = customApp && customApp.length < 6;
+  const subtitleSize = isShortName ? '0.5rem' : '0.65rem';
+  
   return (
     <div className={`sidebar ${isOpen ? 'open' : ''}`}>
-      <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         <Logo size={32} />
         {customApp ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', overflow: 'hidden' }}>
@@ -52,7 +55,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               margin: 0, 
               fontWeight: 700, 
               letterSpacing: '0.5px', 
-              lineHeight: '1.2',
+              lineHeight: '1.1',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis'
@@ -60,11 +63,11 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               {customApp}
             </h2>
             <span style={{ 
-              fontSize: '0.65rem', 
+              fontSize: subtitleSize, 
               fontWeight: 600, 
               opacity: 0.7, 
               textAlign: 'right', 
-              marginTop: '-4px',
+              marginTop: '-2px',
               letterSpacing: '0.5px' 
             }}>
               BY FINTRACK
