@@ -116,15 +116,26 @@ const History = () => {
     // Header Logo
     drawFintrackLogo(14, 12, 10);
     doc.setTextColor(0, 51, 102);
-    doc.setFontSize(16);
-    
     // Custom App Name
-    let appName = "FinTrack";
+    let customApp = null;
     try {
       const u = JSON.parse(localStorage.getItem('user') || '{}');
-      if (u.customAppName) appName = `${u.customAppName} by FinTrack`;
+      if (u.customAppName) customApp = u.customAppName;
     } catch(e) {}
-    doc.text(appName, 27, 19);
+
+    if (customApp) {
+      doc.setFontSize(16);
+      doc.text(customApp, 27, 17);
+      
+      const textWidth = doc.getTextWidth(customApp);
+      doc.setFontSize(7);
+      doc.setTextColor(100, 100, 100);
+      doc.text("BY FINTRACK", 27 + textWidth - doc.getTextWidth("BY FINTRACK"), 21);
+      doc.setTextColor(0, 51, 102);
+    } else {
+      doc.setFontSize(16);
+      doc.text("FinTrack", 27, 19);
+    }
 
     // Title
     doc.setTextColor(50, 50, 50);
@@ -206,8 +217,17 @@ const History = () => {
         drawFintrackLogo(footerLogoX, pageHeight - 10, footerLogoSize);
         
         doc.setTextColor(0, 51, 102);
-        doc.setFontSize(10);
-        doc.text(appName, footerLogoX + footerLogoSize + 3, pageHeight - 5);
+        if (customApp) {
+          doc.setFontSize(10);
+          doc.text(customApp, footerLogoX + footerLogoSize + 3, pageHeight - 6);
+          const fTextWidth = doc.getTextWidth(customApp);
+          doc.setFontSize(5);
+          doc.setTextColor(100, 100, 100);
+          doc.text("BY FINTRACK", footerLogoX + footerLogoSize + 3 + fTextWidth - doc.getTextWidth("BY FINTRACK"), pageHeight - 3);
+        } else {
+          doc.setFontSize(10);
+          doc.text("FinTrack", footerLogoX + footerLogoSize + 3, pageHeight - 5);
+        }
       }
     });
 

@@ -23,13 +23,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const isPro = user?.isPro || false;
   const isAdmin = user?.email === 'tanakorn.tip@student.mahidol.edu';
   
-  const [appName, setAppName] = React.useState('FinTrack');
+  const [customApp, setCustomApp] = React.useState(null);
 
   React.useEffect(() => {
     const checkName = () => {
       try {
         const u = JSON.parse(localStorage.getItem('user') || '{}');
-        setAppName(u.customAppName ? `${u.customAppName} by FinTrack` : 'FinTrack');
+        setCustomApp(u.customAppName || null);
       } catch (e) {}
     };
     checkName();
@@ -45,7 +45,34 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     <div className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <Logo size={32} />
-        <h2 style={{ fontSize: '1.35rem', margin: 0, fontWeight: 700, letterSpacing: '0.5px' }}>{appName}</h2>
+        {customApp ? (
+          <div style={{ display: 'flex', flexDirection: 'column', width: '100%', overflow: 'hidden' }}>
+            <h2 style={{ 
+              fontSize: 'clamp(1rem, 5vw, 1.35rem)', 
+              margin: 0, 
+              fontWeight: 700, 
+              letterSpacing: '0.5px', 
+              lineHeight: '1.2',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}>
+              {customApp}
+            </h2>
+            <span style={{ 
+              fontSize: '0.65rem', 
+              fontWeight: 600, 
+              opacity: 0.7, 
+              textAlign: 'right', 
+              marginTop: '-2px',
+              letterSpacing: '0.5px' 
+            }}>
+              BY FINTRACK
+            </span>
+          </div>
+        ) : (
+          <h2 style={{ fontSize: '1.35rem', margin: 0, fontWeight: 700, letterSpacing: '0.5px' }}>FinTrack</h2>
+        )}
       </div>
       
       <ul className="nav-links">
