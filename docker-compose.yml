@@ -1,13 +1,12 @@
-version: '3.8'
 
 services:
   db:
     image: postgres:15-alpine
     restart: always
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: fintrack
+      POSTGRES_USER: expense_user
+      POSTGRES_PASSWORD: securepassword123
+      POSTGRES_DB: expense_tracker
     ports:
       - "5432:5432"
     volumes:

@@ -23,7 +23,7 @@ const authController = {
       });
 
       const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-      res.status(201).json({ token, user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic, hasSetPrefs: user.hasSetPrefs, notifyEmail: user.notifyEmail } });
+      res.status(201).json({ token, user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic, hasSetPrefs: user.hasSetPrefs, notifyEmail: user.notifyEmail, themeColor: user.themeColor, customLogoUrl: user.customLogoUrl } });
     } catch (error) {
       next(error);
     }
@@ -44,7 +44,7 @@ const authController = {
       }
 
       const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-      res.json({ token, user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic, hasSetPrefs: user.hasSetPrefs, notifyEmail: user.notifyEmail } });
+      res.json({ token, user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic, hasSetPrefs: user.hasSetPrefs, notifyEmail: user.notifyEmail, themeColor: user.themeColor, customLogoUrl: user.customLogoUrl } });
     } catch (error) {
       next(error);
     }
@@ -160,7 +160,7 @@ const authController = {
         data: { profilePic }
       });
 
-      res.json({ user: { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name, isPro: updatedUser.isPro, profilePic: updatedUser.profilePic, hasSetPrefs: updatedUser.hasSetPrefs, notifyEmail: updatedUser.notifyEmail } });
+      res.json({ user: { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name, isPro: updatedUser.isPro, profilePic: updatedUser.profilePic, hasSetPrefs: updatedUser.hasSetPrefs, notifyEmail: updatedUser.notifyEmail, themeColor: updatedUser.themeColor, customLogoUrl: updatedUser.customLogoUrl } });
     } catch (error) {
       next(error);
     }
@@ -179,7 +179,7 @@ const authController = {
         }
       });
       
-      res.json({ message: 'Settings updated', user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic, hasSetPrefs: user.hasSetPrefs, notifyEmail: user.notifyEmail } });
+      res.json({ message: 'Settings updated', user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic, hasSetPrefs: user.hasSetPrefs, notifyEmail: user.notifyEmail, themeColor: user.themeColor, customLogoUrl: user.customLogoUrl } });
     } catch (error) {
       next(error);
     }
@@ -212,7 +212,22 @@ const authController = {
         throw err;
       }
 
-      res.json({ user: { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name, isPro: updatedUser.isPro, profilePic: updatedUser.profilePic, hasSetPrefs: updatedUser.hasSetPrefs, notifyEmail: updatedUser.notifyEmail } });
+      res.json({ user: { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name, isPro: updatedUser.isPro, profilePic: updatedUser.profilePic, hasSetPrefs: updatedUser.hasSetPrefs, notifyEmail: updatedUser.notifyEmail, themeColor: updatedUser.themeColor, customLogoUrl: updatedUser.customLogoUrl } });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getMe(req, res, next) {
+    try {
+      if (!req.user || !req.user.id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.json({ user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic, hasSetPrefs: user.hasSetPrefs, notifyEmail: user.notifyEmail, themeColor: user.themeColor, customLogoUrl: user.customLogoUrl } });
     } catch (error) {
       next(error);
     }

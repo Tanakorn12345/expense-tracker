@@ -12,6 +12,7 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+router.get('/me', authMiddleware, authController.getMe);
 router.post('/register', authLimiter, authController.register);
 router.post('/login', authLimiter, authController.login);
 router.post('/upgrade', authMiddleware, authController.upgrade);

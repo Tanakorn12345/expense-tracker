@@ -44,6 +44,41 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [isDarkMode]);
 
+  // Apply custom user theme color
+  useEffect(() => {
+    const checkUserTheme = () => {
+      try {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          if (user.themeColor) {
+            document.documentElement.style.setProperty('--primary-main', user.themeColor);
+            // Optionally set other related colors like dark/light based on themeColor if needed, or just let them inherit
+            // In a real app we might use a color library to generate shades, but for now we'll set main.
+          } else {
+            document.documentElement.style.removeProperty('--primary-main');
+          }
+        } else {
+          document.documentElement.style.removeProperty('--primary-main');
+        }
+      } catch (e) {
+        console.error('Error parsing user for theme', e);
+      }
+    };
+    
+    // Initial check
+    checkUserTheme();
+    
+    // Listen for custom event or storage change
+    window.addEventListener('userUpdated', checkUserTheme);
+    window.addEventListener('storage', checkUserTheme);
+    
+    return () => {
+      window.removeEventListener('userUpdated', checkUserTheme);
+      window.removeEventListener('storage', checkUserTheme);
+    };
+  }, []);
+
   const toggleTheme = () => {
     setIsDarkMode(prev => !prev);
   };

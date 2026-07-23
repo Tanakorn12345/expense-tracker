@@ -13,9 +13,29 @@ import AdminUserTransactions from './pages/AdminUserTransactions';
 import AdminAds from './pages/AdminAds';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { fetchWithAuth } from './utils/api';
 import './styles/auth.css';
 
 function App() {
+  React.useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const res = await fetchWithAuth('/api/auth/me');
+          if (res.ok) {
+            const data = await res.json();
+            localStorage.setItem('user', JSON.stringify(data.user));
+            window.dispatchEvent(new Event('userUpdated'));
+          }
+        } catch (error) {
+          console.error('Failed to fetch user on load', error);
+        }
+      }
+    };
+    fetchUser();
+  }, []);
+
   return (
     <ThemeProvider>
       <LanguageProvider>

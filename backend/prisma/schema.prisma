@@ -20,6 +20,8 @@ model User {
   resetPasswordExpires DateTime?
   proStatus            String               @default("none")
   proSlipUrl           String?              @db.Text
+  themeColor           String?              @default("#0a2540")
+  customLogoUrl        String?              @db.Text
   transactions         Transaction[]
   savingsGoals         SavingsGoal[]
   savingsTx            SavingsTransaction[]

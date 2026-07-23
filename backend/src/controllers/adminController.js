@@ -13,6 +13,8 @@ exports.getUsers = async (req, res) => {
         name: true,
         isPro: true,
         createdAt: true,
+        themeColor: true,
+        customLogoUrl: true,
         transactions: {
           select: {
             amount: true,
@@ -38,6 +40,8 @@ exports.getUsers = async (req, res) => {
         name: user.name,
         isPro: user.isPro,
         createdAt: user.createdAt,
+        themeColor: user.themeColor,
+        customLogoUrl: user.customLogoUrl,
         balance
       };
     });
@@ -81,12 +85,16 @@ exports.createUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, password, isPro } = req.body;
+    const { name, email, password, isPro, themeColor, customLogoUrl } = req.body;
+    
+    console.log(`[updateUser] Updating user \${id} with themeColor: \${themeColor}`);
     
     const updateData = {};
     if (name !== undefined) updateData.name = name;
     if (email !== undefined) updateData.email = email;
     if (isPro !== undefined) updateData.isPro = isPro;
+    if (themeColor !== undefined) updateData.themeColor = themeColor;
+    if (customLogoUrl !== undefined) updateData.customLogoUrl = customLogoUrl;
     
     if (password) {
       const salt = await bcrypt.genSalt(10);
@@ -98,7 +106,7 @@ exports.updateUser = async (req, res) => {
       data: updateData
     });
 
-    res.json({ message: 'User updated successfully', user: { id: updatedUser.id, email: updatedUser.email } });
+    res.json({ message: 'User updated successfully', user: { id: updatedUser.id, email: updatedUser.email, themeColor: updatedUser.themeColor, customLogoUrl: updatedUser.customLogoUrl } });
   } catch (error) {
     console.error('Error updating user:', error);
     if (error.code === 'P2002') {

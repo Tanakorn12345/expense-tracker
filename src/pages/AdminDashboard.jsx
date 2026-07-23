@@ -29,7 +29,7 @@ const AdminDashboard = () => {
   const loadUsers = async () => {
     setLoading(true);
     try {
-      const res = await fetchWithAuth('/api/admin/users');
+      const res = await fetchWithAuth(`/api/admin/users?t=${new Date().getTime()}`);
       if (!res.ok) throw new Error('Failed to load users');
       const data = await res.json();
       setUsers(data);
@@ -119,6 +119,13 @@ const AdminDashboard = () => {
           <label style="display:block; margin-top: 15px; margin-bottom: 5px;">Email:</label>
           <input id="swal-input2" class="swal2-input" value="${user.email}" placeholder="Email" style="max-width: 100%; box-sizing: border-box; width: calc(100% - 2rem);">
           
+          <label style="display:block; margin-top: 15px; margin-bottom: 5px;">Theme Color:</label>
+          <input type="color" id="swal-color" value="${user.themeColor || '#0a2540'}" style="width: 100%; height: 40px; cursor: pointer; border: none; border-radius: 8px; padding: 0;">
+
+          <label style="display:block; margin-top: 15px; margin-bottom: 5px;">Custom Logo:</label>
+          <input type="file" id="swal-logo" accept="image/*" style="width: 100%; box-sizing: border-box;">
+          ${user.customLogoUrl ? `<img src="${user.customLogoUrl}" style="max-width: 100px; max-height: 100px; margin-top: 10px; border-radius: 8px;" alt="Custom Logo" />` : ''}
+
           <label style="display:flex; align-items:center; margin-top: 15px; cursor: pointer;">
             <label class="custom-toggle" style="margin-right: 12px;">
               <input type="checkbox" id="swal-input3" ${user.isPro ? 'checked' : ''}>
@@ -134,10 +141,26 @@ const AdminDashboard = () => {
         const name = document.getElementById('swal-input1').value;
         const email = document.getElementById('swal-input2').value;
         const isPro = document.getElementById('swal-input3').checked;
+        const themeColor = document.getElementById('swal-color').value;
+        const fileInput = document.getElementById('swal-logo');
+
         if (!email) {
           Swal.showValidationMessage('Email is required');
+          return false;
         }
-        return { name, email, isPro };
+
+        return new Promise((resolve) => {
+          if (fileInput && fileInput.files && fileInput.files.length > 0) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              // Convert to canvas to resize if needed, but for now just read
+              resolve({ name, email, isPro, themeColor, customLogoUrl: e.target.result });
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+          } else {
+            resolve({ name, email, isPro, themeColor, customLogoUrl: user.customLogoUrl });
+          }
+        });
       }
     });
 
@@ -151,6 +174,18 @@ const AdminDashboard = () => {
           const data = await res.json();
           throw new Error(data.message || data.error || 'Failed to update user');
         }
+        
+        // If the admin edited themselves, update localStorage
+        const currentUserStr = localStorage.getItem('user');
+        if (currentUserStr) {
+          const currentUser = JSON.parse(currentUserStr);
+          if (currentUser.id === user.id) {
+            const data = await res.json();
+            localStorage.setItem('user', JSON.stringify({ ...currentUser, ...data.user }));
+            window.dispatchEvent(new Event('userUpdated'));
+          }
+        }
+        
         Swal.fire('Saved!', 'User updated successfully.', 'success');
         loadUsers();
       } catch (error) {
