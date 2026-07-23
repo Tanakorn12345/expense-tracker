@@ -156,6 +156,11 @@ input, button, textarea, select {
     font-family: inherit;
 }
 
+textarea {
+    resize: none;
+    overflow-y: auto;
+}
+
 /* Layout Containers */
 .app-container {
     display: flex;
