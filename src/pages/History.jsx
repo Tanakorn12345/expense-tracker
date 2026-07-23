@@ -117,7 +117,14 @@ const History = () => {
     drawFintrackLogo(14, 12, 10);
     doc.setTextColor(0, 51, 102);
     doc.setFontSize(16);
-    doc.text("FinTrack", 27, 19);
+    
+    // Custom App Name
+    let appName = "FinTrack";
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      if (u.customAppName) appName = `${u.customAppName} by FinTrack`;
+    } catch(e) {}
+    doc.text(appName, 27, 19);
 
     // Title
     doc.setTextColor(50, 50, 50);
@@ -200,7 +207,7 @@ const History = () => {
         
         doc.setTextColor(0, 51, 102);
         doc.setFontSize(10);
-        doc.text("FinTrack", footerLogoX + footerLogoSize + 3, pageHeight - 5);
+        doc.text(appName, footerLogoX + footerLogoSize + 3, pageHeight - 5);
       }
     });
 

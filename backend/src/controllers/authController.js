@@ -44,7 +44,7 @@ const authController = {
       }
 
       const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-      res.json({ token, user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic, hasSetPrefs: user.hasSetPrefs, notifyEmail: user.notifyEmail, themeColor: user.themeColor, customLogoUrl: user.customLogoUrl } });
+      res.json({ token, user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic, hasSetPrefs: user.hasSetPrefs, notifyEmail: user.notifyEmail, themeColor: user.themeColor, customLogoUrl: user.customLogoUrl, customAppName: user.customAppName } });
     } catch (error) {
       next(error);
     }
@@ -160,7 +160,7 @@ const authController = {
         data: { profilePic }
       });
 
-      res.json({ user: { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name, isPro: updatedUser.isPro, profilePic: updatedUser.profilePic, hasSetPrefs: updatedUser.hasSetPrefs, notifyEmail: updatedUser.notifyEmail, themeColor: updatedUser.themeColor, customLogoUrl: updatedUser.customLogoUrl } });
+      res.json({ user: { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name, isPro: updatedUser.isPro, profilePic: updatedUser.profilePic, hasSetPrefs: updatedUser.hasSetPrefs, notifyEmail: updatedUser.notifyEmail, themeColor: updatedUser.themeColor, customLogoUrl: updatedUser.customLogoUrl, customAppName: updatedUser.customAppName } });
     } catch (error) {
       next(error);
     }
@@ -212,7 +212,7 @@ const authController = {
         throw err;
       }
 
-      res.json({ user: { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name, isPro: updatedUser.isPro, profilePic: updatedUser.profilePic, hasSetPrefs: updatedUser.hasSetPrefs, notifyEmail: updatedUser.notifyEmail, themeColor: updatedUser.themeColor, customLogoUrl: updatedUser.customLogoUrl } });
+      res.json({ user: { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name, isPro: updatedUser.isPro, profilePic: updatedUser.profilePic, hasSetPrefs: updatedUser.hasSetPrefs, notifyEmail: updatedUser.notifyEmail, themeColor: updatedUser.themeColor, customLogoUrl: updatedUser.customLogoUrl, customAppName: updatedUser.customAppName } });
     } catch (error) {
       next(error);
     }
@@ -227,7 +227,7 @@ const authController = {
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
-      res.json({ user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic, hasSetPrefs: user.hasSetPrefs, notifyEmail: user.notifyEmail, themeColor: user.themeColor, customLogoUrl: user.customLogoUrl } });
+      res.json({ user: { id: user.id, email: user.email, name: user.name, isPro: user.isPro, profilePic: user.profilePic, hasSetPrefs: user.hasSetPrefs, notifyEmail: user.notifyEmail, themeColor: user.themeColor, customLogoUrl: user.customLogoUrl, customAppName: user.customAppName } });
     } catch (error) {
       next(error);
     }

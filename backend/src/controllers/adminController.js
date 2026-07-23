@@ -15,6 +15,7 @@ exports.getUsers = async (req, res) => {
         createdAt: true,
         themeColor: true,
         customLogoUrl: true,
+        customAppName: true,
         transactions: {
           select: {
             amount: true,
@@ -42,6 +43,7 @@ exports.getUsers = async (req, res) => {
         createdAt: user.createdAt,
         themeColor: user.themeColor,
         customLogoUrl: user.customLogoUrl,
+        customAppName: user.customAppName,
         balance
       };
     });
@@ -85,9 +87,9 @@ exports.createUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, password, isPro, themeColor, customLogoUrl } = req.body;
+    const { name, email, password, isPro, themeColor, customLogoUrl, customAppName } = req.body;
     
-    console.log(`[updateUser] Updating user \${id} with themeColor: \${themeColor}`);
+    console.log(`[updateUser] Updating user \${id} with themeColor: \${themeColor}, customAppName: \${customAppName}`);
     
     const updateData = {};
     if (name !== undefined) updateData.name = name;
@@ -95,6 +97,7 @@ exports.updateUser = async (req, res) => {
     if (isPro !== undefined) updateData.isPro = isPro;
     if (themeColor !== undefined) updateData.themeColor = themeColor;
     if (customLogoUrl !== undefined) updateData.customLogoUrl = customLogoUrl;
+    if (customAppName !== undefined) updateData.customAppName = customAppName;
     
     if (password) {
       const salt = await bcrypt.genSalt(10);
@@ -106,7 +109,7 @@ exports.updateUser = async (req, res) => {
       data: updateData
     });
 
-    res.json({ message: 'User updated successfully', user: { id: updatedUser.id, email: updatedUser.email, themeColor: updatedUser.themeColor, customLogoUrl: updatedUser.customLogoUrl } });
+    res.json({ message: 'User updated successfully', user: { id: updatedUser.id, email: updatedUser.email, themeColor: updatedUser.themeColor, customLogoUrl: updatedUser.customLogoUrl, customAppName: updatedUser.customAppName } });
   } catch (error) {
     console.error('Error updating user:', error);
     if (error.code === 'P2002') {

@@ -126,6 +126,9 @@ const AdminDashboard = () => {
           <input type="file" id="swal-logo" accept="image/*" style="width: 100%; box-sizing: border-box;">
           ${user.customLogoUrl ? `<img src="${user.customLogoUrl}" style="max-width: 100px; max-height: 100px; margin-top: 10px; border-radius: 8px;" alt="Custom Logo" />` : ''}
 
+          <label style="display:block; margin-top: 15px; margin-bottom: 5px;">Custom App Name:</label>
+          <input id="swal-appname" class="swal2-input" value="${user.customAppName || ''}" placeholder="Leave empty for FinTrack" style="max-width: 100%; box-sizing: border-box; width: calc(100% - 2rem); margin-top: 0;">
+
           <label style="display:flex; align-items:center; margin-top: 15px; cursor: pointer;">
             <label class="custom-toggle" style="margin-right: 12px;">
               <input type="checkbox" id="swal-input3" ${user.isPro ? 'checked' : ''}>
@@ -143,6 +146,7 @@ const AdminDashboard = () => {
         const isPro = document.getElementById('swal-input3').checked;
         const themeColor = document.getElementById('swal-color').value;
         const fileInput = document.getElementById('swal-logo');
+        const customAppName = document.getElementById('swal-appname').value;
 
         if (!email) {
           Swal.showValidationMessage('Email is required');
@@ -154,11 +158,11 @@ const AdminDashboard = () => {
             const reader = new FileReader();
             reader.onload = (e) => {
               // Convert to canvas to resize if needed, but for now just read
-              resolve({ name, email, isPro, themeColor, customLogoUrl: e.target.result });
+              resolve({ name, email, isPro, themeColor, customLogoUrl: e.target.result, customAppName });
             };
             reader.readAsDataURL(fileInput.files[0]);
           } else {
-            resolve({ name, email, isPro, themeColor, customLogoUrl: user.customLogoUrl });
+            resolve({ name, email, isPro, themeColor, customLogoUrl: user.customLogoUrl, customAppName });
           }
         });
       }

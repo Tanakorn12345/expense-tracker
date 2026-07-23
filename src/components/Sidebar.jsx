@@ -23,11 +23,29 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const isPro = user?.isPro || false;
   const isAdmin = user?.email === 'tanakorn.tip@student.mahidol.edu';
   
+  const [appName, setAppName] = React.useState('FinTrack');
+
+  React.useEffect(() => {
+    const checkName = () => {
+      try {
+        const u = JSON.parse(localStorage.getItem('user') || '{}');
+        setAppName(u.customAppName ? `${u.customAppName} by FinTrack` : 'FinTrack');
+      } catch (e) {}
+    };
+    checkName();
+    window.addEventListener('userUpdated', checkName);
+    window.addEventListener('storage', checkName);
+    return () => {
+      window.removeEventListener('userUpdated', checkName);
+      window.removeEventListener('storage', checkName);
+    };
+  }, []);
+  
   return (
     <div className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <Logo size={32} />
-        <h2 style={{ fontSize: '1.35rem', margin: 0, fontWeight: 700, letterSpacing: '0.5px' }}>FinTrack</h2>
+        <h2 style={{ fontSize: '1.35rem', margin: 0, fontWeight: 700, letterSpacing: '0.5px' }}>{appName}</h2>
       </div>
       
       <ul className="nav-links">

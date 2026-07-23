@@ -22,6 +22,7 @@ model User {
   proSlipUrl           String?              @db.Text
   themeColor           String?              @default("#0a2540")
   customLogoUrl        String?              @db.Text
+  customAppName        String?
   transactions         Transaction[]
   savingsGoals         SavingsGoal[]
   savingsTx            SavingsTransaction[]
