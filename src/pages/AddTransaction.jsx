@@ -26,6 +26,7 @@ const AddTransaction = () => {
   const [isCoPayMode, setIsCoPayMode] = useState(false);
   const [amountError, setAmountError] = useState(false);
   const [amount, setAmount] = useState('');
+  const [category, setCategory] = useState('');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const isPro = user?.isPro || false;
 
@@ -35,16 +36,46 @@ const AddTransaction = () => {
       .then(data => setCategories(data))
       .catch(err => console.error('Error fetching categories:', err));
   }, []);
-
   const expenseCategories = categories.expense;
   const incomeCategories = categories.income;
+
+  const recentCategoriesList = React.useMemo(() => {
+    const currentType = isExpense ? 'expense' : 'income';
+    const typeTransactions = transactions.filter(t => (t.category?.type || t.type) === currentType);
+    
+    // Sort by date descending
+    const sorted = [...typeTransactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    const uniqueCategories = [];
+    const categoryAmounts = {};
+    
+    for (const t of sorted) {
+      const catName = currentType === 'expense' 
+        ? (t.category?.name || t.subtitle) 
+        : t.subtitle;
+        
+      if (!catName) continue;
+      
+      if (!categoryAmounts[catName]) {
+        categoryAmounts[catName] = t.amount;
+        uniqueCategories.push(catName);
+      }
+      
+      if (uniqueCategories.length >= 4) break;
+    }
+    
+    return uniqueCategories.map(name => ({
+      name,
+      latestAmount: categoryAmounts[name]
+    }));
+  }, [transactions, isExpense]);
 
   const handleSave = async (e) => {
     e.preventDefault();
     
-    const amountInput = document.querySelector('.amount-input').value;
+    const amountInput = amount;
     const dateInput = document.querySelector('input[type="date"]').value;
-    const categoryInput = document.querySelector('select').value;
+    const categoryInput = category;
     const descriptionInput = document.querySelector('textarea').value;
     
     let parsedAmount = parseFloat(amountInput) || 0;
@@ -152,21 +183,21 @@ const AddTransaction = () => {
           <div className="tab-group">
             <button 
               className={`tab-btn ${isExpense ? 'active' : ''}`}
-              onClick={() => setIsExpense(true)}
-              style={isExpense ? { color: 'var(--danger)', borderBottom: '2px solid var(--danger)', borderRadius: '8px 8px 0 0' } : {}}
+              onClick={() => { setIsExpense(true); setCategory(''); }}
+              style={isExpense ? { color: 'var(--danger)', borderColor: 'var(--danger)', backgroundColor: 'white' } : {}}
             >
               <ArrowUp size={18} /> {t('expense')}
             </button>
             <button 
               className={`tab-btn ${!isExpense ? 'active' : ''}`}
-              onClick={() => setIsExpense(false)}
-              style={!isExpense ? { color: 'var(--success)', borderBottom: '2px solid var(--success)', borderRadius: '8px 8px 0 0' } : {}}
+              onClick={() => { setIsExpense(false); setCategory(''); }}
+              style={!isExpense ? { color: 'var(--success)', borderColor: 'var(--success)', backgroundColor: 'white' } : {}}
             >
               <ArrowDown size={18} /> {t('income')}
             </button>
           </div>
 
-          <form onSubmit={handleSave}>
+          <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
             <div className="amount-input-container">
               <span className="amount-label">{t('amount')}</span>
               <div className="amount-wrapper">
@@ -234,7 +265,12 @@ const AddTransaction = () => {
               </div>
               <div className="form-group">
                 <label className="form-label">{isExpense ? t('category') : t('source')}</label>
-                <select className="form-control" required>
+                <select 
+                  className="form-control" 
+                  required 
+                  value={category} 
+                  onChange={(e) => setCategory(e.target.value)}
+                >
                   <option value="">{isExpense ? t('selectCategory') : t('selectSource')}</option>
                   {isExpense ? expenseCategories.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
@@ -256,7 +292,7 @@ const AddTransaction = () => {
               <textarea className="form-control" rows="3" placeholder={isExpense ? t('descriptionPlaceholderExpense') : t('descriptionPlaceholderIncome')}></textarea>
             </div>
 
-            <div className="flex justify-between items-center mt-4">
+            <div className="flex justify-between items-center" style={{ marginTop: 'auto', paddingTop: '2rem' }}>
               <button type="button" className="btn btn-outline" onClick={() => navigate('/dashboard')}>{t('cancel')}</button>
               <button 
                 type="submit" 
@@ -303,10 +339,39 @@ const AddTransaction = () => {
               {t('recentCategories')}
             </h3>
             <div className="category-chips">
-              <span className="category-chip">อาหาร</span>
-              <span className="category-chip">บันเทิง</span>
-              <span className="category-chip">การศึกษา</span>
-              <span className="category-chip">เสื้อผ้า</span>
+              {recentCategoriesList.length > 0 ? (
+                recentCategoriesList.map((cat, idx) => (
+                  <div 
+                    key={idx} 
+                    className="category-chip" 
+                    onClick={() => setCategory(cat.name)}
+                    style={{
+                      display: 'inline-flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      padding: '8px 16px',
+                      background: category === cat.name ? 'rgba(0, 168, 232, 0.1)' : 'white',
+                      border: category === cat.name ? '1px solid var(--accent)' : '1px solid var(--border)',
+                      borderRadius: '12px',
+                      marginRight: '8px',
+                      marginBottom: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <div style={{ fontWeight: '600', color: category === cat.name ? 'var(--primary-dark)' : 'inherit' }}>
+                      {cat.name}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                      ล่าสุด: ฿{cat.latestAmount?.toLocaleString()}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                  ไม่มีประวัติการทำรายการล่าสุด
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -314,7 +379,13 @@ const AddTransaction = () => {
 
       <style>{`
         .page-header { margin-bottom: 2.5rem; }
-        .form-card { max-width: 800px; margin: 0 auto; }
+        .form-card { 
+          max-width: 800px; 
+          margin: 0 auto; 
+          min-height: 650px;
+          display: flex;
+          flex-direction: column;
+        }
         .tab-group {
           display: flex;
           background: #f1f5f9;
@@ -323,9 +394,9 @@ const AddTransaction = () => {
           margin-bottom: 2.5rem;
         }
         .tab-btn {
-          flex: 1;
+          flex: 1 1 0;
           padding: 12px;
-          border: none;
+          border: 2px solid transparent;
           background: transparent;
           border-radius: 8px;
           font-weight: 600;
@@ -339,8 +410,6 @@ const AddTransaction = () => {
           font-family: inherit;
         }
         .tab-btn.active {
-          background: white;
-          color: var(--primary-dark);
           box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
         .amount-input-container { text-align: center; margin-bottom: 3rem; }
@@ -391,19 +460,7 @@ const AddTransaction = () => {
           box-shadow: var(--shadow-sm);
           color: var(--text-muted);
         }
-        .category-chip {
-          display: inline-flex;
-          padding: 8px 16px;
-          background: white;
-          border: 1px solid var(--border);
-          border-radius: 100px;
-          font-size: 0.85rem;
-          margin-right: 8px;
-          margin-bottom: 8px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        .category-chip:hover { border-color: var(--accent); color: var(--accent); }
+        .category-chip:hover { border-color: var(--accent); }
         @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
       `}</style>
     </Layout>
