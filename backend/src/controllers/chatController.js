@@ -81,6 +81,19 @@ const chatController = {
         }
       });
 
+      // Format date and time for notification (Thailand timezone)
+      const now = new Date();
+      const dateString = now.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Bangkok' });
+      const timeString = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
+
+      // Create notification for the receiver
+      await prisma.notification.create({
+        data: {
+          userId: parseInt(receiverId),
+          message: `💬 แชทจาก: ${message.sender.name} | ข้อความ: "${content}" | เวลา: ${timeString} น. | วันที่: ${dateString}`
+        }
+      });
+
       res.status(201).json(message);
     } catch (err) {
       console.error('Error sending message:', err);
