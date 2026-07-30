@@ -99,7 +99,7 @@ const ChatWidget = () => {
     return () => {
       newSocket.disconnect();
     };
-  }, [shouldRender, user?.id]);
+  }, [shouldRender, user?.id, adminInfo]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
