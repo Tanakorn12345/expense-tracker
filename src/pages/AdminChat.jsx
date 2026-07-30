@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../utils/api';
 import { useLanguage } from '../contexts/LanguageContext';
-import { MessageSquare, ArrowLeft, Send, Trash2 } from 'lucide-react';
+import { MessageSquare, ArrowLeft, Send, Trash2, Check, CheckCheck } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { io } from 'socket.io-client';
 import Layout from '../components/Layout';
@@ -41,6 +41,11 @@ const AdminChat = () => {
           if (res.ok) {
             const data = await res.json();
             setMessages(data);
+            fetchWithAuth('/api/chat/read', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ senderId: selectedUser.id })
+            }).catch(() => {});
           }
         } catch (err) {
           console.error('Error fetching messages:', err);
@@ -331,8 +336,13 @@ const AdminChat = () => {
                           lineHeight: '1.5'
                         }}>
                           {msg.content}
-                          <div style={{ fontSize: '0.7rem', opacity: 0.7, textAlign: 'right', marginTop: '4px' }}>
-                            {formatTime(msg.createdAt)}
+                          <div style={{ fontSize: '0.7rem', opacity: 0.7, textAlign: 'right', marginTop: '4px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                            <span>{formatTime(msg.createdAt)}</span>
+                            {isMe && (
+                              <span>
+                                {msg.isRead ? <CheckCheck size={14} style={{ color: '#bae6fd' }} /> : <Check size={14} />}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>

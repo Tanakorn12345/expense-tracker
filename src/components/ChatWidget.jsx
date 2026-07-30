@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, X, Send } from 'lucide-react';
+import { MessageSquare, X, Send, Check, CheckCheck } from 'lucide-react';
 import { io } from 'socket.io-client';
 import { fetchWithAuth } from '../utils/api';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -84,6 +84,13 @@ const ChatWidget = () => {
           if (adminRes.ok) {
             const data = await adminRes.json();
             setAdminInfo(data);
+            if (isOpen && data.id) {
+              fetchWithAuth('/api/chat/read', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ senderId: data.id })
+              }).catch(() => {});
+            }
           }
         } catch (err) {
           console.error("Error fetching chat data:", err);
@@ -265,8 +272,13 @@ const ChatWidget = () => {
                       fontSize: '0.9rem'
                     }}>
                       {msg.content}
-                      <div style={{ fontSize: '0.7rem', opacity: 0.7, textAlign: 'right', marginTop: '4px' }}>
-                        {formatTime(msg.createdAt)}
+                      <div style={{ fontSize: '0.7rem', opacity: 0.7, textAlign: 'right', marginTop: '4px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                        <span>{formatTime(msg.createdAt)}</span>
+                        {isMe && (
+                          <span>
+                            {msg.isRead ? <CheckCheck size={14} style={{ color: '#bae6fd' }} /> : <Check size={14} />}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
