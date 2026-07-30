@@ -29,6 +29,7 @@ const AdminChat = () => {
     const socketUrl = import.meta.env.VITE_API_URL || '';
     const newSocket = io(socketUrl, {
       path: '/api/socket.io',
+      transports: ['polling'],
       withCredentials: true
     });
 
