@@ -120,6 +120,11 @@ const AdminChat = () => {
   const handleSend = () => {
     if (!inputValue.trim() || !socket || !selectedUser) return;
 
+    if (!socket.connected) {
+      alert(`Debug Info: Admin Socket exists but is NOT CONNECTED!`);
+      return;
+    }
+
     socket.emit('send_message', {
       senderId: admin.id,
       receiverId: selectedUser.id,

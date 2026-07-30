@@ -111,7 +111,11 @@ const ChatWidget = () => {
   const handleSend = () => {
     if (!inputValue.trim()) return;
     if (!socket || !adminInfo) {
-      alert(`Debug Info:\nsocket is: ${socket ? 'CONNECTED' : 'NULL'}\nadminInfo is: ${adminInfo ? 'LOADED' : 'NULL'}\nshouldRender is: ${shouldRender}`);
+      alert(`Debug Info:\nsocket is: ${socket ? 'EXISTS' : 'NULL'}\nadminInfo is: ${adminInfo ? 'LOADED' : 'NULL'}\nshouldRender is: ${shouldRender}`);
+      return;
+    }
+    if (!socket.connected) {
+      alert(`Debug Info: Socket exists but is NOT CONNECTED! It is currently trying to connect. Please wait or check if WebSocket is supported by your server.`);
       return;
     }
 
