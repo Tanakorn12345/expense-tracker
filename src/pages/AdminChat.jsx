@@ -149,11 +149,11 @@ const AdminChat = () => {
   return (
     <Layout>
       <div className="container" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 100px)', paddingBottom: '20px' }}>
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-4" style={{ marginBottom: '24px' }}>
           <button className="btn btn-outline" onClick={() => navigate('/admin')}>
             <ArrowLeft size={18} /> {language === 'th' ? 'กลับ' : 'Back'}
           </button>
-          <h2>{language === 'th' ? 'แชทกับผู้ใช้' : 'User Chats'}</h2>
+          <h2 style={{ margin: 0 }}>{language === 'th' ? 'แชทกับผู้ใช้' : 'User Chats'}</h2>
         </div>
 
         <div className={`admin-chat-wrapper ${selectedUser ? 'chat-active' : ''}`}>
