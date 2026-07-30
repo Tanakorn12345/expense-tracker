@@ -6,6 +6,7 @@ let io;
 
 function initSocket(server) {
   io = new Server(server, {
+    path: '/api/socket.io',
     cors: {
       origin: (origin, callback) => {
         callback(null, true);

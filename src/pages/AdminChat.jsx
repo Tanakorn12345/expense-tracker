@@ -26,8 +26,9 @@ const AdminChat = () => {
 
     fetchUsers();
 
-    const socketUrl = import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:5002`;
+    const socketUrl = import.meta.env.VITE_API_URL || '';
     const newSocket = io(socketUrl, {
+      path: '/api/socket.io',
       withCredentials: true
     });
 
