@@ -36,6 +36,18 @@ const transactionController = {
                 console.error('Failed to send email notification:', err);
               });
             }
+            
+            // In-App Notification
+            if (u.notifyInApp !== false) {
+              const typeLabel = transaction.category?.type === 'income' ? 'รายรับ' : 'ค่าใช้จ่าย';
+              const amtStr = transaction.amount.toLocaleString();
+              prisma.notification.create({
+                data: {
+                  userId: u.id,
+                  message: `คุณเพิ่ม${typeLabel}ใหม่: ${transaction.title} (฿${amtStr})`
+                }
+              }).catch(err => console.error('Failed to create in-app notification:', err));
+            }
           }
         }).catch(err => console.error('Failed to fetch user for notification:', err));
       }
