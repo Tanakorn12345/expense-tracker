@@ -139,6 +139,13 @@ const ChatWidget = () => {
 
   if (!shouldRender) return null;
 
+  const formatTime = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const locale = language === 'th' ? 'th-TH' : 'en-US';
+    return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }) + (language === 'th' ? ' น.' : '');
+  };
+
   const formatLastSeen = (dateString) => {
     if (!dateString) return language === 'th' ? 'ออฟไลน์' : 'Offline';
     const date = new Date(dateString);
@@ -150,7 +157,8 @@ const ChatWidget = () => {
     if (diffMins < 1) return language === 'th' ? 'เมื่อสักครู่' : 'Just now';
     if (diffMins < 60) return language === 'th' ? `${diffMins} นาทีที่แล้ว` : `${diffMins} mins ago`;
     if (diffHours < 24) return language === 'th' ? `${diffHours} ชั่วโมงที่แล้ว` : `${diffHours} hours ago`;
-    return date.toLocaleDateString();
+    const locale = language === 'th' ? 'th-TH' : 'en-US';
+    return date.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
   return (
@@ -257,6 +265,9 @@ const ChatWidget = () => {
                       fontSize: '0.9rem'
                     }}>
                       {msg.content}
+                      <div style={{ fontSize: '0.7rem', opacity: 0.7, textAlign: 'right', marginTop: '4px' }}>
+                        {formatTime(msg.createdAt)}
+                      </div>
                     </div>
                   </div>
                 );
