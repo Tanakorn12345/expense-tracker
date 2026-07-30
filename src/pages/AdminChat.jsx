@@ -159,22 +159,22 @@ const AdminChat = () => {
         <div style={{ display: 'flex', flex: 1, backgroundColor: 'white', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 10px 25px rgba(0,0,0,0.05)' }}>
           {/* User List Sidebar */}
           <div style={{ width: '320px', backgroundColor: '#fcfcfd', borderRight: '1px solid rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '24px 20px 16px', fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-main)' }}>
+            <div style={{ padding: '20px', fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-main)' }}>
               {language === 'th' ? 'กล่องข้อความ' : 'Inbox'}
             </div>
-            <div style={{ overflowY: 'auto', flex: 1, padding: '0 12px 16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ overflowY: 'auto', flex: 1, padding: '0 12px 16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
               {users.map(u => (
                 <div 
                   key={u.id}
                   onClick={() => setSelectedUser(u)}
                   style={{ 
                     padding: '12px 16px', 
-                    borderRadius: '16px',
+                    borderRadius: '12px',
                     cursor: 'pointer',
                     backgroundColor: selectedUser?.id === u.id ? '#eef2ff' : 'transparent',
-                    boxShadow: selectedUser?.id === u.id ? '0 4px 12px rgba(99, 102, 241, 0.1)' : 'none',
+                    boxShadow: selectedUser?.id === u.id ? '0 2px 8px rgba(99, 102, 241, 0.1)' : 'none',
                     display: 'flex',
-                    gap: '14px',
+                    gap: '12px',
                     alignItems: 'center',
                     transition: 'all 0.2s ease'
                   }}
@@ -218,13 +218,13 @@ const AdminChat = () => {
             {selectedUser ? (
               <>
                 <div style={{ 
-                  padding: '16px 24px', 
+                  padding: '12px 20px', 
                   backgroundColor: 'rgba(255, 255, 255, 0.85)', 
                   backdropFilter: 'blur(12px)',
-                  borderBottom: '1px solid rgba(0,0,0,0.03)', 
+                  borderBottom: '1px solid rgba(0,0,0,0.05)', 
                   display: 'flex', 
                   alignItems: 'center', 
-                  gap: '16px',
+                  gap: '12px',
                   position: 'sticky',
                   top: 0,
                   zIndex: 10
@@ -248,20 +248,20 @@ const AdminChat = () => {
                   </div>
                 </div>
 
-                <div style={{ flex: 1, padding: '24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px', backgroundColor: '#f8fafc' }}>
+                <div style={{ flex: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', backgroundColor: '#f8fafc' }}>
                   {messages.map((msg, i) => {
                     const isMe = msg.senderId === admin.id;
                     return (
                       <div key={i} style={{ display: 'flex', justifyContent: isMe ? 'flex-end' : 'flex-start' }}>
                         <div style={{ 
-                          maxWidth: '70%', 
-                          padding: '14px 18px', 
-                          borderRadius: '20px', 
-                          background: isMe ? 'linear-gradient(135deg, var(--primary-main), #818cf8)' : '#ffffff', 
+                          maxWidth: '75%', 
+                          padding: '10px 14px', 
+                          borderRadius: '16px', 
+                          background: isMe ? 'var(--primary-main)' : '#ffffff', 
                           color: isMe ? 'white' : 'var(--text-main)', 
-                          boxShadow: isMe ? '0 4px 12px rgba(99, 102, 241, 0.25)' : '0 2px 8px rgba(0,0,0,0.04)',
-                          borderBottomRightRadius: isMe ? '4px' : '20px',
-                          borderBottomLeftRadius: !isMe ? '4px' : '20px',
+                          boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                          borderBottomRightRadius: isMe ? '4px' : '16px',
+                          borderBottomLeftRadius: !isMe ? '4px' : '16px',
                           lineHeight: '1.5'
                         }}>
                           {msg.content}
@@ -275,7 +275,7 @@ const AdminChat = () => {
                   <div ref={messagesEndRef} />
                 </div>
 
-                <div style={{ padding: '20px 24px', backgroundColor: 'white', borderTop: '1px solid rgba(0,0,0,0.03)', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <div style={{ padding: '16px 20px', backgroundColor: 'white', borderTop: '1px solid rgba(0,0,0,0.05)', display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <input
                     type="text"
                     value={inputValue}
@@ -284,10 +284,10 @@ const AdminChat = () => {
                     placeholder={language === 'th' ? 'พิมพ์ข้อความ...' : 'Type a message...'}
                     style={{ 
                       flex: 1, 
-                      padding: '14px 20px', 
+                      padding: '12px 16px', 
                       backgroundColor: '#f1f5f9',
                       border: '1px solid transparent', 
-                      borderRadius: '24px', 
+                      borderRadius: '20px', 
                       outline: 'none',
                       transition: 'all 0.2s',
                       fontSize: '0.95rem'
@@ -299,21 +299,21 @@ const AdminChat = () => {
                     onClick={handleSend}
                     disabled={!inputValue.trim()}
                     style={{ 
-                      background: 'linear-gradient(135deg, var(--primary-main), #818cf8)', 
+                      background: 'var(--primary-main)', 
                       color: 'white', 
                       border: 'none', 
-                      width: '48px', height: '48px', 
+                      width: '44px', height: '44px', 
                       borderRadius: '50%', 
                       display: 'flex', alignItems: 'center', justifyContent: 'center', 
                       cursor: inputValue.trim() ? 'pointer' : 'not-allowed', 
                       opacity: inputValue.trim() ? 1 : 0.6,
-                      boxShadow: inputValue.trim() ? '0 4px 12px rgba(99, 102, 241, 0.3)' : 'none',
+                      boxShadow: inputValue.trim() ? '0 2px 8px rgba(99, 102, 241, 0.3)' : 'none',
                       transition: 'all 0.2s'
                     }}
                     onMouseOver={(e) => { if(inputValue.trim()) e.currentTarget.style.transform = 'scale(1.05)'; }}
                     onMouseOut={(e) => { if(inputValue.trim()) e.currentTarget.style.transform = 'scale(1)'; }}
                   >
-                    <Send size={20} style={{ marginLeft: '2px' }} />
+                    <Send size={18} style={{ marginLeft: '2px' }} />
                   </button>
                 </div>
               </>
