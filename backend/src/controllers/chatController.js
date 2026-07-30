@@ -24,6 +24,12 @@ const chatController = {
         }
       });
 
+      // Update presence
+      await prisma.user.update({
+        where: { id: currentUserId },
+        data: { isOnline: true, lastSeen: new Date() }
+      }).catch(() => {});
+
       res.json(messages);
     } catch (err) {
       console.error('Error fetching chat history:', err);
@@ -64,6 +70,12 @@ const chatController = {
     try {
       const adminId = req.user.id; // assume req.user is admin
       
+      // Update admin presence
+      await prisma.user.update({
+        where: { id: adminId },
+        data: { isOnline: true, lastSeen: new Date() }
+      }).catch(() => {});
+
       const users = await prisma.user.findMany({
         where: { id: { not: adminId } },
         select: {
@@ -86,36 +98,52 @@ const chatController = {
         }
       });
 
-      // Format the data to give the "latest" message
-      const formattedUsers = users.map(user => {
+      // Compute dynamic online status (last seen within 60 seconds)
+      const now = new Date();
+      
+      const formattedUsers = await Promise.all(users.map(async u => {
+        const isOnlineDynamic = u.lastSeen ? (now - new Date(u.lastSeen) < 60000) : false;
+        
         let lastMessage = null;
         let lastMessageAt = null;
+        let unreadCount = 0;
 
-        const sent = user.sentMessages[0];
-        const received = user.receivedMessages[0];
-
-        if (sent && !received) { lastMessage = sent; }
-        else if (received && !sent) { lastMessage = received; }
-        else if (sent && received) {
-          lastMessage = sent.createdAt > received.createdAt ? sent : received;
+        if (u.sentMessages.length > 0 && u.receivedMessages.length > 0) {
+          if (u.sentMessages[0].createdAt > u.receivedMessages[0].createdAt) {
+            lastMessage = u.sentMessages[0].content;
+            lastMessageAt = u.sentMessages[0].createdAt;
+          } else {
+            lastMessage = u.receivedMessages[0].content;
+            lastMessageAt = u.receivedMessages[0].createdAt;
+          }
+        } else if (u.sentMessages.length > 0) {
+          lastMessage = u.sentMessages[0].content;
+          lastMessageAt = u.sentMessages[0].createdAt;
+        } else if (u.receivedMessages.length > 0) {
+          lastMessage = u.receivedMessages[0].content;
+          lastMessageAt = u.receivedMessages[0].createdAt;
         }
 
-        if (lastMessage) {
-          lastMessageAt = lastMessage.createdAt;
-        }
+        unreadCount = await prisma.message.count({
+          where: {
+            senderId: u.id,
+            receiverId: adminId,
+            isRead: false
+          }
+        });
 
         return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          profilePic: user.profilePic,
-          isOnline: user.isOnline,
-          lastSeen: user.lastSeen,
-          lastMessage: lastMessage ? lastMessage.content : null,
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          profilePic: u.profilePic,
+          isOnline: isOnlineDynamic,
+          lastSeen: u.lastSeen,
+          lastMessage,
           lastMessageAt,
-          unreadCount: 0 // Placeholder for unread count logic
+          unreadCount
         };
-      });
+      }));
 
       // Sort by newest message
       formattedUsers.sort((a, b) => {
@@ -139,9 +167,9 @@ const chatController = {
         select: { id: true, name: true, profilePic: true, isOnline: true, lastSeen: true }
       });
       if (!admin) {
-        // Auto-create admin if it doesn't exist
-        const bcrypt = require('bcrypt');
-        const hashedPassword = await bcrypt.hash('password123', 10);
+        // Admin doesn't exist, create it via seed or here
+        const bcrypt = require('bcryptjs');
+        const hashedPassword = await bcrypt.hash('admin123', 10);
         admin = await prisma.user.create({
           data: {
             email: process.env.ADMIN_EMAIL,
@@ -152,9 +180,17 @@ const chatController = {
           select: { id: true, name: true, profilePic: true, isOnline: true, lastSeen: true }
         });
       }
-      res.json(admin);
+
+      // Compute dynamic online status
+      const now = new Date();
+      const isOnlineDynamic = admin.lastSeen ? (now - new Date(admin.lastSeen) < 60000) : false;
+
+      res.json({
+        ...admin,
+        isOnline: isOnlineDynamic
+      });
     } catch (err) {
-      console.error('Error fetching/creating admin info:', err);
+      console.error('Error fetching admin info:', err);
       res.status(500).json({ error: 'Failed to fetch admin info' });
     }
   },
