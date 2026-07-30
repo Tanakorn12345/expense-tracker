@@ -108,7 +108,15 @@ const ChatWidget = () => {
   }, [messages, isOpen]);
 
   const handleSend = () => {
-    if (!inputValue.trim() || !socket || !adminInfo) return;
+    if (!inputValue.trim()) return;
+    if (!socket) {
+      alert("Socket is not connected. The chat server might be offline or blocked by a firewall.");
+      return;
+    }
+    if (!adminInfo) {
+      alert("Admin information is not loaded. Please refresh the page.");
+      return;
+    }
 
     socket.emit('send_message', {
       senderId: user.id,
