@@ -214,8 +214,11 @@ const AdminChat = () => {
             {selectedUser ? (
               <>
                 <div style={{ padding: '16px 24px', backgroundColor: 'white', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--primary-main)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                    {selectedUser.profilePic ? <img src={selectedUser.profilePic} style={{width:'100%', height:'100%', borderRadius:'50%', objectFit:'cover'}}/> : selectedUser.name.charAt(0).toUpperCase()}
+                  <div style={{ position: 'relative' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--primary-main)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', overflow: 'hidden' }}>
+                      {selectedUser.profilePic ? <img src={selectedUser.profilePic} style={{width:'100%', height:'100%', objectFit:'cover'}}/> : selectedUser.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div style={{ position: 'absolute', bottom: 0, right: 0, width: '12px', height: '12px', borderRadius: '50%', backgroundColor: selectedUser.isOnline ? '#10b981' : '#9ca3af', border: '2px solid white' }} />
                   </div>
                   <div>
                     <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>{selectedUser.name}</div>

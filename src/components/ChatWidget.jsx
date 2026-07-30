@@ -70,20 +70,28 @@ const ChatWidget = () => {
     let intervalId;
     if (isOpen) {
       // Fetch messages periodically when chat is open
-      const fetchMessages = async () => {
+      const pollData = async () => {
         try {
-          const res = await fetchWithAuth(`/api/chat/${adminInfo.id}`);
-          if (res.ok) {
-            const data = await res.json();
+          const [msgRes, adminRes] = await Promise.all([
+            fetchWithAuth(`/api/chat/${adminInfo.id}`),
+            fetchWithAuth('/api/chat/admin-info')
+          ]);
+          
+          if (msgRes.ok) {
+            const data = await msgRes.json();
             setMessages(data);
           }
+          if (adminRes.ok) {
+            const data = await adminRes.json();
+            setAdminInfo(data);
+          }
         } catch (err) {
-          console.error("Error fetching messages:", err);
+          console.error("Error fetching chat data:", err);
         }
       };
 
-      fetchMessages();
-      intervalId = setInterval(fetchMessages, 3000); // Poll every 3 seconds
+      pollData();
+      intervalId = setInterval(pollData, 3000); // Poll every 3 seconds
     }
 
     return () => {
