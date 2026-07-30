@@ -23,10 +23,14 @@ model User {
   themeColor           String?              @default("#0a2540")
   customLogoUrl        String?              @db.Text
   customAppName        String?
+  lastSeen             DateTime?            
+  isOnline             Boolean              @default(false)
   transactions         Transaction[]
   savingsGoals         SavingsGoal[]
   savingsTx            SavingsTransaction[]
   notifications        Notification[]
+  sentMessages         Message[]            @relation("SentMessages")
+  receivedMessages     Message[]            @relation("ReceivedMessages")
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
 }
@@ -108,5 +112,19 @@ model Notification {
   isRead      Boolean  @default(false)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int
+  createdAt   DateTime @default(now())
+}
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  content     String   @db.Text
+  
+  senderId    Int
+  sender      User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  
+  receiverId  Int
+  receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  
+  isRead      Boolean  @default(false)
   createdAt   DateTime @default(now())
 }

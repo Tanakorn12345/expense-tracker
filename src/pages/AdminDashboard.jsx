@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../utils/api';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Trash2, Edit, Plus, Eye, Check, X, UserPlus, Megaphone } from 'lucide-react';
+import { Trash2, Edit, Plus, Eye, Check, X, UserPlus, Megaphone, MessageSquare } from 'lucide-react';
 import Layout from '../components/Layout';
 import Swal from 'sweetalert2';
 import '../index.css';
@@ -267,6 +267,10 @@ const AdminDashboard = () => {
             <p style={{ color: 'var(--text-muted)' }}>{language === 'th' ? 'จัดการผู้ใช้และดูภาพรวมของระบบ' : 'Manage users and system overview'}</p>
           </div>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <button onClick={() => navigate('/admin/chat')} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid var(--border)', background: 'white' }}>
+              <MessageSquare size={18} />
+              {language === 'th' ? 'แชทกับผู้ใช้' : 'User Chats'}
+            </button>
             <button onClick={() => navigate('/admin/ads')} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Megaphone size={18} />
               {language === 'th' ? 'จัดการโฆษณา' : 'Manage Ads'}

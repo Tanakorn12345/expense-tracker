@@ -1,0 +1,317 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { MessageSquare, X, Send } from 'lucide-react';
+import { io } from 'socket.io-client';
+import { fetchWithAuth } from '../utils/api';
+import { useLanguage } from '../contexts/LanguageContext';
+
+const ChatWidget = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+  const [adminInfo, setAdminInfo] = useState(null);
+  const [socket, setSocket] = useState(null);
+  const [user, setUser] = useState(() => {
+    const userStr = localStorage.getItem('user');
+    return userStr ? JSON.parse(userStr) : null;
+  });
+  const { t, language } = useLanguage();
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    const handleUserUpdate = () => {
+      const userStr = localStorage.getItem('user');
+      setUser(userStr ? JSON.parse(userStr) : null);
+    };
+
+    window.addEventListener('userUpdated', handleUserUpdate);
+    // Also listen to storage events in case of multiple tabs
+    window.addEventListener('storage', handleUserUpdate);
+
+    return () => {
+      window.removeEventListener('userUpdated', handleUserUpdate);
+      window.removeEventListener('storage', handleUserUpdate);
+    };
+  }, []);
+
+  // We only show the widget for non-admin logged-in users
+  // (Admins will have a separate dashboard for chat)
+  const isAdmin = user?.email === 'tanakorn.tip@student.mahidol.edu';
+  const shouldRender = user && !isAdmin;
+
+  useEffect(() => {
+    if (!shouldRender) return;
+
+    // Fetch admin info
+    const getAdmin = async () => {
+      try {
+        const res = await fetchWithAuth('/api/chat/admin-info');
+        if (res.ok) {
+          const data = await res.json();
+          setAdminInfo(data);
+          
+          // Fetch chat history
+          const histRes = await fetchWithAuth(`/api/chat/${data.id}`);
+          if (histRes.ok) {
+            const histData = await histRes.json();
+            setMessages(histData);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching admin or chat history:', err);
+      }
+    };
+    
+    getAdmin();
+
+    // Initialize socket connection
+    const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:5002', {
+      withCredentials: true
+    });
+
+    newSocket.on('connect', () => {
+      newSocket.emit('join', user.id);
+    });
+
+    newSocket.on('receive_message', (msg) => {
+      setMessages((prev) => [...prev, msg]);
+    });
+
+    newSocket.on('user_status_change', (data) => {
+      setAdminInfo((prev) => {
+        if (prev && prev.id === data.userId) {
+          return { ...prev, isOnline: data.isOnline, lastSeen: data.lastSeen };
+        }
+        return prev;
+      });
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [shouldRender, user?.id]);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isOpen]);
+
+  const handleSend = () => {
+    if (!inputValue.trim() || !socket || !adminInfo) return;
+
+    socket.emit('send_message', {
+      senderId: user.id,
+      receiverId: adminInfo.id,
+      content: inputValue
+    });
+    setInputValue('');
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSend();
+    }
+  };
+
+  if (!shouldRender) return null;
+
+  const formatLastSeen = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+
+    if (diffMins < 1) return language === 'th' ? 'เมื่อสักครู่' : 'Just now';
+    if (diffMins < 60) return language === 'th' ? `${diffMins} นาทีที่แล้ว` : `${diffMins} mins ago`;
+    if (diffHours < 24) return language === 'th' ? `${diffHours} ชั่วโมงที่แล้ว` : `${diffHours} hours ago`;
+    return date.toLocaleDateString();
+  };
+
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: '24px',
+      right: '24px',
+      zIndex: 1000
+    }}>
+      {/* Chat Window */}
+      {isOpen && (
+        <div style={{
+          width: '320px',
+          height: '450px',
+          backgroundColor: 'white',
+          borderRadius: '16px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+          display: 'flex',
+          flexDirection: 'column',
+          marginBottom: '16px',
+          overflow: 'hidden'
+        }}>
+          {/* Header */}
+          <div style={{
+            padding: '16px',
+            backgroundColor: 'var(--primary-main)',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ position: 'relative' }}>
+                <div style={{
+                  width: '40px', height: '40px', borderRadius: '50%',
+                  backgroundColor: 'white', color: 'var(--primary-main)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontWeight: 'bold', fontSize: '1.2rem', overflow: 'hidden'
+                }}>
+                  {adminInfo?.profilePic ? (
+                    <img src={adminInfo.profilePic} alt="Admin" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    adminInfo?.name?.charAt(0) || 'A'
+                  )}
+                </div>
+                <div style={{
+                  position: 'absolute', bottom: '0', right: '0',
+                  width: '12px', height: '12px', borderRadius: '50%',
+                  backgroundColor: adminInfo?.isOnline ? '#10b981' : '#9ca3af',
+                  border: '2px solid var(--primary-main)'
+                }} />
+              </div>
+              <div>
+                <div style={{ fontWeight: 600 }}>{adminInfo?.name || 'Admin'}</div>
+                <div style={{ fontSize: '0.75rem', opacity: 0.9 }}>
+                  {adminInfo?.isOnline 
+                    ? (language === 'th' ? 'ออนไลน์' : 'Online')
+                    : (language === 'th' ? `ใช้งานล่าสุด: ${formatLastSeen(adminInfo?.lastSeen)}` : `Last seen: ${formatLastSeen(adminInfo?.lastSeen)}`)
+                  }
+                </div>
+              </div>
+            </div>
+            <button onClick={() => setIsOpen(false)} style={{
+              background: 'none', border: 'none', color: 'white', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Messages */}
+          <div style={{
+            flex: 1,
+            padding: '16px',
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            backgroundColor: '#f8fafc'
+          }}>
+            {messages.length === 0 ? (
+              <div style={{ textAlign: 'center', color: 'var(--text-muted)', marginTop: '2rem', fontSize: '0.9rem' }}>
+                {language === 'th' ? 'มีอะไรให้เราช่วยเหลือไหมครับ?' : 'How can we help you?'}
+              </div>
+            ) : (
+              messages.map((msg, i) => {
+                const isMe = msg.senderId === user.id;
+                return (
+                  <div key={i} style={{
+                    display: 'flex',
+                    justifyContent: isMe ? 'flex-end' : 'flex-start'
+                  }}>
+                    <div style={{
+                      maxWidth: '80%',
+                      padding: '10px 14px',
+                      borderRadius: '16px',
+                      backgroundColor: isMe ? 'var(--primary-main)' : 'white',
+                      color: isMe ? 'white' : 'var(--text-main)',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                      borderBottomRightRadius: isMe ? '4px' : '16px',
+                      borderBottomLeftRadius: !isMe ? '4px' : '16px',
+                      fontSize: '0.9rem'
+                    }}>
+                      {msg.content}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input */}
+          <div style={{
+            padding: '16px',
+            backgroundColor: 'white',
+            borderTop: '1px solid var(--border)',
+            display: 'flex',
+            gap: '8px'
+          }}>
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder={language === 'th' ? 'พิมพ์ข้อความ...' : 'Type a message...'}
+              style={{
+                flex: 1,
+                padding: '10px 14px',
+                border: '1px solid var(--border)',
+                borderRadius: '20px',
+                outline: 'none',
+                fontSize: '0.9rem'
+              }}
+            />
+            <button 
+              onClick={handleSend}
+              disabled={!inputValue.trim()}
+              style={{
+                background: 'var(--primary-main)',
+                color: 'white',
+                border: 'none',
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: inputValue.trim() ? 'pointer' : 'not-allowed',
+                opacity: inputValue.trim() ? 1 : 0.6
+              }}
+            >
+              <Send size={18} style={{ marginLeft: '2px' }} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Button */}
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          width: '60px',
+          height: '60px',
+          borderRadius: '50%',
+          backgroundColor: 'var(--primary-main)',
+          color: 'white',
+          border: 'none',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          transition: 'transform 0.2s',
+          float: 'right'
+        }}
+        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+      >
+        {isOpen ? <X size={28} /> : <MessageSquare size={28} />}
+      </button>
+    </div>
+  );
+};
+
+export default ChatWidget;

@@ -184,20 +184,20 @@ const AddTransaction = () => {
             <button 
               className={`tab-btn ${isExpense ? 'active' : ''}`}
               onClick={() => { setIsExpense(true); setCategory(''); }}
-              style={isExpense ? { color: 'var(--danger)', borderColor: 'var(--danger)', backgroundColor: 'white' } : {}}
+              style={isExpense ? { color: 'var(--danger)', backgroundColor: 'rgba(239, 68, 68, 0.1)' } : {}}
             >
               <ArrowUp size={18} /> {t('expense')}
             </button>
             <button 
               className={`tab-btn ${!isExpense ? 'active' : ''}`}
               onClick={() => { setIsExpense(false); setCategory(''); }}
-              style={!isExpense ? { color: 'var(--success)', borderColor: 'var(--success)', backgroundColor: 'white' } : {}}
+              style={!isExpense ? { color: 'var(--success)', backgroundColor: 'rgba(16, 185, 129, 0.1)' } : {}}
             >
               <ArrowDown size={18} /> {t('income')}
             </button>
           </div>
 
-          <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+          <form onSubmit={handleSave}>
             <div className="amount-input-container">
               <span className="amount-label">{t('amount')}</span>
               <div className="amount-wrapper">
@@ -257,6 +257,18 @@ const AddTransaction = () => {
                 )}
               </div>
             )}
+            
+            {!isExpense && isPro && (
+              <div style={{ margin: '1rem 0', padding: '1rem', border: '1px solid transparent', visibility: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{ width: '1.5em', height: '1.5em' }}></div>
+                    <span style={{ fontWeight: 600 }}>{language === 'th' ? 'ใช้สิทธิ์โครงการไทยช่วยไทย (60/40)' : 'Use Thai Chuy Thai (60/40)'}</span>
+                  </div>
+                  <div style={{ width: '40px', height: '20px' }}></div>
+                </div>
+              </div>
+            )}
 
             <div className="form-grid">
               <div className="form-group">
@@ -292,7 +304,7 @@ const AddTransaction = () => {
               <textarea className="form-control" rows="3" placeholder={isExpense ? t('descriptionPlaceholderExpense') : t('descriptionPlaceholderIncome')}></textarea>
             </div>
 
-            <div className="flex justify-between items-center" style={{ marginTop: 'auto', paddingTop: '2rem' }}>
+            <div className="flex justify-between items-center mt-6">
               <button type="button" className="btn btn-outline" onClick={() => navigate('/dashboard')}>{t('cancel')}</button>
               <button 
                 type="submit" 
@@ -382,7 +394,6 @@ const AddTransaction = () => {
         .form-card { 
           max-width: 800px; 
           margin: 0 auto; 
-          min-height: 650px;
           display: flex;
           flex-direction: column;
         }
@@ -396,7 +407,7 @@ const AddTransaction = () => {
         .tab-btn {
           flex: 1 1 0;
           padding: 12px;
-          border: 2px solid transparent;
+          border: none;
           background: transparent;
           border-radius: 8px;
           font-weight: 600;

@@ -11,8 +11,10 @@ import CoPayCalculator from './pages/CoPayCalculator';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminUserTransactions from './pages/AdminUserTransactions';
 import AdminAds from './pages/AdminAds';
+import AdminChat from './pages/AdminChat';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import ChatWidget from './components/ChatWidget';
 import { fetchWithAuth } from './utils/api';
 import './styles/auth.css';
 
@@ -51,10 +53,12 @@ function App() {
         <Route path="/calculator" element={<CoPayCalculator />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/ads" element={<AdminAds />} />
+        <Route path="/admin/chat" element={<AdminChat />} />
         <Route path="/admin/users/:id" element={<AdminUserTransactions />} />
           {/* Redirect unknown routes to dashboard or login */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <ChatWidget />
       </Router>
     </LanguageProvider>
     </ThemeProvider>

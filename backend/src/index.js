@@ -1,3 +1,4 @@
+const http = require('http');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -20,11 +21,14 @@ const savingsRoutes = require('./routes/savingsRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const adRoutes = require('./routes/adRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 const authenticate = require('./middleware/authMiddleware');
 const adminMiddleware = require('./middleware/adminMiddleware');
 const { initCronJobs } = require('./services/cronJobs');
+const { initSocket } = require('./socket');
 
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 5001;
 
 // Trust reverse proxy (e.g. Nginx, Cloudflare) for rate limiting and real IP
@@ -59,6 +63,7 @@ app.use('/api/savings', authenticate, savingsRoutes);
 app.use('/api/admin', authenticate, adminMiddleware, adminRoutes);
 app.use('/api/ads', adRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/chat', authenticate, chatRoutes);
 // Global Error Handler Middleware
 app.use((err, req, res, next) => {
   const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
@@ -68,7 +73,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
+// Initialize WebSockets
+initSocket(server);
+
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   initCronJobs();
 });
