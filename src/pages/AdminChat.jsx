@@ -133,7 +133,7 @@ const AdminChat = () => {
   };
 
   const formatLastSeen = (dateString) => {
-    if (!dateString) return '';
+    if (!dateString) return language === 'th' ? 'ออฟไลน์' : 'Offline';
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = now - date;
@@ -222,7 +222,12 @@ const AdminChat = () => {
                   <div>
                     <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>{selectedUser.name}</div>
                     <div style={{ fontSize: '0.85rem', color: selectedUser.isOnline ? '#10b981' : 'var(--text-muted)' }}>
-                      {selectedUser.isOnline ? (language === 'th' ? 'ออนไลน์' : 'Online') : (language === 'th' ? `ใช้งานล่าสุด: ${formatLastSeen(selectedUser.lastSeen)}` : `Last seen: ${formatLastSeen(selectedUser.lastSeen)}`)}
+                      {selectedUser.isOnline 
+                        ? (language === 'th' ? 'ออนไลน์' : 'Online') 
+                        : (selectedUser.lastSeen 
+                            ? (language === 'th' ? `ใช้งานล่าสุด: ${formatLastSeen(selectedUser.lastSeen)}` : `Last seen: ${formatLastSeen(selectedUser.lastSeen)}`)
+                            : (language === 'th' ? 'ออฟไลน์' : 'Offline'))
+                      }
                     </div>
                   </div>
                 </div>

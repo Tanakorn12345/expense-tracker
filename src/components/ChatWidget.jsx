@@ -118,7 +118,7 @@ const ChatWidget = () => {
   if (!shouldRender) return null;
 
   const formatLastSeen = (dateString) => {
-    if (!dateString) return '';
+    if (!dateString) return language === 'th' ? 'ออฟไลน์' : 'Offline';
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = now - date;
@@ -186,7 +186,9 @@ const ChatWidget = () => {
                 <div style={{ fontSize: '0.75rem', opacity: 0.9 }}>
                   {adminInfo?.isOnline 
                     ? (language === 'th' ? 'ออนไลน์' : 'Online')
-                    : (language === 'th' ? `ใช้งานล่าสุด: ${formatLastSeen(adminInfo?.lastSeen)}` : `Last seen: ${formatLastSeen(adminInfo?.lastSeen)}`)
+                    : (adminInfo?.lastSeen 
+                        ? (language === 'th' ? `ใช้งานล่าสุด: ${formatLastSeen(adminInfo?.lastSeen)}` : `Last seen: ${formatLastSeen(adminInfo?.lastSeen)}`)
+                        : (language === 'th' ? 'ออฟไลน์' : 'Offline'))
                   }
                 </div>
               </div>
