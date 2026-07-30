@@ -31,6 +31,34 @@ const chatController = {
     }
   },
 
+  // Send a message via REST API
+  sendMessage: async (req, res, next) => {
+    try {
+      const { receiverId, content } = req.body;
+      const senderId = req.user.id;
+
+      if (!receiverId || !content) {
+        return res.status(400).json({ error: 'Missing receiverId or content' });
+      }
+
+      const message = await prisma.message.create({
+        data: {
+          senderId: parseInt(senderId),
+          receiverId: parseInt(receiverId),
+          content
+        },
+        include: {
+          sender: { select: { id: true, name: true, profilePic: true } }
+        }
+      });
+
+      res.status(201).json(message);
+    } catch (err) {
+      console.error('Error sending message:', err);
+      res.status(500).json({ error: 'Failed to send message' });
+    }
+  },
+
   // Get list of all users and their latest message (for Admin Dashboard)
   getUsersWithChats: async (req, res, next) => {
     try {

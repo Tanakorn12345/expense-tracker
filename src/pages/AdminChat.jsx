@@ -25,54 +25,34 @@ const AdminChat = () => {
     }
 
     fetchUsers();
+  }, [navigate]);
 
-    const socketUrl = import.meta.env.VITE_API_URL || '';
-    const newSocket = io(socketUrl, {
-      path: '/api/socket.io',
-      transports: ['polling'],
-      withCredentials: true
-    });
-
-    newSocket.on('connect', () => {
-      newSocket.emit('join', admin.id);
-    });
-
-    newSocket.on('receive_message', (msg) => {
-      setMessages((prev) => [...prev, msg]);
-      // Also update the latest message in the user list
-      setUsers((prevUsers) => {
-        return prevUsers.map(u => {
-          if (u.id === msg.senderId || u.id === msg.receiverId) {
-            return {
-              ...u,
-              lastMessage: msg.content,
-              lastMessageAt: msg.createdAt,
-              unreadCount: msg.senderId === u.id && selectedUser?.id !== u.id ? (u.unreadCount || 0) + 1 : u.unreadCount
-            };
+  useEffect(() => {
+    let intervalId;
+    
+    // Poll for user list updates and messages if a user is selected
+    const pollData = async () => {
+      fetchUsers();
+      if (selectedUser) {
+        // Fetch new messages
+        try {
+          const res = await fetchWithAuth(`/api/chat/${selectedUser.id}`);
+          if (res.ok) {
+            const data = await res.json();
+            setMessages(data);
           }
-          return u;
-        }).sort((a, b) => new Date(b.lastMessageAt || 0) - new Date(a.lastMessageAt || 0));
-      });
-    });
-
-    newSocket.on('user_status_change', (data) => {
-      setUsers((prevUsers) => prevUsers.map(u => {
-        if (u.id === data.userId) {
-          return { ...u, isOnline: data.isOnline, lastSeen: data.lastSeen };
+        } catch (err) {
+          console.error('Error fetching messages:', err);
         }
-        return u;
-      }));
-      if (selectedUser?.id === data.userId) {
-        setSelectedUser(prev => ({ ...prev, isOnline: data.isOnline, lastSeen: data.lastSeen }));
       }
-    });
+    };
 
-    setSocket(newSocket);
+    intervalId = setInterval(pollData, 3000);
 
     return () => {
-      newSocket.disconnect();
+      if (intervalId) clearInterval(intervalId);
     };
-  }, [navigate]);
+  }, [selectedUser]);
 
   useEffect(() => {
     if (selectedUser) {
@@ -118,20 +98,30 @@ const AdminChat = () => {
     }
   };
 
-  const handleSend = () => {
-    if (!inputValue.trim() || !socket || !selectedUser) return;
-
-    if (!socket.connected) {
-      alert(`Debug Info: Admin Socket exists but is NOT CONNECTED!`);
-      return;
-    }
-
-    socket.emit('send_message', {
-      senderId: admin.id,
-      receiverId: selectedUser.id,
-      content: inputValue
-    });
+  const handleSend = async () => {
+    if (!inputValue.trim() || !selectedUser) return;
+    
+    const content = inputValue;
     setInputValue('');
+
+    try {
+      const res = await fetchWithAuth('/api/chat/send', {
+        method: 'POST',
+        body: JSON.stringify({
+          receiverId: selectedUser.id,
+          content: content
+        })
+      });
+      
+      if (res.ok) {
+        const newMessage = await res.json();
+        setMessages((prev) => [...prev, newMessage]);
+        fetchUsers(); // Update the sidebar with latest message
+      }
+    } catch (err) {
+      console.error("Error sending message:", err);
+      alert("Failed to send message. Please try again.");
+    }
   };
 
   const formatTime = (dateStr) => {

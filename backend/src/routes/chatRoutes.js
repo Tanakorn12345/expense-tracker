@@ -12,6 +12,9 @@ router.get('/:otherUserId', chatController.getChatHistory);
 // Get all users who have chats (Admin only)
 router.get('/admin/users', adminMiddleware, chatController.getUsersWithChats);
 
+// Send a message
+router.post('/send', chatController.sendMessage);
+
 // Mark messages as read
 router.post('/read', chatController.markAsRead);
 

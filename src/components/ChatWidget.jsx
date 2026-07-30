@@ -65,43 +65,31 @@ const ChatWidget = () => {
   }, [shouldRender]);
 
   useEffect(() => {
-    // Only connect socket if we have admin info and user is logged in
     if (!adminInfo || !shouldRender) return;
 
-    const userStr = localStorage.getItem('user');
-    if (!userStr) return;
-    const user = JSON.parse(userStr);
-
-    const socketUrl = import.meta.env.VITE_API_URL || '';
-    const newSocket = io(socketUrl, {
-      path: '/api/socket.io',
-      transports: ['polling'],
-      withCredentials: true
-    });
-
-    newSocket.on('connect', () => {
-      newSocket.emit('join', user.id);
-    });
-
-    newSocket.on('receive_message', (msg) => {
-      setMessages((prev) => [...prev, msg]);
-    });
-
-    newSocket.on('user_status_change', (data) => {
-      setAdminInfo((prev) => {
-        if (prev && prev.id === data.userId) {
-          return { ...prev, isOnline: data.isOnline, lastSeen: data.lastSeen };
+    let intervalId;
+    if (isOpen) {
+      // Fetch messages periodically when chat is open
+      const fetchMessages = async () => {
+        try {
+          const res = await fetchWithAuth(`/api/chat/${adminInfo.id}`);
+          if (res.ok) {
+            const data = await res.json();
+            setMessages(data);
+          }
+        } catch (err) {
+          console.error("Error fetching messages:", err);
         }
-        return prev;
-      });
-    });
+      };
 
-    setSocket(newSocket);
+      fetchMessages();
+      intervalId = setInterval(fetchMessages, 3000); // Poll every 3 seconds
+    }
 
     return () => {
-      newSocket.disconnect();
+      if (intervalId) clearInterval(intervalId);
     };
-  }, [shouldRender, user?.id, adminInfo]);
+  }, [shouldRender, adminInfo, isOpen]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -109,23 +97,30 @@ const ChatWidget = () => {
     }
   }, [messages, isOpen]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!inputValue.trim()) return;
-    if (!socket || !adminInfo) {
-      alert(`Debug Info:\nsocket is: ${socket ? 'EXISTS' : 'NULL'}\nadminInfo is: ${adminInfo ? 'LOADED' : 'NULL'}\nshouldRender is: ${shouldRender}`);
-      return;
-    }
-    if (!socket.connected) {
-      alert(`Debug Info: Socket exists but is NOT CONNECTED! It is currently trying to connect. Please wait or check if WebSocket is supported by your server.`);
-      return;
-    }
+    if (!adminInfo) return;
+    
+    const content = inputValue;
+    setInputValue(''); // Clear immediately for good UX
 
-    socket.emit('send_message', {
-      senderId: user.id,
-      receiverId: adminInfo.id,
-      content: inputValue
-    });
-    setInputValue('');
+    try {
+      const res = await fetchWithAuth('/api/chat/send', {
+        method: 'POST',
+        body: JSON.stringify({
+          receiverId: adminInfo.id,
+          content: content
+        })
+      });
+      
+      if (res.ok) {
+        const newMessage = await res.json();
+        setMessages((prev) => [...prev, newMessage]);
+      }
+    } catch (err) {
+      console.error("Error sending message:", err);
+      alert("Failed to send message. Please try again.");
+    }
   };
 
   const handleKeyPress = (e) => {
