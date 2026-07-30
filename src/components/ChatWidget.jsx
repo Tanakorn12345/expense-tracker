@@ -109,12 +109,8 @@ const ChatWidget = () => {
 
   const handleSend = () => {
     if (!inputValue.trim()) return;
-    if (!socket) {
-      alert("Socket is not connected. The chat server might be offline or blocked by a firewall.");
-      return;
-    }
-    if (!adminInfo) {
-      alert("Admin information is not loaded. Please refresh the page.");
+    if (!socket || !adminInfo) {
+      alert(`Debug Info:\nsocket is: ${socket ? 'CONNECTED' : 'NULL'}\nadminInfo is: ${adminInfo ? 'LOADED' : 'NULL'}\nshouldRender is: ${shouldRender}`);
       return;
     }
 
