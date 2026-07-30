@@ -57,8 +57,9 @@ const Dashboard = () => {
     }
   };
 
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!user.isPro) {
       fetchAd();
     }
