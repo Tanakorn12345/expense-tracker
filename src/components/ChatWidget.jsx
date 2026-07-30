@@ -103,7 +103,7 @@ const ChatWidget = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isOpen]);
+  }, [messages.length, isOpen]);
 
   const handleSend = async () => {
     if (!inputValue.trim()) return;
