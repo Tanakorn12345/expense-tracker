@@ -97,7 +97,7 @@ const ChatWidget = () => {
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [shouldRender, adminInfo, isOpen]);
+  }, [shouldRender, adminInfo?.id, isOpen]);
 
   useEffect(() => {
     if (messagesEndRef.current) {

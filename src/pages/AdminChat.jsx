@@ -53,7 +53,7 @@ const AdminChat = () => {
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [selectedUser]);
+  }, [selectedUser?.id]);
 
   useEffect(() => {
     if (selectedUser) {
