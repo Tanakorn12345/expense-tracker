@@ -156,9 +156,9 @@ const AdminChat = () => {
           <h2>{language === 'th' ? 'แชทกับผู้ใช้' : 'User Chats'}</h2>
         </div>
 
-        <div style={{ display: 'flex', flex: 1, backgroundColor: 'white', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 10px 25px rgba(0,0,0,0.05)' }}>
+        <div className={`admin-chat-wrapper ${selectedUser ? 'chat-active' : ''}`}>
           {/* User List Sidebar */}
-          <div style={{ width: '320px', backgroundColor: '#fcfcfd', borderRight: '1px solid rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
+          <div className="admin-chat-sidebar">
             <div style={{ padding: '20px', fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-main)' }}>
               {language === 'th' ? 'กล่องข้อความ' : 'Inbox'}
             </div>
@@ -214,7 +214,7 @@ const AdminChat = () => {
           </div>
 
           {/* Chat Area */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#ffffff', position: 'relative' }}>
+          <div className="admin-chat-main">
             {selectedUser ? (
               <>
                 <div style={{ 
@@ -229,6 +229,12 @@ const AdminChat = () => {
                   top: 0,
                   zIndex: 10
                 }}>
+                  <button 
+                    className="mobile-back-btn" 
+                    onClick={() => setSelectedUser(null)}
+                  >
+                    <ArrowLeft size={20} />
+                  </button>
                   <div style={{ position: 'relative' }}>
                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--primary-main)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', overflow: 'hidden' }}>
                       {selectedUser.profilePic ? <img src={selectedUser.profilePic} style={{width:'100%', height:'100%', objectFit:'cover'}}/> : selectedUser.name.charAt(0).toUpperCase()}
