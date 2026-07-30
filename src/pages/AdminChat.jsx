@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../utils/api';
 import { useLanguage } from '../contexts/LanguageContext';
-import { MessageSquare, ArrowLeft, Send } from 'lucide-react';
+import { MessageSquare, ArrowLeft, Send, Trash2 } from 'lucide-react';
+import Swal from 'sweetalert2';
 import { io } from 'socket.io-client';
 import Layout from '../components/Layout';
 
@@ -121,6 +122,44 @@ const AdminChat = () => {
     } catch (err) {
       console.error("Error sending message:", err);
       alert("Failed to send message. Please try again.");
+    }
+  };
+
+  const handleClearChat = async () => {
+    if (!selectedUser) return;
+    
+    const confirmResult = await Swal.fire({
+      title: language === 'th' ? 'ล้างประวัติแชท?' : 'Clear Chat History?',
+      text: language === 'th' ? `คุณแน่ใจหรือไม่ที่จะลบประวัติการแชททั้งหมดกับ ${selectedUser.name}?` : `Are you sure you want to clear all chat history with ${selectedUser.name}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: language === 'th' ? 'ใช่, ลบเลย!' : 'Yes, clear it!',
+      cancelButtonText: language === 'th' ? 'ยกเลิก' : 'Cancel'
+    });
+
+    if (confirmResult.isConfirmed) {
+      try {
+        const res = await fetchWithAuth(`/api/chat/${selectedUser.id}`, {
+          method: 'DELETE'
+        });
+        
+        if (res.ok) {
+          setMessages([]);
+          fetchUsers(); // Update sidebar list
+          Swal.fire(
+            language === 'th' ? 'ลบแล้ว!' : 'Cleared!',
+            language === 'th' ? 'ประวัติการแชทถูกลบเรียบร้อยแล้ว' : 'The chat history has been cleared.',
+            'success'
+          );
+        } else {
+          throw new Error('Failed to clear chat');
+        }
+      } catch (err) {
+        console.error("Error clearing chat history:", err);
+        Swal.fire('Error', 'Failed to clear chat history.', 'error');
+      }
     }
   };
 
@@ -252,6 +291,27 @@ const AdminChat = () => {
                       }
                     </div>
                   </div>
+                  <button 
+                    onClick={handleClearChat}
+                    style={{ 
+                      marginLeft: 'auto', 
+                      background: 'transparent', 
+                      border: 'none', 
+                      color: 'var(--text-muted)', 
+                      cursor: 'pointer',
+                      padding: '8px',
+                      borderRadius: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease'
+                    }}
+                    title={language === 'th' ? 'ล้างประวัติแชท' : 'Clear Chat'}
+                    onMouseOver={(e) => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = '#fef2f2'; }}
+                    onMouseOut={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <Trash2 size={20} />
+                  </button>
                 </div>
 
                 <div style={{ flex: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', backgroundColor: '#f8fafc' }}>

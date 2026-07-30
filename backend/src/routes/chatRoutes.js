@@ -12,6 +12,9 @@ router.get('/:otherUserId', chatController.getChatHistory);
 // Get all users who have chats (Admin only)
 router.get('/admin/users', adminMiddleware, chatController.getUsersWithChats);
 
+// Clear chat history with a specific user
+router.delete('/:otherUserId', chatController.clearChatHistory);
+
 // Send a message
 router.post('/send', chatController.sendMessage);
 

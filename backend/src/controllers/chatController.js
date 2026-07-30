@@ -37,6 +37,29 @@ const chatController = {
     }
   },
 
+  // Clear chat history with a specific user
+  clearChatHistory: async (req, res, next) => {
+    try {
+      const { otherUserId } = req.params;
+      const currentUserId = req.user.id;
+      const targetUserId = parseInt(otherUserId);
+
+      await prisma.message.deleteMany({
+        where: {
+          OR: [
+            { senderId: currentUserId, receiverId: targetUserId },
+            { senderId: targetUserId, receiverId: currentUserId }
+          ]
+        }
+      });
+
+      res.json({ message: 'Chat history cleared successfully' });
+    } catch (err) {
+      console.error('Error clearing chat history:', err);
+      res.status(500).json({ error: 'Failed to clear chat history' });
+    }
+  },
+
   // Send a message via REST API
   sendMessage: async (req, res, next) => {
     try {
