@@ -7,6 +7,8 @@ let io;
 function initSocket(server) {
   io = new Server(server, {
     path: '/api/socket.io',
+    pingInterval: 5000,
+    pingTimeout: 4000,
     cors: {
       origin: (origin, callback) => {
         callback(null, true);
