@@ -106,15 +106,27 @@ const chatController = {
   // Get Admin ID (so users know who to send messages to)
   getAdminInfo: async (req, res, next) => {
     try {
-      const admin = await prisma.user.findUnique({
+      let admin = await prisma.user.findUnique({
         where: { email: process.env.ADMIN_EMAIL },
         select: { id: true, name: true, profilePic: true, isOnline: true, lastSeen: true }
       });
       if (!admin) {
-        return res.status(404).json({ error: 'Admin not found' });
+        // Auto-create admin if it doesn't exist
+        const bcrypt = require('bcrypt');
+        const hashedPassword = await bcrypt.hash('password123', 10);
+        admin = await prisma.user.create({
+          data: {
+            email: process.env.ADMIN_EMAIL,
+            name: 'Admin',
+            password: hashedPassword,
+            isPro: true
+          },
+          select: { id: true, name: true, profilePic: true, isOnline: true, lastSeen: true }
+        });
       }
       res.json(admin);
     } catch (err) {
+      console.error('Error fetching/creating admin info:', err);
       res.status(500).json({ error: 'Failed to fetch admin info' });
     }
   },
