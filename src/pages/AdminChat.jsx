@@ -156,28 +156,30 @@ const AdminChat = () => {
           <h2>{language === 'th' ? 'แชทกับผู้ใช้' : 'User Chats'}</h2>
         </div>
 
-        <div style={{ display: 'flex', flex: 1, backgroundColor: 'white', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+        <div style={{ display: 'flex', flex: 1, backgroundColor: 'white', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 10px 25px rgba(0,0,0,0.05)' }}>
           {/* User List Sidebar */}
-          <div style={{ width: '300px', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '16px', borderBottom: '1px solid var(--border)', fontWeight: 600 }}>
+          <div style={{ width: '320px', backgroundColor: '#fcfcfd', borderRight: '1px solid rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '24px 20px 16px', fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-main)' }}>
               {language === 'th' ? 'กล่องข้อความ' : 'Inbox'}
             </div>
-            <div style={{ overflowY: 'auto', flex: 1 }}>
+            <div style={{ overflowY: 'auto', flex: 1, padding: '0 12px 16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {users.map(u => (
                 <div 
                   key={u.id}
                   onClick={() => setSelectedUser(u)}
                   style={{ 
-                    padding: '16px', 
-                    borderBottom: '1px solid var(--border)', 
+                    padding: '12px 16px', 
+                    borderRadius: '16px',
                     cursor: 'pointer',
-                    backgroundColor: selectedUser?.id === u.id ? '#f8fafc' : 'white',
+                    backgroundColor: selectedUser?.id === u.id ? '#eef2ff' : 'transparent',
+                    boxShadow: selectedUser?.id === u.id ? '0 4px 12px rgba(99, 102, 241, 0.1)' : 'none',
                     display: 'flex',
-                    gap: '12px',
-                    alignItems: 'center'
+                    gap: '14px',
+                    alignItems: 'center',
+                    transition: 'all 0.2s ease'
                   }}
-                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
-                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = selectedUser?.id === u.id ? '#f8fafc' : 'white'}
+                  onMouseOver={(e) => { if (selectedUser?.id !== u.id) e.currentTarget.style.backgroundColor = '#f1f5f9'; }}
+                  onMouseOut={(e) => { if (selectedUser?.id !== u.id) e.currentTarget.style.backgroundColor = 'transparent'; }}
                 >
                   <div style={{ position: 'relative' }}>
                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--primary-main)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
@@ -212,10 +214,21 @@ const AdminChat = () => {
           </div>
 
           {/* Chat Area */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#f8fafc' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#ffffff', position: 'relative' }}>
             {selectedUser ? (
               <>
-                <div style={{ padding: '16px 24px', backgroundColor: 'white', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ 
+                  padding: '16px 24px', 
+                  backgroundColor: 'rgba(255, 255, 255, 0.85)', 
+                  backdropFilter: 'blur(12px)',
+                  borderBottom: '1px solid rgba(0,0,0,0.03)', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '16px',
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 10
+                }}>
                   <div style={{ position: 'relative' }}>
                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--primary-main)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', overflow: 'hidden' }}>
                       {selectedUser.profilePic ? <img src={selectedUser.profilePic} style={{width:'100%', height:'100%', objectFit:'cover'}}/> : selectedUser.name.charAt(0).toUpperCase()}
@@ -235,20 +248,21 @@ const AdminChat = () => {
                   </div>
                 </div>
 
-                <div style={{ flex: 1, padding: '24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ flex: 1, padding: '24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px', backgroundColor: '#f8fafc' }}>
                   {messages.map((msg, i) => {
                     const isMe = msg.senderId === admin.id;
                     return (
                       <div key={i} style={{ display: 'flex', justifyContent: isMe ? 'flex-end' : 'flex-start' }}>
                         <div style={{ 
                           maxWidth: '70%', 
-                          padding: '12px 16px', 
-                          borderRadius: '16px', 
-                          backgroundColor: isMe ? 'var(--primary-main)' : 'white', 
+                          padding: '14px 18px', 
+                          borderRadius: '20px', 
+                          background: isMe ? 'linear-gradient(135deg, var(--primary-main), #818cf8)' : '#ffffff', 
                           color: isMe ? 'white' : 'var(--text-main)', 
-                          boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-                          borderBottomRightRadius: isMe ? '4px' : '16px',
-                          borderBottomLeftRadius: !isMe ? '4px' : '16px'
+                          boxShadow: isMe ? '0 4px 12px rgba(99, 102, 241, 0.25)' : '0 2px 8px rgba(0,0,0,0.04)',
+                          borderBottomRightRadius: isMe ? '4px' : '20px',
+                          borderBottomLeftRadius: !isMe ? '4px' : '20px',
+                          lineHeight: '1.5'
                         }}>
                           {msg.content}
                           <div style={{ fontSize: '0.7rem', opacity: 0.7, textAlign: 'right', marginTop: '4px' }}>
@@ -261,28 +275,55 @@ const AdminChat = () => {
                   <div ref={messagesEndRef} />
                 </div>
 
-                <div style={{ padding: '20px', backgroundColor: 'white', borderTop: '1px solid var(--border)', display: 'flex', gap: '12px' }}>
+                <div style={{ padding: '20px 24px', backgroundColor: 'white', borderTop: '1px solid rgba(0,0,0,0.03)', display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <input
                     type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                     placeholder={language === 'th' ? 'พิมพ์ข้อความ...' : 'Type a message...'}
-                    style={{ flex: 1, padding: '12px 16px', border: '1px solid var(--border)', borderRadius: '24px', outline: 'none' }}
+                    style={{ 
+                      flex: 1, 
+                      padding: '14px 20px', 
+                      backgroundColor: '#f1f5f9',
+                      border: '1px solid transparent', 
+                      borderRadius: '24px', 
+                      outline: 'none',
+                      transition: 'all 0.2s',
+                      fontSize: '0.95rem'
+                    }}
+                    onFocus={(e) => { e.target.style.backgroundColor = 'white'; e.target.style.border = '1px solid #c7d2fe'; e.target.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)' }}
+                    onBlur={(e) => { e.target.style.backgroundColor = '#f1f5f9'; e.target.style.border = '1px solid transparent'; e.target.style.boxShadow = 'none' }}
                   />
                   <button 
                     onClick={handleSend}
                     disabled={!inputValue.trim()}
-                    style={{ background: 'var(--primary-main)', color: 'white', border: 'none', width: '48px', height: '48px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: inputValue.trim() ? 'pointer' : 'not-allowed', opacity: inputValue.trim() ? 1 : 0.6 }}
+                    style={{ 
+                      background: 'linear-gradient(135deg, var(--primary-main), #818cf8)', 
+                      color: 'white', 
+                      border: 'none', 
+                      width: '48px', height: '48px', 
+                      borderRadius: '50%', 
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                      cursor: inputValue.trim() ? 'pointer' : 'not-allowed', 
+                      opacity: inputValue.trim() ? 1 : 0.6,
+                      boxShadow: inputValue.trim() ? '0 4px 12px rgba(99, 102, 241, 0.3)' : 'none',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseOver={(e) => { if(inputValue.trim()) e.currentTarget.style.transform = 'scale(1.05)'; }}
+                    onMouseOut={(e) => { if(inputValue.trim()) e.currentTarget.style.transform = 'scale(1)'; }}
                   >
                     <Send size={20} style={{ marginLeft: '2px' }} />
                   </button>
                 </div>
               </>
             ) : (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-                <MessageSquare size={48} style={{ opacity: 0.2, marginBottom: '16px' }} />
-                <h3>{language === 'th' ? 'เลือกผู้ใช้เพื่อเริ่มแชท' : 'Select a user to start chatting'}</h3>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', background: 'linear-gradient(180deg, #f8fafc, #f1f5f9)' }}>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 16px rgba(0,0,0,0.05)', marginBottom: '20px' }}>
+                  <MessageSquare size={36} color="var(--primary-main)" style={{ opacity: 0.8 }} />
+                </div>
+                <h3 style={{ margin: 0, color: 'var(--text-main)', fontWeight: 600 }}>{language === 'th' ? 'แชทกับผู้ใช้' : 'User Chats'}</h3>
+                <p style={{ marginTop: '8px', fontSize: '0.9rem' }}>{language === 'th' ? 'เลือกผู้ใช้จากแถบด้านซ้ายเพื่อเริ่มสนทนา' : 'Select a user from the left sidebar to start chatting'}</p>
               </div>
             )}
           </div>
