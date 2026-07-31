@@ -47,6 +47,8 @@ const AdminUserTransactions = () => {
   }
 
   const { user, balance, transactions } = data;
+  const totalIncome = transactions.reduce((acc, tx) => tx.category.type === 'income' ? acc + tx.amount : acc, 0);
+  const totalExpense = transactions.reduce((acc, tx) => tx.category.type === 'expense' ? acc + tx.amount : acc, 0);
 
   return (
     <Layout>
@@ -101,12 +103,28 @@ const AdminUserTransactions = () => {
                 ))}
               </tbody>
               <tfoot>
-                <tr style={{ background: 'var(--bg-hover)', borderTop: '2px solid var(--border)' }}>
-                  <td colSpan="3" style={{ padding: '16px', fontWeight: 'bold', textAlign: 'right' }}>
-                    {language === 'th' ? 'รวมทั้งหมด (' + transactions.length + ' ธุรกรรม):' : 'Total (' + transactions.length + ' transactions):'}
+                <tr style={{ borderTop: '2px solid var(--border)' }}>
+                  <td colSpan="3" style={{ padding: '12px 16px', fontWeight: 'bold', textAlign: 'right', color: 'var(--text-muted)' }}>
+                    {language === 'th' ? 'รวมรายรับ (Total Income):' : 'Total Income:'}
                   </td>
-                  <td style={{ padding: '16px', fontWeight: 'bold', textAlign: 'right', color: balance >= 0 ? 'var(--income)' : 'var(--expense)' }}>
-                    ฿{balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  <td style={{ padding: '12px 16px', fontWeight: 'bold', textAlign: 'right', color: 'var(--income)' }}>
+                    +฿{totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan="3" style={{ padding: '12px 16px', fontWeight: 'bold', textAlign: 'right', color: 'var(--text-muted)' }}>
+                    {language === 'th' ? 'รวมรายจ่าย (Total Expense):' : 'Total Expense:'}
+                  </td>
+                  <td style={{ padding: '12px 16px', fontWeight: 'bold', textAlign: 'right', color: 'var(--expense)' }}>
+                    -฿{totalExpense.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  </td>
+                </tr>
+                <tr style={{ background: 'var(--bg-hover)', borderTop: '2px solid var(--border)' }}>
+                  <td colSpan="3" style={{ padding: '16px', fontWeight: 'bold', textAlign: 'right', color: 'var(--text-main)', fontSize: '1.05rem' }}>
+                    {language === 'th' ? 'ยอดคงเหลือสุทธิ (Net Balance):' : 'Net Balance:'}
+                  </td>
+                  <td style={{ padding: '16px', fontWeight: 'bold', textAlign: 'right', color: balance >= 0 ? 'var(--income)' : 'var(--expense)', fontSize: '1.1rem' }}>
+                    {balance >= 0 ? '+' : ''}฿{balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </td>
                 </tr>
               </tfoot>
