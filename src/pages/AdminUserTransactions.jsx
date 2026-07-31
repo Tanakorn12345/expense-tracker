@@ -120,7 +120,6 @@ const AdminUserTransactions = () => {
           </div>
         </div>
 
-        </div>
 
         {filteredTransactions.length === 0 ? (
           <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>
