@@ -86,12 +86,13 @@ const AdminUserTransactions = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.5rem', gap: '1rem' }}>
           <h3 style={{ margin: 0 }}>{language === 'th' ? 'ประวัติธุรกรรม' : 'Transaction History'}</h3>
           
-          <div className="date-picker flex gap-4" style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <select 
-              className="form-control" 
-              style={{ width: 'auto', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)' }}
+              style={{ padding: '10px 16px', borderRadius: '12px', border: '1px solid var(--border)', background: '#f8fafc', color: 'var(--text-main)', fontWeight: 500, cursor: 'pointer', outline: 'none', transition: 'all 0.2s', fontSize: '0.9rem' }}
               value={filterMonth}
               onChange={(e) => setFilterMonth(e.target.value)}
+              onMouseOver={(e) => e.target.style.borderColor = 'var(--primary-main)'}
+              onMouseOut={(e) => e.target.style.borderColor = 'var(--border)'}
             >
               <option value="all">{language === 'th' ? 'ทุกเดือน' : 'All Months'}</option>
               {Array.from({ length: 12 }).map((_, i) => (
@@ -101,10 +102,11 @@ const AdminUserTransactions = () => {
               ))}
             </select>
             <select
-              className="form-control"
-              style={{ width: 'auto', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)' }}
+              style={{ padding: '10px 16px', borderRadius: '12px', border: '1px solid var(--border)', background: '#f8fafc', color: 'var(--text-main)', fontWeight: 500, cursor: 'pointer', outline: 'none', transition: 'all 0.2s', fontSize: '0.9rem' }}
               value={filterYear}
               onChange={(e) => setFilterYear(e.target.value)}
+              onMouseOver={(e) => e.target.style.borderColor = 'var(--primary-main)'}
+              onMouseOut={(e) => e.target.style.borderColor = 'var(--border)'}
             >
               {Array.from({ length: 5 }).map((_, i) => {
                 const year = new Date().getFullYear() - i;
@@ -115,6 +117,25 @@ const AdminUserTransactions = () => {
                 );
               })}
             </select>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', background: '#f8fafc', padding: '20px 24px', borderRadius: '16px', marginBottom: '2rem', border: '1px solid var(--border)', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '4px', fontWeight: 500 }}>{language === 'th' ? 'รวมรายรับ' : 'Total Income'}</span>
+              <span style={{ color: 'var(--income)', fontWeight: 'bold', fontSize: '1.2rem' }}>+฿{totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '4px', fontWeight: 500 }}>{language === 'th' ? 'รวมรายจ่าย' : 'Total Expense'}</span>
+              <span style={{ color: 'var(--expense)', fontWeight: 'bold', fontSize: '1.2rem' }}>-฿{totalExpense.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '4px', fontWeight: 500 }}>{language === 'th' ? 'ยอดสุทธิ (Net)' : 'Net Balance'}</span>
+            <span style={{ color: filteredBalance >= 0 ? 'var(--income)' : 'var(--expense)', fontWeight: 'bold', fontSize: '1.4rem' }}>
+              {filteredBalance >= 0 ? '+' : ''}฿{filteredBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            </span>
           </div>
         </div>
 
@@ -152,30 +173,6 @@ const AdminUserTransactions = () => {
                   </tr>
                 ))}
               </tbody>
-              <tfoot>
-                <tr style={{ background: 'var(--bg-hover)', borderTop: '2px solid var(--border)' }}>
-                  <td colSpan="4" style={{ padding: '16px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-                      <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-                        <div>
-                          <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginRight: '8px' }}>{language === 'th' ? 'รวมรายรับ:' : 'Income:'}</span>
-                          <span style={{ color: 'var(--income)', fontWeight: 'bold' }}>+฿{totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                        <div>
-                          <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginRight: '8px' }}>{language === 'th' ? 'รวมรายจ่าย:' : 'Expense:'}</span>
-                          <span style={{ color: 'var(--expense)', fontWeight: 'bold' }}>-฿{totalExpense.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                      </div>
-                      <div style={{ fontSize: '1.05rem' }}>
-                        <span style={{ color: 'var(--text-main)', fontWeight: 'bold', marginRight: '12px' }}>{language === 'th' ? 'ยอดสุทธิ (Net):' : 'Net Balance:'}</span>
-                        <span style={{ color: filteredBalance >= 0 ? 'var(--income)' : 'var(--expense)', fontWeight: 'bold', fontSize: '1.1rem' }}>
-                          {filteredBalance >= 0 ? '+' : ''}฿{filteredBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                        </span>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </tfoot>
             </table>
           </div>
         )}
