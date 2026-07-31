@@ -86,7 +86,7 @@ const AdminUserTransactions = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.5rem', gap: '1rem' }}>
           <h3 style={{ margin: 0 }}>{language === 'th' ? 'ประวัติธุรกรรม' : 'Transaction History'}</h3>
           
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <div className="date-picker" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <select 
               style={{ padding: '10px 16px', borderRadius: '12px', border: '1px solid var(--border)', background: '#f8fafc', color: 'var(--text-main)', fontWeight: 500, cursor: 'pointer', outline: 'none', transition: 'all 0.2s', fontSize: '0.9rem' }}
               value={filterMonth}
@@ -161,7 +161,7 @@ const AdminUserTransactions = () => {
         )}
 
         {filteredTransactions.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', background: '#f8fafc', padding: '20px 24px', borderRadius: '16px', marginTop: '1.5rem', border: '1px solid var(--border)', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="admin-summary-card">
             <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '4px', fontWeight: 500 }}>{language === 'th' ? 'รวมรายรับ' : 'Total Income'}</span>

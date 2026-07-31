@@ -684,6 +684,32 @@ select.form-control {
 }
 
 /* --- New UI Components --- */
+.admin-summary-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  background: #f8fafc;
+  padding: 20px 24px;
+  border-radius: 16px;
+  margin-top: 1.5rem;
+  border: 1px solid var(--border);
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .admin-summary-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 16px;
+  }
+  .admin-summary-card > div:last-child {
+    align-items: flex-start !important;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+  }
+}
 
 /* Lang Toggle */
 .lang-toggle-wrapper {
