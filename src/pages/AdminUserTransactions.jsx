@@ -12,6 +12,13 @@ const AdminUserTransactions = () => {
   const { language } = useLanguage();
   const [data, setData] = useState({ user: null, balance: 0, transactions: [] });
   const [loading, setLoading] = useState(true);
+  const [filterMonth, setFilterMonth] = useState('all');
+  const [filterYear, setFilterYear] = useState(new Date().getFullYear().toString());
+
+  const getMonthName = (monthIndex) => {
+    const date = new Date(2024, monthIndex, 1);
+    return date.toLocaleString(language === 'th' ? 'th-TH' : 'en-US', { month: 'long' });
+  };
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -46,9 +53,18 @@ const AdminUserTransactions = () => {
     );
   }
 
-  const { user, balance, transactions } = data;
-  const totalIncome = transactions.reduce((acc, tx) => tx.category.type === 'income' ? acc + tx.amount : acc, 0);
-  const totalExpense = transactions.reduce((acc, tx) => tx.category.type === 'expense' ? acc + tx.amount : acc, 0);
+  const { user, balance: totalBalance, transactions } = data;
+  
+  const filteredTransactions = transactions.filter(tx => {
+    const txDate = new Date(tx.date);
+    const matchYear = txDate.getFullYear().toString() === filterYear;
+    const matchMonth = filterMonth === 'all' || txDate.getMonth().toString() === filterMonth;
+    return matchYear && matchMonth;
+  });
+
+  const totalIncome = filteredTransactions.reduce((acc, tx) => tx.category.type === 'income' ? acc + tx.amount : acc, 0);
+  const totalExpense = filteredTransactions.reduce((acc, tx) => tx.category.type === 'expense' ? acc + tx.amount : acc, 0);
+  const filteredBalance = totalIncome - totalExpense;
 
   return (
     <Layout>
@@ -67,8 +83,42 @@ const AdminUserTransactions = () => {
       </div>
 
       <div className="card">
-        <h3 style={{ marginBottom: '1.5rem' }}>{language === 'th' ? 'ประวัติธุรกรรม' : 'Transaction History'}</h3>
-        {transactions.length === 0 ? (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.5rem', gap: '1rem' }}>
+          <h3 style={{ margin: 0 }}>{language === 'th' ? 'ประวัติธุรกรรม' : 'Transaction History'}</h3>
+          
+          <div className="date-picker flex gap-4" style={{ display: 'flex', gap: '8px' }}>
+            <select 
+              className="form-control" 
+              style={{ width: 'auto', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)' }}
+              value={filterMonth}
+              onChange={(e) => setFilterMonth(e.target.value)}
+            >
+              <option value="all">{language === 'th' ? 'ทุกเดือน' : 'All Months'}</option>
+              {Array.from({ length: 12 }).map((_, i) => (
+                <option key={i} value={i.toString()}>
+                  {getMonthName(i)}
+                </option>
+              ))}
+            </select>
+            <select
+              className="form-control"
+              style={{ width: 'auto', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)' }}
+              value={filterYear}
+              onChange={(e) => setFilterYear(e.target.value)}
+            >
+              {Array.from({ length: 5 }).map((_, i) => {
+                const year = new Date().getFullYear() - i;
+                return (
+                  <option key={year} value={year.toString()}>
+                    {year}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+        </div>
+
+        {filteredTransactions.length === 0 ? (
           <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>
             {language === 'th' ? 'ไม่มีรายการธุรกรรม' : 'No transactions found'}
           </p>
@@ -84,7 +134,7 @@ const AdminUserTransactions = () => {
                 </tr>
               </thead>
               <tbody>
-                {transactions.map(tx => (
+                {filteredTransactions.map(tx => (
                   <tr key={tx.id} style={{ borderBottom: '1px solid var(--border)', transition: 'background-color 0.2s' }} className="table-row-hover">
                     <td style={{ padding: '16px' }}>
                       {new Date(tx.date).toLocaleDateString(language === 'th' ? 'th-TH' : 'en-US', { dateStyle: 'medium' })}
@@ -117,9 +167,9 @@ const AdminUserTransactions = () => {
                         </div>
                       </div>
                       <div style={{ fontSize: '1.05rem' }}>
-                        <span style={{ color: 'var(--text-main)', fontWeight: 'bold', marginRight: '12px' }}>{language === 'th' ? 'ยอดคงเหลือสุทธิ:' : 'Net Balance:'}</span>
-                        <span style={{ color: balance >= 0 ? 'var(--income)' : 'var(--expense)', fontWeight: 'bold', fontSize: '1.1rem' }}>
-                          {balance >= 0 ? '+' : ''}฿{balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        <span style={{ color: 'var(--text-main)', fontWeight: 'bold', marginRight: '12px' }}>{language === 'th' ? 'ยอดสุทธิ (Net):' : 'Net Balance:'}</span>
+                        <span style={{ color: filteredBalance >= 0 ? 'var(--income)' : 'var(--expense)', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                          {filteredBalance >= 0 ? '+' : ''}฿{filteredBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                         </span>
                       </div>
                     </div>
