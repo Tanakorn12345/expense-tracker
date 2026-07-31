@@ -39,6 +39,11 @@ export default function AdModal({ ad, onClose }) {
     return <ProUpgradeModal isOpen={true} onClose={onClose} onSuccess={() => window.location.reload()} />;
   }
 
+  const descLines = ad?.description ? ad.description.split('\n').filter(l => l.trim() !== '') : [];
+  const title = descLines.length > 0 ? descLines[0] : '';
+  const subtitle = descLines.length > 1 ? descLines[1] : '';
+  const details = descLines.length > 2 ? descLines.slice(2).join('\n') : '';
+
   const modalContent = (
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -47,48 +52,77 @@ export default function AdModal({ ad, onClose }) {
       backdropFilter: 'blur(10px)'
     }}>
       <div style={{
-        backgroundColor: 'var(--bg-card)', borderRadius: '16px',
-        padding: '2rem', width: '90%', maxWidth: '600px',
+        backgroundColor: 'var(--bg-card)', borderRadius: '24px',
+        padding: '0', width: '90%', maxWidth: '500px',
         maxHeight: '90vh', overflowY: 'auto',
-        textAlign: 'center', boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
-        animation: 'pageFadeInUp 0.5s ease-out'
+        textAlign: 'left', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+        animation: 'pageFadeInUp 0.4s ease-out'
       }}>
-        <div style={{ marginBottom: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          Advertisement closes in <strong style={{ color: 'var(--danger)', fontSize: '1.2rem' }}>{timeLeft}</strong> seconds
+        {/* Header / Timer */}
+        <div style={{ padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', backgroundColor: 'var(--bg-hover)' }}>
+           <span style={{ fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.9rem' }}>Advertisement</span>
+           <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', padding: '4px 12px', borderRadius: '100px', fontSize: '0.85rem', fontWeight: 'bold' }}>
+             Closes in {timeLeft}s
+           </div>
         </div>
         
-        {ad.images && ad.images.length > 0 && (
-          <div style={{ position: 'relative', width: '100%', height: '300px', borderRadius: '12px', overflow: 'hidden', marginBottom: '1rem', backgroundColor: '#000' }}>
-            <img 
-              src={ad.images[currentImageIndex]} 
-              alt="ad" 
-              style={{ width: '100%', height: '100%', objectFit: 'contain', transition: 'opacity 0.5s ease-in-out' }} 
-            />
-            {ad.images.length > 1 && (
-              <div style={{ position: 'absolute', bottom: '10px', width: '100%', display: 'flex', justifyContent: 'center', gap: '5px' }}>
-                {ad.images.map((_, idx) => (
-                  <div key={idx} style={{ 
-                    width: '8px', height: '8px', borderRadius: '50%', 
-                    backgroundColor: idx === currentImageIndex ? 'white' : 'rgba(255,255,255,0.5)' 
-                  }} />
-                ))}
+        <div style={{ padding: '1.5rem' }}>
+          {/* Image */}
+          {ad.images && ad.images.length > 0 && (
+            <div style={{ position: 'relative', width: '100%', height: '280px', borderRadius: '16px', overflow: 'hidden', marginBottom: '1.5rem', backgroundColor: '#f8fafc', border: '1px solid var(--border)' }}>
+              <img 
+                src={ad.images[currentImageIndex]} 
+                alt="ad" 
+                style={{ width: '100%', height: '100%', objectFit: 'contain', transition: 'opacity 0.5s ease-in-out' }} 
+              />
+              {ad.images.length > 1 && (
+                <div style={{ position: 'absolute', bottom: '12px', width: '100%', display: 'flex', justifyContent: 'center', gap: '6px' }}>
+                  {ad.images.map((_, idx) => (
+                    <div key={idx} style={{ 
+                      width: '8px', height: '8px', borderRadius: '50%', 
+                      backgroundColor: idx === currentImageIndex ? 'var(--primary-main)' : 'rgba(0,0,0,0.2)',
+                      transition: 'background-color 0.3s'
+                    }} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Text Content Sections */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
+            {descLines.length >= 3 ? (
+              <>
+                <h2 style={{ margin: 0, color: 'var(--text-main)', fontSize: '1.4rem', fontWeight: 700, lineHeight: 1.3 }}>{title}</h2>
+                <h4 style={{ margin: 0, color: 'var(--primary-main)', fontSize: '1.05rem', fontWeight: 600 }}>{subtitle}</h4>
+                <div style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.6, background: 'var(--bg-hover)', padding: '1rem', borderRadius: '12px', whiteSpace: 'pre-line' }}>
+                  {details}
+                </div>
+              </>
+            ) : descLines.length > 0 ? (
+              <div style={{ color: 'var(--text-main)', fontSize: '1.1rem', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
+                {ad.description}
               </div>
-            )}
+            ) : null}
           </div>
-        )}
 
-        <h3 style={{ marginBottom: '0.5rem', color: 'var(--text-main)' }}>{ad.description}</h3>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem' }}>
-          Sponsored by: {ad.ownerEmail}
-        </p>
+          {/* Footer Info */}
+          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem', borderTop: '1px dashed var(--border)', paddingTop: '1rem' }}>
+            <span style={{ display: 'inline-flex', padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: '6px', fontWeight: 500 }}>Sponsored by</span>
+            {ad.ownerEmail}
+          </div>
 
-        <button 
-          onClick={handleUpgrade}
-          className="btn btn-primary" 
-          style={{ width: '100%', padding: '1rem', fontSize: '1.1rem', fontWeight: 'bold', background: 'linear-gradient(135deg, var(--warning), #F39C12)', color: '#000', border: 'none' }}
-        >
-          ✨ สมัคร PRO สิ ถ้าอยากข้ามโฆษณา ✨
-        </button>
+          {/* Action Button */}
+          <button 
+            onClick={handleUpgrade}
+            className="btn" 
+            style={{ width: '100%', padding: '1rem', fontSize: '1.05rem', fontWeight: 'bold', background: 'linear-gradient(135deg, var(--warning), #F39C12)', color: '#000', border: 'none', borderRadius: '12px', boxShadow: '0 4px 12px rgba(243, 156, 18, 0.3)', cursor: 'pointer', transition: 'transform 0.1s' }}
+            onMouseOver={(e) => e.target.style.transform = 'scale(1.02)'}
+            onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+          >
+            ✨ สมัคร PRO สิ ถ้าอยากข้ามโฆษณา ✨
+          </button>
+        </div>
       </div>
     </div>
   );
