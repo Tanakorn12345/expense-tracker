@@ -112,29 +112,32 @@ const AdminDashboard = () => {
     const { value: formValues } = await Swal.fire({
       title: language === 'th' ? 'แก้ไขผู้ใช้' : 'Edit User',
       html: `
-        <div style="text-align: left;">
-          <label style="display:block; margin-bottom: 5px;">Name:</label>
-          <input id="swal-input1" class="swal2-input" value="${user.name || ''}" placeholder="Name" style="max-width: 100%; box-sizing: border-box; width: calc(100% - 2rem);">
+        <div style="text-align: left; padding: 0 10px;">
+          <label style="display:block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: var(--text-main);">Name:</label>
+          <input id="swal-input1" class="swal2-input" value="${user.name || ''}" placeholder="Name" style="margin: 0 0 15px 0; width: 100%;">
           
-          <label style="display:block; margin-top: 15px; margin-bottom: 5px;">Email:</label>
-          <input id="swal-input2" class="swal2-input" value="${user.email}" placeholder="Email" style="max-width: 100%; box-sizing: border-box; width: calc(100% - 2rem);">
+          <label style="display:block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: var(--text-main);">Email:</label>
+          <input id="swal-input2" class="swal2-input" value="${user.email}" placeholder="Email" style="margin: 0 0 15px 0; width: 100%;">
           
-          <label style="display:block; margin-top: 15px; margin-bottom: 5px;">Theme Color:</label>
-          <input type="color" id="swal-color" value="${user.themeColor || '#0a2540'}" style="width: 100%; height: 40px; cursor: pointer; border: none; border-radius: 8px; padding: 0;">
+          <label style="display:block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: var(--text-main);">Theme Color:</label>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+            <input type="color" id="swal-color" value="${user.themeColor || '#0a2540'}" style="width: 50px; height: 50px; cursor: pointer; border: none; border-radius: 8px; padding: 0; background: none;">
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Click to pick a color</span>
+          </div>
 
-          <label style="display:block; margin-top: 15px; margin-bottom: 5px;">Custom Logo:</label>
-          <input type="file" id="swal-logo" accept="image/*" style="width: 100%; box-sizing: border-box;">
-          ${user.customLogoUrl ? `<img src="${user.customLogoUrl}" style="max-width: 100px; max-height: 100px; margin-top: 10px; border-radius: 8px;" alt="Custom Logo" />` : ''}
+          <label style="display:block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: var(--text-main);">Custom Logo:</label>
+          <input type="file" id="swal-logo" accept="image/*" style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px dashed var(--border); border-radius: 8px; margin-bottom: 10px; background: #f8fafc;">
+          ${user.customLogoUrl ? `<div style="margin-bottom: 15px;"><img src="${user.customLogoUrl}" style="max-width: 80px; max-height: 80px; border-radius: 8px; border: 1px solid var(--border);" alt="Custom Logo" /></div>` : '<div style="margin-bottom: 15px;"></div>'}
 
-          <label style="display:block; margin-top: 15px; margin-bottom: 5px;">Custom App Name:</label>
-          <input id="swal-appname" class="swal2-input" value="${user.customAppName || ''}" placeholder="Leave empty for FinTrack" style="max-width: 100%; box-sizing: border-box; width: calc(100% - 2rem); margin-top: 0;">
+          <label style="display:block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: var(--text-main);">Custom App Name:</label>
+          <input id="swal-appname" class="swal2-input" value="${user.customAppName || ''}" placeholder="Leave empty for FinTrack" style="margin: 0 0 20px 0; width: 100%;">
 
-          <label style="display:flex; align-items:center; margin-top: 15px; cursor: pointer;">
-            <label class="custom-toggle" style="margin-right: 12px;">
+          <label style="display:flex; align-items:center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px; border: 1px solid var(--border);">
+            <label class="custom-toggle" style="margin-right: 12px; margin-bottom: 0;">
               <input type="checkbox" id="swal-input3" ${user.isPro ? 'checked' : ''}>
               <span class="custom-toggle-slider"></span>
             </label>
-            Is Pro User
+            <span style="font-weight: 500; color: var(--text-main);">Pro User Access</span>
           </label>
         </div>
       `,
@@ -212,16 +215,22 @@ const AdminDashboard = () => {
     const { value: formValues } = await Swal.fire({
       title: language === 'th' ? 'สร้างผู้ใช้ใหม่' : 'Create User',
       html: `
-        <div style="text-align: left;">
-          <input id="swal-create1" class="swal2-input" placeholder="Name" style="max-width: 100%; box-sizing: border-box; width: calc(100% - 2rem);">
-          <input id="swal-create2" class="swal2-input" placeholder="Email (required)" style="max-width: 100%; box-sizing: border-box; width: calc(100% - 2rem);">
-          <input type="password" id="swal-create3" class="swal2-input" placeholder="Password (required)" style="max-width: 100%; box-sizing: border-box; width: calc(100% - 2rem);">
-          <label style="display:flex; align-items:center; margin-top: 15px; margin-left: 5px; cursor: pointer;">
-            <label class="custom-toggle" style="margin-right: 12px;">
+        <div style="text-align: left; padding: 0 10px;">
+          <label style="display:block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: var(--text-main);">Name:</label>
+          <input id="swal-create1" class="swal2-input" placeholder="Enter full name" style="margin: 0 0 15px 0; width: 100%;">
+          
+          <label style="display:block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: var(--text-main);">Email (required):</label>
+          <input id="swal-create2" class="swal2-input" placeholder="Enter email address" style="margin: 0 0 15px 0; width: 100%;">
+          
+          <label style="display:block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: var(--text-main);">Password (required):</label>
+          <input type="password" id="swal-create3" class="swal2-input" placeholder="Enter password" style="margin: 0 0 20px 0; width: 100%;">
+          
+          <label style="display:flex; align-items:center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px; border: 1px solid var(--border);">
+            <label class="custom-toggle" style="margin-right: 12px; margin-bottom: 0;">
               <input type="checkbox" id="swal-create4">
               <span class="custom-toggle-slider"></span>
             </label>
-            Is Pro User
+            <span style="font-weight: 500; color: var(--text-main);">Pro User Access</span>
           </label>
         </div>
       `,
