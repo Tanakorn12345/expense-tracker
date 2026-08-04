@@ -1,3 +1,5 @@
+const prisma = require('../db/prisma');
+
 const auditMiddleware = (req, res, next) => {
   res.on('finish', () => {
     // Skip OPTIONS and chat websocket polling for less noise
@@ -9,40 +11,51 @@ const auditMiddleware = (req, res, next) => {
     const method = req.method;
     const url = req.originalUrl;
     
-    // Attempt to identify user
-    let userStr = 'Guest';
-    if (req.user) {
-      userStr = `User ${req.user.id} (${req.user.email})`;
+    const logAudit = (finalUserStr) => {
+      // Map methods to readable actions
+      let action = method;
+      switch(method) {
+        case 'GET': action = 'VIEWED'; break;
+        case 'POST': action = 'CREATED/SUBMITTED'; break;
+        case 'PUT': action = 'UPDATED'; break;
+        case 'DELETE': action = 'DELETED'; break;
+      }
+
+      // Extract relevant payload data, filter out sensitive or huge fields
+      let bodyStr = '';
+      if (['POST', 'PUT'].includes(method) && req.body && Object.keys(req.body).length > 0) {
+        const safeBody = { ...req.body };
+        
+        // Remove sensitive/large fields
+        const hiddenFields = ['password', 'profilePic', 'images', 'customLogoUrl'];
+        hiddenFields.forEach(field => {
+          if (safeBody[field] !== undefined) {
+            safeBody[field] = '[REDACTED]';
+          }
+        });
+        
+        bodyStr = ` | Data: ${JSON.stringify(safeBody)}`;
+      }
+
+      console.log(`[AUDIT] ${status} | ${action} ${url} | ${finalUserStr}${bodyStr}`);
+    };
+
+    // Attempt to identify user by querying the database asynchronously
+    if (req.user && req.user.id) {
+      prisma.user.findUnique({ where: { id: req.user.id }, select: { id: true, name: true, email: true } })
+        .then(u => {
+          if (u) {
+            logAudit(`User ${u.id} (${u.name} : ${u.email})`);
+          } else {
+            logAudit(`User ${req.user.id} (Unknown)`);
+          }
+        })
+        .catch(() => logAudit(`User ${req.user.id} (Error DB)`));
     } else if (req.body && req.body.email && url.includes('/login')) {
-      userStr = `Login Attempt (${req.body.email})`;
+      logAudit(`Login Attempt (${req.body.email})`);
+    } else {
+      logAudit('Guest');
     }
-
-    // Map methods to readable actions
-    let action = method;
-    switch(method) {
-      case 'GET': action = 'VIEWED'; break;
-      case 'POST': action = 'CREATED/SUBMITTED'; break;
-      case 'PUT': action = 'UPDATED'; break;
-      case 'DELETE': action = 'DELETED'; break;
-    }
-
-    // Extract relevant payload data, filter out sensitive or huge fields
-    let bodyStr = '';
-    if (['POST', 'PUT'].includes(method) && req.body && Object.keys(req.body).length > 0) {
-      const safeBody = { ...req.body };
-      
-      // Remove sensitive/large fields
-      const hiddenFields = ['password', 'profilePic', 'images', 'customLogoUrl'];
-      hiddenFields.forEach(field => {
-        if (safeBody[field] !== undefined) {
-          safeBody[field] = '[REDACTED]';
-        }
-      });
-      
-      bodyStr = ` | Data: ${JSON.stringify(safeBody)}`;
-    }
-
-    console.log(`[AUDIT] ${status} | ${action} ${url} | ${userStr}${bodyStr}`);
   });
 
   next();
