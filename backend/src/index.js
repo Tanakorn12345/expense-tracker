@@ -26,6 +26,7 @@ const authenticate = require('./middleware/authMiddleware');
 const adminMiddleware = require('./middleware/adminMiddleware');
 const { initCronJobs } = require('./services/cronJobs');
 const { initSocket } = require('./socket');
+const auditMiddleware = require('./middleware/auditMiddleware');
 
 const app = express();
 const server = http.createServer(app);
@@ -54,6 +55,9 @@ const globalLimiter = rateLimit({
 app.use('/api', globalLimiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+// Global Audit Logger
+app.use(auditMiddleware);
 
 // Routes
 app.use('/api/auth', authRoutes);
