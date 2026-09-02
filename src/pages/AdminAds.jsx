@@ -110,14 +110,29 @@ export default function AdminAds() {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleEditClick = (ad) => {
-    setEditAdId(ad.id);
-    setImages(ad.images || []);
-    setDescription(ad.description || '');
-    setOwnerEmail(ad.ownerEmail || '');
-    setStartDate(formatDateForInput(ad.startDate));
-    setEndDate(formatDateForInput(ad.endDate));
-    setShowForm(true);
+  const handleEditClick = async (ad) => {
+    try {
+      // Show loading (optional, but good UX if the image is large)
+      Swal.fire({ title: 'Loading...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      
+      const res = await fetchWithAuth(`/api/ads/${ad.id}`);
+      if (res.ok) {
+        const fullAd = await res.json();
+        setEditAdId(fullAd.id);
+        setImages(fullAd.images || []);
+        setDescription(fullAd.description || '');
+        setOwnerEmail(fullAd.ownerEmail || '');
+        setStartDate(formatDateForInput(fullAd.startDate));
+        setEndDate(formatDateForInput(fullAd.endDate));
+        setShowForm(true);
+        Swal.close();
+      } else {
+        Swal.fire('Error', 'Failed to fetch ad details', 'error');
+      }
+    } catch (error) {
+      console.error('Fetch ad error:', error);
+      Swal.fire('Error', 'Server error', 'error');
+    }
   };
 
   const handleAddNewClick = () => {

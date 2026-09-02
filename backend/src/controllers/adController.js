@@ -22,9 +22,35 @@ exports.getActiveAds = async (req, res, next) => {
 exports.getAllAds = async (req, res, next) => {
   try {
     const ads = await prisma.advertisement.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        description: true,
+        ownerEmail: true,
+        startDate: true,
+        endDate: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true
+      }
     });
     res.json(ads);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Admin: Get single ad by ID (includes images)
+exports.getAdById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const ad = await prisma.advertisement.findUnique({
+      where: { id: parseInt(id) }
+    });
+    if (!ad) {
+      return res.status(404).json({ error: 'Ad not found' });
+    }
+    res.json(ad);
   } catch (error) {
     next(error);
   }

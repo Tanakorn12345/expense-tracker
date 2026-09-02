@@ -9,6 +9,7 @@ router.get('/active', authMiddleware, adController.getActiveAds);
 
 // Admin routes
 router.get('/', authMiddleware, adminMiddleware, adController.getAllAds);
+router.get('/:id', authMiddleware, adminMiddleware, adController.getAdById);
 router.post('/', authMiddleware, adminMiddleware, adController.createAd);
 router.put('/:id', authMiddleware, adminMiddleware, adController.updateAd);
 router.delete('/:id', authMiddleware, adminMiddleware, adController.deleteAd);
